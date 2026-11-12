@@ -75,7 +75,7 @@ function onSelect() {
     :class="[
       active
         ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
-        : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900',
+        : 'border-transparent bg-tile',
       selectable && !active ? 'press cursor-pointer hover:border-slate-300 hover:shadow-sm dark:hover:border-slate-600' : '',
       !selectable ? 'cursor-default' : '',
       bouncing && 'anim-select',

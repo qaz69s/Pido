@@ -33,6 +33,10 @@ export default {
         slate: palette('n'),
         brand: palette('b'),
         accent: palette('a'),
+        // 表面层级（见 themes.css 末尾 --s-*）：页面底色 / 卡片 / 卡片内的小块
+        page: 'rgb(var(--s-page) / <alpha-value>)',
+        surface: 'rgb(var(--s-card) / <alpha-value>)',
+        tile: 'rgb(var(--s-tile) / <alpha-value>)',
         // 主色背景上的文字色（大多数主题为白色，素墨深色下为深灰）
         'on-brand': 'rgb(var(--on-b, 255 255 255) / <alpha-value>)',
       },

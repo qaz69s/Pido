@@ -36,7 +36,7 @@ const statusInfo = computed(() => {
 
 <template>
   <header
-    class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200/80 bg-slate-50/80 px-4 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/80"
+    class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200/80 bg-page/80 px-4 backdrop-blur dark:border-slate-800/80 "
   >
     <!-- 手机端显示 Logo -->
     <span class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-600 text-on-brand md:hidden">

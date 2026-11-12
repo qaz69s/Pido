@@ -15,7 +15,7 @@ const activeIndex = computed(() => navItems.findIndex((n) => n.path === route.pa
 
 <template>
   <nav
-    class="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-white/90 backdrop-blur md:hidden dark:border-slate-800 dark:bg-slate-900/90"
+    class="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-slate-200 bg-surface/90 backdrop-blur md:hidden dark:border-slate-800 "
   >
     <div class="relative grid grid-cols-6">
       <!-- 指示条 -->

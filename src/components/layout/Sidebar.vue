@@ -11,7 +11,7 @@ const backend = useBackendStore()
 
 <template>
   <aside
-    class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-slate-200 bg-white md:flex dark:border-slate-800 dark:bg-slate-900"
+    class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-slate-200 bg-surface md:flex dark:border-slate-800 "
   >
     <!-- Logo -->
     <div class="flex h-14 items-center gap-2 px-5 text-lg font-semibold">

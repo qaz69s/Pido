@@ -10,7 +10,7 @@
     -webkit-tap-highlight-color: transparent;
   }
   body {
-    @apply bg-slate-50 text-slate-800 antialiased dark:bg-slate-950 dark:text-slate-200;
+    @apply bg-page text-slate-800 antialiased dark:text-slate-200;
     /* 中文字体按平台补齐：苹果 PingFang、华为 HarmonyOS、小米 MiSans、OPPO/realme OPPO Sans、其余 Noto */
     font-family: var(--font-sans);
     font-variant-numeric: tabular-nums; /* 数字等宽，测速 / 速率跳动时不抖 */
@@ -20,7 +20,7 @@
 /* ---------- 可复用组件类 ---------- */
 @layer components {
   .card {
-    @apply rounded-2xl border border-slate-200 bg-white shadow-sm dark:border-slate-800 dark:bg-slate-900;
+    @apply rounded-2xl border border-slate-200/80 bg-surface shadow-[0_1px_3px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.04)] dark:border-white/[0.06] dark:shadow-none;
   }
   .btn {
     @apply inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
