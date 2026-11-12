@@ -5,7 +5,7 @@
  * - 折叠时显示一排延迟色点，方便快速概览
  * - 动画：展开/收起高度过渡；整组测速时色点依次亮起；延迟更新时数字轻闪
  */
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { delayLevel, delayText, DELAY_BG_CLASS, DELAY_TEXT_CLASS } from '@/utils/format'
 import Icon from '@/components/common/Icon.vue'
 import ProxyNode from './ProxyNode.vue'
@@ -45,6 +45,20 @@ const nodes = computed(() => {
   }
   return list
 })
+
+/* ---------- 展开性能 ----------
+ * 节点网格第一次展开后就保留在 DOM 里（之后用 v-show 切换），
+ * 避免每次展开都重新创建几十上百个节点组件导致卡顿 */
+const rendered = ref(!props.collapsed)
+watch(
+  () => props.collapsed,
+  (c) => {
+    if (!c) rendered.value = true
+  },
+)
+// 节点超过 24 个时只做淡入淡出 + 轻微位移，不做高度动画（高度动画每帧都要重新排版整页，节点多了手机上会掉帧）
+const LARGE = 24
+const isLarge = computed(() => nodes.value.length > LARGE)
 </script>
 
 <template>
@@ -86,23 +100,22 @@ const nodes = computed(() => {
     </header>
 
     <!-- 折叠时：延迟色点，左侧与文字对齐（图标只占前两行，与展开时一致） -->
-    <ExpandTransition>
-      <div v-if="collapsed" class="-mt-1 flex flex-wrap gap-1 pb-3 pr-4" :class="group.icon ? 'pl-[68px]' : 'pl-4'">
-        <span
-          v-for="(n, i) in nodes"
-          :key="n.name"
-          class="h-2 w-2 rounded-full transition-colors duration-300"
-          :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900', testing && 'anim-sweep']"
-          :style="testing ? { animationDelay: `${(i % 30) * 45}ms` } : null"
-          :title="n.name"
-        />
-      </div>
-    </ExpandTransition>
+    <div v-if="collapsed" class="-mt-1 flex flex-wrap gap-1 pb-3 pr-4" :class="group.icon ? 'pl-[68px]' : 'pl-4'">
+      <span
+        v-for="(n, i) in nodes"
+        :key="n.name"
+        class="h-2 w-2 rounded-full transition-colors duration-300"
+        :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900', testing && 'anim-sweep']"
+        :style="testing ? { animationDelay: `${(i % 30) * 45}ms` } : null"
+        :title="n.name"
+      />
+    </div>
 
     <!-- 展开：节点网格（高度平滑拉开） -->
-    <ExpandTransition>
+    <ExpandTransition :fade-only="isLarge">
       <div
-        v-if="!collapsed"
+        v-if="rendered"
+        v-show="!collapsed"
         class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:border-slate-800"
       >
         <ProxyNode

@@ -4,8 +4,9 @@
  * - 点击卡片：切换到该节点（仅 Selector 组可切换）
  * - 点击延迟：单独测该节点延迟
  * - 动画：被选中时弹一下（.anim-select），延迟更新时数字轻闪（.anim-pop），按下轻微缩小
+ *   这两个动画只在挂载之后“变化”时才播放，展开网格时不会让几十个节点同时跑动画
  */
-import { computed } from 'vue'
+import { computed, ref, watch } from 'vue'
 import { delayLevel, delayText, DELAY_TEXT_CLASS } from '@/utils/format'
 import ProxyIcon from './ProxyIcon.vue'
 
@@ -22,6 +23,24 @@ const emit = defineEmits(['select', 'test'])
 
 const delayClass = computed(() => DELAY_TEXT_CLASS[delayLevel(props.delay)])
 
+/* 只在变化时触发动画：用自增 key 重新挂载数字/切换选中动画类 */
+const popKey = ref(0)
+const popping = ref(false)
+watch(
+  () => props.delay,
+  () => {
+    popKey.value++
+    popping.value = true
+  },
+)
+const bouncing = ref(false)
+watch(
+  () => props.active,
+  (a) => {
+    bouncing.value = a
+  },
+)
+
 function onSelect() {
   if (props.selectable && !props.active) emit('select')
 }
@@ -31,14 +50,16 @@ function onSelect() {
   <div
     role="button"
     :tabindex="selectable ? 0 : -1"
-    class="flex min-w-0 flex-col gap-1 rounded-xl border p-2.5 text-left transition duration-200"
+    class="flex min-w-0 flex-col gap-1 rounded-xl border p-2.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-200 [contain:layout_style]"
     :class="[
       active
-        ? 'anim-select border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
+        ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
         : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900',
       selectable && !active ? 'press cursor-pointer hover:border-slate-300 hover:shadow-sm dark:hover:border-slate-600' : '',
       !selectable ? 'cursor-default' : '',
+      bouncing && 'anim-select',
     ]"
+    @animationend.self="bouncing = false"
     @click="onSelect"
     @keydown.enter="onSelect"
   >
@@ -57,7 +78,7 @@ function onSelect() {
         @click.stop="emit('test')"
       >
         <span v-if="testing" class="inline-block animate-pulse">测速中</span>
-        <span v-else :key="delayText(delay)" class="anim-pop">{{ delayText(delay) }}</span>
+        <span v-else :key="popKey" :class="popping && 'anim-pop'">{{ delayText(delay) }}</span>
       </button>
     </div>
   </div>
