@@ -39,10 +39,10 @@ const statusInfo = computed(() => {
     class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200/80 bg-slate-50/80 px-4 backdrop-blur dark:border-slate-800/80 dark:bg-slate-950/80"
   >
     <!-- 手机端显示 Logo -->
-    <span class="grid h-7 w-7 place-items-center rounded-lg bg-brand-600 text-on-brand md:hidden">
+    <span class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-600 text-on-brand md:hidden">
       <Icon name="zap" class="h-4 w-4" />
     </span>
-    <h1 class="text-base font-semibold">{{ route.meta.title }}</h1>
+    <h1 class="shrink-0 whitespace-nowrap text-base font-semibold">{{ route.meta.title }}</h1>
 
     <div class="ml-auto flex items-center gap-1">
       <RouterLink

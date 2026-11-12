@@ -164,16 +164,16 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
 <template>
   <div class="space-y-3">
-    <!-- 工具栏 -->
-    <div class="flex flex-wrap items-center gap-2">
-      <div class="flex rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
+    <!-- 工具栏：固定一行不换行（系统字体放大时标签先截断）；手机端搜索框单独一行 -->
+    <div class="flex flex-nowrap items-center gap-2">
+      <div class="tb-tabs flex min-w-0 shrink-0 overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
         <button
           v-for="t in [
             { key: 'rules', label: '规则', count: rules.length },
             { key: 'providers', label: '规则集合', count: providerList.length },
           ]"
           :key="t.key"
-          class="rounded-md px-3 py-1 transition"
+          class="min-w-0 shrink truncate whitespace-nowrap rounded-md transition"
           :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
           @click="tab = t.key"
         >
@@ -182,27 +182,36 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       </div>
 
       <template v-if="tab === 'rules'">
-        <div class="relative order-last w-full sm:order-none sm:w-auto sm:flex-1">
+        <!-- 桌面端：搜索框内联 -->
+        <div class="relative hidden flex-1 sm:block">
           <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
           <input v-model="keyword" type="search" class="input py-1.5 pl-8" placeholder="搜索规则内容、类型或目标" />
         </div>
-        <select v-model="target" class="input ml-auto w-auto max-w-[45%] py-1.5 sm:ml-0" title="按目标筛选">
+        <select v-model="target" class="input ml-auto w-auto min-w-0 max-w-[45%] shrink py-1.5 sm:ml-0" title="按目标筛选">
           <option value="">全部目标</option>
           <option v-for="t in targets" :key="t.name" :value="t.name">{{ t.name }}（{{ t.n }}）</option>
         </select>
+        <div class="tb flex shrink-0 items-center">
+          <button class="btn-icon" title="刷新列表" @click="load({ silent: true })">
+            <Icon name="refresh" class="h-[18px] w-[18px]" />
+          </button>
+        </div>
       </template>
-      <div v-else class="ml-auto">
-        <button class="btn-primary" :disabled="updatingAll || !providerList.length" @click="onUpdateAll">
-          <Icon name="refresh" class="h-4 w-4" :class="updatingAll && 'animate-spin'" />
-          <span class="hidden sm:inline">全部更新</span>
+      <!-- 规则集合：只保留一个「全部更新」，更新完成后会自动刷新列表 -->
+      <div v-else class="tb ml-auto flex shrink-0 items-center">
+        <button class="btn-primary" title="全部更新（重新下载所有规则集合）" :disabled="updatingAll || !providerList.length" @click="onUpdateAll">
+          <Icon name="download" class="h-4 w-4" :class="updatingAll && 'animate-bounce'" />
+          <span class="whitespace-nowrap">{{ updatingAll ? '更新中' : '全部更新' }}</span>
         </button>
       </div>
-      <button class="btn-icon" :class="tab === 'providers' && 'ml-0'" title="刷新" @click="load({ silent: true })">
-        <Icon name="refresh" class="h-[18px] w-[18px]" />
-      </button>
     </div>
 
-    <!-- 加载中 -->
+    <!-- 手机端：搜索框单独一行 -->
+    <div v-if="tab === 'rules'" class="relative sm:hidden">
+      <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <input v-model="keyword" type="search" class="input py-1.5 pl-8" placeholder="搜索规则内容、类型或目标" />
+    </div>
+
     <div v-if="loading" class="card divide-y divide-slate-100 dark:divide-slate-800">
       <div v-for="i in 8" :key="i" class="skeleton h-12" />
     </div>
