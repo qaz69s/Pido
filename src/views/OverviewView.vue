@@ -72,12 +72,12 @@ onActivated(loadConfigs)
 const MODE_LABEL = { rule: '规则', global: '全局', direct: '直连' }
 
 const stats = computed(() => [
-  { label: '上传速率', value: formatSpeed(speed.up), icon: 'arrowUp', color: 'text-accent-500 bg-accent-500/10' },
-  { label: '下载速率', value: formatSpeed(speed.down), icon: 'arrowDown', color: 'text-brand-500 bg-brand-500/10' },
-  { label: '上传总量', value: formatBytes(conn.uploadTotal), icon: 'arrowUp', color: 'text-slate-500 bg-slate-500/10' },
-  { label: '下载总量', value: formatBytes(conn.downloadTotal), icon: 'arrowDown', color: 'text-slate-500 bg-slate-500/10' },
+  { label: '上传速率', value: formatSpeed(speed.up), icon: 'arrowUp', color: 'text-amber-500 bg-amber-500/10' },
+  { label: '下载速率', value: formatSpeed(speed.down), icon: 'arrowDown', color: 'text-sky-500 bg-sky-500/10' },
+  { label: '上传总量', value: formatBytes(conn.uploadTotal), icon: 'upload', color: 'text-amber-500/80 bg-amber-500/5' },
+  { label: '下载总量', value: formatBytes(conn.downloadTotal), icon: 'download', color: 'text-sky-500/80 bg-sky-500/5' },
   { label: '内存占用', value: formatBytes(memory.value), icon: 'cpu', color: 'text-emerald-500 bg-emerald-500/10' },
-  { label: '活动连接', value: String(conn.count), icon: 'link', color: 'text-sky-500 bg-sky-500/10' },
+  { label: '活动连接', value: String(conn.count), icon: 'link', color: 'text-violet-500 bg-violet-500/10' },
 ])
 
 const infoRows = computed(() => {
@@ -121,11 +121,12 @@ const infoRows = computed(() => {
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-semibold">实时流量</h2>
           <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-accent-500" />上传</span>
-            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-brand-500" />下载</span>
+            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-amber-500" />上传</span>
+            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-sky-500" />下载</span>
           </div>
         </div>
-        <TrafficChart :up="upHistory" :down="downHistory" :height="240" />
+        <!-- 上传琥珀、下载天蓝，与上方卡片一致，不随主题变化 -->
+        <TrafficChart :up="upHistory" :down="downHistory" up-color="#f59e0b" down-color="#0ea5e9" :height="240" />
       </section>
 
       <!-- 运行信息 -->
