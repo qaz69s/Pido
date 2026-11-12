@@ -153,7 +153,16 @@ async function toggle(key, value, okText) {
 }
 
 /* ---------- TUN ---------- */
-const TUN_STACKS = ['gVisor', 'System', 'Mixed']
+/**
+ * TUN 网络栈（值与 mihomo 返回的大小写一致）
+ * Mips 为 mihomo 自研 IP 协议栈，新版本内核的默认值；旧内核不认识时会保持原来的栈
+ */
+const TUN_STACKS = ['Mips', 'System', 'gVisor', 'Mixed']
+/** 下拉框选项：当前内核返回了列表外的值时也显示出来，避免显示错位 */
+const tunStackOptions = computed(() => {
+  const cur = tun.value.stack
+  return cur && !TUN_STACKS.some((s) => s.toLowerCase() === String(cur).toLowerCase()) ? [...TUN_STACKS, cur] : TUN_STACKS
+})
 const tun = computed(() => cfg.value?.tun || {})
 
 async function setTun(partial, okText) {
@@ -163,6 +172,9 @@ async function setTun(partial, okText) {
   // 开启 TUN 需要管理员 / root 权限，失败时后端不会报错，只是状态没变
   if (wantEnable === true && !cfg.value?.tun?.enable) {
     toast.warning('TUN 未能开启：通常需要以管理员 / root 权限运行 mihomo，详情见日志页', { timeout: 6000 })
+  } else if (partial.stack && String(cfg.value?.tun?.stack || '').toLowerCase() !== partial.stack.toLowerCase()) {
+    // 旧内核不认识新的网络栈（如 Mips）时不会报错，只是保持原值
+    toast.warning(`当前内核不支持 ${partial.stack} 网络栈，请先升级 mihomo`, { timeout: 6000 })
   } else {
     toast.success(okText)
   }
@@ -402,14 +414,14 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                 @update:model-value="(v) => setTun({ enable: v }, v ? 'TUN 已开启' : 'TUN 已关闭')"
               />
             </SettingRow>
-            <SettingRow title="网络栈" description="System 性能好；gVisor 兼容性好；Mixed 兼顾两者">
+            <SettingRow title="网络栈" description="Mips 为 mihomo 自研栈（推荐）；System 占用低；gVisor 隔离性好；Mixed 兼顾">
               <select
                 class="input w-auto py-1.5"
                 :value="tun.stack"
                 :disabled="!!saving.tun"
                 @change="(e) => setTun({ stack: e.target.value }, `网络栈已切换为 ${e.target.value}`)"
               >
-                <option v-for="s in TUN_STACKS" :key="s" :value="s">{{ s }}</option>
+                <option v-for="s in tunStackOptions" :key="s" :value="s">{{ s }}</option>
               </select>
             </SettingRow>
             <SettingRow title="自动路由" description="auto-route，自动设置系统路由表">
