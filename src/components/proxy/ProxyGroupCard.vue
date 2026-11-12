@@ -56,8 +56,8 @@ watch(
     if (!c) rendered.value = true
   },
 )
-// 节点超过 24 个时只做淡入淡出 + 轻微位移，不做高度动画（高度动画每帧都要重新排版整页，节点多了手机上会掉帧）
-const LARGE = 24
+// 一律只做淡入淡出 + 轻微位移，不做高度动画：高度动画每帧都要重新排版整页，用户真机（Android Chrome）上即使 10 个节点也掉帧
+const LARGE = 0
 const isLarge = computed(() => nodes.value.length > LARGE)
 </script>
 

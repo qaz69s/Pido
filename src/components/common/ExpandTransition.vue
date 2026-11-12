@@ -51,11 +51,12 @@ function clear(el) {
 }
 
 function onEnter(el, done) {
-  if (props.fadeOnly) return run(el, { opacity: '0', transform: 'translateY(-6px)' }, { opacity: '1', transform: 'none' }, done)
+  if (props.fadeOnly) return run(el, { opacity: '0', transform: 'translateY(-8px) scale(0.98)' }, { opacity: '1', transform: 'none' }, done)
   run(el, { height: '0px', opacity: '0' }, { height: `${el.scrollHeight}px`, opacity: '1' }, done)
 }
 function onLeave(el, done) {
-  if (props.fadeOnly) return run(el, { opacity: '1', transform: 'none' }, { opacity: '0', transform: 'translateY(-6px)' }, done)
+  // 淡入模式下收起直接隐藏：淡出期间内容仍占位，反而显得拖沓
+  if (props.fadeOnly) return done()
   run(el, { height: `${el.offsetHeight}px`, opacity: '1' }, { height: '0px', opacity: '0' }, done)
 }
 </script>
