@@ -75,7 +75,7 @@ const isLarge = computed(() => nodes.value.length > LARGE)
           <h3 class="max-w-full shrink-0 truncate font-semibold">{{ group.name }}</h3>
           <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ group.type }} · {{ group.all?.length || 0 }}</span>
           <!-- 右上角：当前节点延迟 -->
-          <span v-if="nowDelay !== undefined" class="ml-auto shrink-0 text-xs font-medium tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]">
+          <span v-if="nowDelay !== undefined" class="ml-auto shrink-0 text-[13px] font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]">
             <span :key="delayText(nowDelay)" class="anim-pop">{{ delayText(nowDelay) }}</span>
           </span>
         </div>

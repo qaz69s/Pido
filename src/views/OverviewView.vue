@@ -82,12 +82,12 @@ const tMemory = useTween(() => memory.value)
 const tCount = useTween(() => conn.count)
 
 const stats = computed(() => [
-  { label: '上传速率', value: formatSpeed(tUp.value), icon: 'arrowUp', color: 'text-amber-500 bg-amber-500/10' },
-  { label: '下载速率', value: formatSpeed(tDown.value), icon: 'arrowDown', color: 'text-sky-500 bg-sky-500/10' },
-  { label: '上传总量', value: formatBytes(tUpTotal.value), icon: 'upload', color: 'text-amber-500/80 bg-amber-500/5' },
-  { label: '下载总量', value: formatBytes(tDownTotal.value), icon: 'download', color: 'text-sky-500/80 bg-sky-500/5' },
-  { label: '内存占用', value: formatBytes(tMemory.value), icon: 'cpu', color: 'text-emerald-500 bg-emerald-500/10' },
-  { label: '活动连接', value: String(Math.round(tCount.value)), icon: 'link', color: 'text-violet-500 bg-violet-500/10' },
+  { label: '上传速率', value: formatSpeed(tUp.value), icon: 'arrowUp', color: 'text-amber-600 dark:text-amber-400 bg-amber-500/10' },
+  { label: '下载速率', value: formatSpeed(tDown.value), icon: 'arrowDown', color: 'text-sky-600 dark:text-sky-400 bg-sky-500/10' },
+  { label: '上传总量', value: formatBytes(tUpTotal.value), icon: 'upload', color: 'text-amber-600/80 dark:text-amber-400/80 bg-amber-500/5' },
+  { label: '下载总量', value: formatBytes(tDownTotal.value), icon: 'download', color: 'text-sky-600/80 dark:text-sky-400/80 bg-sky-500/5' },
+  { label: '内存占用', value: formatBytes(tMemory.value), icon: 'cpu', color: 'text-emerald-600 dark:text-emerald-400 bg-emerald-500/10' },
+  { label: '活动连接', value: String(Math.round(tCount.value)), icon: 'link', color: 'text-violet-600 dark:text-violet-400 bg-violet-500/10' },
 ])
 
 const infoRows = computed(() => {
@@ -120,7 +120,7 @@ const infoRows = computed(() => {
         </span>
         <div class="min-w-0">
           <div class="text-xs text-slate-500">{{ s.label }}</div>
-          <div class="truncate font-semibold tabular-nums">{{ s.value }}</div>
+          <div class="truncate text-[17px] font-semibold tabular-nums">{{ s.value }}</div>
         </div>
       </div>
     </div>

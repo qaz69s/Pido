@@ -171,7 +171,7 @@ async function updateCore(force = false) {
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2 text-sm font-medium">
           面板
-          <span v-if="panelHasUpdate" class="rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-brand-500/10 text-brand-600 dark:text-brand-400">有新版本</span>
+          <span v-if="panelHasUpdate" class="rounded-full px-1.5 py-0.5 text-xs font-medium bg-brand-500/10 text-brand-600 dark:text-brand-400">有新版本</span>
         </div>
         <div class="mt-0.5 text-xs text-slate-500">
           当前 <span class="font-mono">{{ PANEL_VERSION }}</span>
@@ -190,7 +190,7 @@ async function updateCore(force = false) {
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 text-sm font-medium">
             mihomo 内核
-            <span v-if="coreHasUpdate" class="rounded-full px-1.5 py-0.5 text-[10px] font-medium bg-brand-500/10 text-brand-600 dark:text-brand-400">有新版本</span>
+            <span v-if="coreHasUpdate" class="rounded-full px-1.5 py-0.5 text-xs font-medium bg-brand-500/10 text-brand-600 dark:text-brand-400">有新版本</span>
           </div>
           <div class="mt-0.5 text-xs text-slate-500">
             当前 <span class="font-mono">{{ coreVersion || '--' }}</span>

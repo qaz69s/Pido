@@ -12,6 +12,14 @@ function palette(prefix) {
   return Object.fromEntries(keys.map((k) => [k, `rgb(var(--${prefix}-${k}) / <alpha-value>)`]))
 }
 
+/** 文字专用色板：优先用 --tx-* / --txb-*（对比度修正过），未定义时回退到背景色板 */
+function textPalette(prefix, fallback) {
+  const keys = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
+  return Object.fromEntries(
+    keys.map((k) => [k, `rgb(var(--${prefix}-${k}, var(--${fallback}-${k})) / <alpha-value>)`]),
+  )
+}
+
 const r = (rem) => `calc(${rem}rem * var(--radius-scale, 1))`
 
 /** @type {import('tailwindcss').Config} */
@@ -27,6 +35,11 @@ export default {
         accent: palette('a'),
         // 主色背景上的文字色（大多数主题为白色，素墨深色下为深灰）
         'on-brand': 'rgb(var(--on-b, 255 255 255) / <alpha-value>)',
+      },
+      // 文字颜色单独走对比度修正后的变量（见 src/themes.css 末尾）
+      textColor: {
+        slate: textPalette('tx', 'n'),
+        brand: textPalette('txb', 'b'),
       },
       borderRadius: {
         md: r(0.375),

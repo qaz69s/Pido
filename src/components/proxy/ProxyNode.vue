@@ -88,11 +88,11 @@ function onSelect() {
       <ProxyIcon v-if="icon" :icon="icon" :size="16" />
       <span class="truncate text-sm font-medium" :title="name">{{ name }}</span>
     </span>
-    <div class="flex items-center justify-between gap-2 text-xs">
+    <div class="flex items-center justify-between gap-2 text-[13px]">
       <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
       <button
         type="button"
-        class="shrink-0 rounded px-1 tabular-nums font-medium hover:bg-slate-100 dark:hover:bg-slate-800"
+        class="shrink-0 rounded px-1 tabular-nums font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"
         :class="delayClass"
         :disabled="testing"
         title="测试延迟"

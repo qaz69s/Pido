@@ -145,7 +145,7 @@ function clearConfig() {
 
         <div v-if="backend.isConfigured" class="flex items-center justify-between pt-1 text-sm">
           <RouterLink to="/overview" class="text-slate-500 hover:underline">← 返回面板</RouterLink>
-          <button type="button" class="text-rose-500 hover:underline" @click="clearConfig">清除配置</button>
+          <button type="button" class="text-rose-600 dark:text-rose-400 hover:underline" @click="clearConfig">清除配置</button>
         </div>
       </form>
 

@@ -51,9 +51,9 @@ export function delayLevel(delay) {
 /** 延迟分级对应的文字颜色 */
 export const DELAY_TEXT_CLASS = {
   none: 'text-slate-400 dark:text-slate-500',
-  timeout: 'text-rose-500',
-  good: 'text-emerald-600 dark:text-emerald-400',
-  ok: 'text-amber-500',
+  timeout: 'text-rose-600 dark:text-rose-400',
+  good: 'text-emerald-700 dark:text-emerald-400',
+  ok: 'text-amber-700 dark:text-amber-400',
   bad: 'text-orange-600 dark:text-orange-400',
 }
 

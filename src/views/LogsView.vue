@@ -191,8 +191,8 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
     <div v-else class="card divide-y divide-slate-100 overflow-hidden dark:divide-slate-800">
       <div v-for="l in visible" :key="l.id" class="flex gap-2 px-3 py-2 sm:gap-3 sm:px-4">
         <div class="flex shrink-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
-          <span class="text-[11px] tabular-nums text-slate-400 sm:w-14">{{ formatClock(l.time) }}</span>
-          <span class="rounded px-1.5 py-0.5 text-[10px] font-semibold" :class="LEVEL_CLASS[l.type] || LEVEL_CLASS.debug">
+          <span class="text-xs tabular-nums text-slate-400 sm:w-14">{{ formatClock(l.time) }}</span>
+          <span class="rounded px-1.5 py-0.5 text-xs font-semibold" :class="LEVEL_CLASS[l.type] || LEVEL_CLASS.debug">
             {{ LEVEL_TEXT[l.type] || l.type }}
           </span>
         </div>

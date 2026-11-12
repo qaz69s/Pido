@@ -30,7 +30,7 @@ const activeIndex = computed(() => navItems.findIndex((n) => n.path === route.pa
         v-for="item in navItems"
         :key="item.path"
         :to="item.path"
-        class="press flex flex-col items-center gap-0.5 py-2 text-[11px] text-slate-500 transition dark:text-slate-400"
+        class="press flex flex-col items-center gap-0.5 py-2 text-xs text-slate-500 transition dark:text-slate-400"
         active-class="nav-active !text-brand-600 dark:!text-brand-400"
       >
         <Icon :name="item.icon" class="h-5 w-5" />

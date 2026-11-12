@@ -316,7 +316,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
               >
                 <Icon :name="m.icon" class="h-5 w-5" />
                 <span class="text-sm font-medium">{{ m.label }}</span>
-                <span class="text-[11px] text-slate-500">{{ m.desc }}</span>
+                <span class="text-xs text-slate-500">{{ m.desc }}</span>
               </button>
             </div>
           </section>
@@ -347,7 +347,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                   class="input py-1.5 tabular-nums"
                   :class="portErrors[p.key] && '!border-rose-500 focus:!ring-rose-500/20'"
                 />
-                <p v-if="portErrors[p.key]" class="mt-0.5 text-[11px] text-rose-500">{{ portErrors[p.key] }}</p>
+                <p v-if="portErrors[p.key]" class="mt-0.5 text-xs text-rose-600 dark:text-rose-400">{{ portErrors[p.key] }}</p>
               </div>
             </div>
           </section>
