@@ -85,6 +85,14 @@ const keyword = ref('')
 const sort = reactive({ key: 'start', desc: true, ...loadJSON('conn-sort', {}) })
 watch(sort, (v) => saveJSON('conn-sort', v), { deep: true })
 
+/** 手机端排序菜单 */
+const sortMenu = ref(false)
+function pickSort(key) {
+  if (sort.key === key) sort.desc = !sort.desc
+  else Object.assign(sort, { key, desc: true })
+  sortMenu.value = false
+}
+
 const SORTS = [
   { key: 'start', label: '连接时间' },
   { key: 'downSpeed', label: '下载速率' },
@@ -274,17 +282,32 @@ const STATUS_TEXT = {
       </div>
 
       <div class="ml-auto flex items-center gap-1">
-        <select v-if="tab === 'active'" v-model="sort.key" class="input w-auto py-1.5 md:hidden" title="排序">
-          <option v-for="s in SORTS" :key="s.key" :value="s.key">{{ s.label }}</option>
-        </select>
-        <button
-          v-if="tab === 'active'"
-          class="btn-icon md:hidden"
-          :title="sort.desc ? '降序' : '升序'"
-          @click="sort.desc = !sort.desc"
-        >
-          <Icon :name="sort.desc ? 'arrowDown' : 'arrowUp'" class="h-4 w-4" />
-        </button>
+        <!-- 手机端排序：一个图标 + 小菜单（再点当前项切换升降序）；宽屏用表头排序 -->
+        <div v-if="tab === 'active'" class="relative md:hidden">
+          <button
+            class="btn-icon"
+            :class="sortMenu && 'bg-slate-200/70 dark:bg-slate-800'"
+            title="排序"
+            @click="sortMenu = !sortMenu"
+          >
+            <Icon name="sort" class="h-[18px] w-[18px]" />
+          </button>
+          <template v-if="sortMenu">
+            <div class="fixed inset-0 z-20" @click="sortMenu = false" />
+            <div class="card absolute right-0 top-full z-30 mt-1 w-44 p-1 shadow-lg">
+              <button
+                v-for="s in SORTS"
+                :key="s.key"
+                class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                :class="sort.key === s.key ? 'font-medium' : 'text-slate-500'"
+                @click="pickSort(s.key)"
+              >
+                {{ s.label }}
+                <Icon v-if="sort.key === s.key" :name="sort.desc ? 'arrowDown' : 'arrowUp'" class="h-4 w-4" />
+              </button>
+            </div>
+          </template>
+        </div>
         <button
           class="btn-icon"
           :class="paused && 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'"

@@ -269,15 +269,15 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
       <div class="ml-auto flex items-center gap-1">
         <template v-if="tab === 'groups'">
-          <select v-model="prefs.sort" class="input w-auto py-1.5" title="节点排序">
-            <option value="default">默认顺序</option>
-            <option value="delay">按延迟</option>
-            <option value="name">按名称</option>
-          </select>
           <button class="btn-icon" :title="allCollapsed ? '全部展开' : '全部折叠'" @click="toggleAll">
             <Icon name="chevronDown" class="h-5 w-5 transition-transform" :class="allCollapsed ? '' : 'rotate-180'" />
           </button>
-          <button class="btn-icon" title="测速设置" @click="showSettings = !showSettings">
+          <button
+            class="btn-icon"
+            :class="showSettings && 'bg-slate-200/70 dark:bg-slate-800'"
+            title="显示与测速设置"
+            @click="showSettings = !showSettings"
+          >
             <Icon name="settings" class="h-[18px] w-[18px]" />
           </button>
           <button class="btn-primary" :disabled="testingAll || !groups.length" @click="onTestAll">
@@ -297,8 +297,16 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       </div>
     </div>
 
-    <!-- 测速设置 -->
-    <div v-if="showSettings && tab === 'groups'" class="card grid gap-3 p-4 sm:grid-cols-[1fr_10rem_auto] sm:items-end">
+    <!-- 显示与测速设置（排序收在这里，手机上工具栏才能放在一行） -->
+    <div v-if="showSettings && tab === 'groups'" class="card grid gap-3 p-4 sm:grid-cols-[9rem_1fr_10rem_auto] sm:items-end">
+      <div>
+        <label class="label">节点排序</label>
+        <select v-model="prefs.sort" class="input">
+          <option value="default">默认顺序</option>
+          <option value="delay">按延迟</option>
+          <option value="name">按名称</option>
+        </select>
+      </div>
       <div>
         <label class="label">测速地址</label>
         <input v-model.trim="prefs.testUrl" class="input font-mono" :placeholder="DEFAULT_TEST_URL" />
@@ -307,7 +315,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <label class="label">超时（毫秒）</label>
         <input v-model.number="prefs.timeout" type="number" min="500" step="500" class="input" />
       </div>
-      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000">恢复默认</button>
+      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'">恢复默认</button>
     </div>
 
     <div

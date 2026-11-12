@@ -52,7 +52,7 @@ const nodes = computed(() => {
       class="flex cursor-pointer select-none items-center gap-3 px-4 py-3"
       @click="emit('toggle')"
     >
-      <ProxyIcon v-if="group.icon" :icon="group.icon" :size="44" />
+      <ProxyIcon v-if="group.icon" :icon="group.icon" :size="40" />
       <div class="min-w-0 flex-1">
         <!-- 第一行：组名 + 淡色的类型与节点数 -->
         <div class="flex items-baseline gap-2">
@@ -66,16 +66,6 @@ const nodes = computed(() => {
         <!-- 第二行：当前节点 -->
         <div class="mt-0.5 flex items-center gap-2 text-sm">
           <span class="min-w-0 truncate text-slate-600 dark:text-slate-300" :title="group.now">{{ group.now || '--' }}</span>
-        </div>
-        <!-- 第三行（折叠时）：延迟色点 -->
-        <div v-if="collapsed" class="mt-2 flex flex-wrap gap-1">
-          <span
-            v-for="n in nodes"
-            :key="n.name"
-            class="h-2 w-2 rounded-full"
-            :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900']"
-            :title="n.name"
-          />
         </div>
       </div>
       <button
@@ -92,6 +82,17 @@ const nodes = computed(() => {
         :class="collapsed ? '' : 'rotate-180'"
       />
     </header>
+
+    <!-- 折叠时：延迟色点，左侧与文字对齐（图标只占前两行，与展开时一致） -->
+    <div v-if="collapsed" class="-mt-1 flex flex-wrap gap-1 pb-3 pr-4" :class="group.icon ? 'pl-[68px]' : 'pl-4'">
+      <span
+        v-for="n in nodes"
+        :key="n.name"
+        class="h-2 w-2 rounded-full"
+        :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900']"
+        :title="n.name"
+      />
+    </div>
 
     <!-- 展开：节点网格 -->
     <div

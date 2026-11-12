@@ -21,6 +21,7 @@ const PATHS = {
   zap: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
   refresh: 'M21 12a9 9 0 01-15.5 6.2M3 12A9 9 0 0118.5 5.8M21 4v5h-5M3 20v-5h5',
   chevronDown: 'M6 9l6 6 6-6',
+  sort: 'M3 6h11M3 12h7M3 18h4M18 6v14M15 17l3 3 3-3',
   arrowUp: 'M12 19V5M5 12l7-7 7 7',
   arrowDown: 'M12 5v14M19 12l-7 7-7-7',
   cpu: 'M6 6h12v12H6zM9 9h6v6H9zM9 2v4M15 2v4M9 18v4M15 18v4M2 9h4M2 15h4M18 9h4M18 15h4',
