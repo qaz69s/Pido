@@ -5,7 +5,7 @@
  * - 折叠时显示一排延迟色点，方便快速概览
  */
 import { computed } from 'vue'
-import { delayLevel, DELAY_BG_CLASS } from '@/utils/format'
+import { delayLevel, delayText, DELAY_BG_CLASS, DELAY_TEXT_CLASS } from '@/utils/format'
 import Icon from '@/components/common/Icon.vue'
 import ProxyNode from './ProxyNode.vue'
 import ProxyIcon from './ProxyIcon.vue'
@@ -20,6 +20,9 @@ const props = defineProps({
   sort: { type: String, default: 'default' }, // default | delay | name
 })
 const emit = defineEmits(['select', 'test-group', 'test-node', 'toggle'])
+
+/** 当前节点的延迟（子策略组会跟随它自己的当前节点） */
+const nowDelay = computed(() => (props.group.now ? props.delays[props.group.now] : undefined))
 
 /** 只有 Selector（含 GLOBAL）允许手动切换 */
 const selectable = computed(() => props.group.type === 'Selector')
@@ -49,16 +52,31 @@ const nodes = computed(() => {
       class="flex cursor-pointer select-none items-center gap-3 px-4 py-3"
       @click="emit('toggle')"
     >
-      <ProxyIcon v-if="group.icon" :icon="group.icon" :size="32" />
+      <ProxyIcon v-if="group.icon" :icon="group.icon" :size="44" />
       <div class="min-w-0 flex-1">
-        <div class="flex items-center gap-2">
-          <h3 class="truncate font-semibold">{{ group.name }}</h3>
-          <span class="chip">{{ group.type }}</span>
-          <span class="text-xs text-slate-400">{{ group.all?.length || 0 }}</span>
+        <!-- 第一行：组名 + 淡色的类型与节点数 -->
+        <div class="flex items-baseline gap-2">
+          <h3 class="max-w-full shrink-0 truncate font-semibold">{{ group.name }}</h3>
+          <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ group.type }} · {{ group.all?.length || 0 }}</span>
+          <!-- 右上角：当前节点延迟 -->
+          <span v-if="nowDelay !== undefined" class="ml-auto shrink-0 text-xs font-medium tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]">
+            {{ delayText(nowDelay) }}
+          </span>
         </div>
-        <p class="mt-0.5 truncate text-xs text-slate-500">
-          当前：<span class="font-medium text-slate-700 dark:text-slate-300">{{ group.now || '--' }}</span>
-        </p>
+        <!-- 第二行：当前节点 -->
+        <div class="mt-0.5 flex items-center gap-2 text-sm">
+          <span class="min-w-0 truncate text-slate-600 dark:text-slate-300" :title="group.now">{{ group.now || '--' }}</span>
+        </div>
+        <!-- 第三行（折叠时）：延迟色点 -->
+        <div v-if="collapsed" class="mt-2 flex flex-wrap gap-1">
+          <span
+            v-for="n in nodes"
+            :key="n.name"
+            class="h-2 w-2 rounded-full"
+            :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900']"
+            :title="n.name"
+          />
+        </div>
       </div>
       <button
         class="btn-icon"
@@ -75,20 +93,9 @@ const nodes = computed(() => {
       />
     </header>
 
-    <!-- 折叠时：延迟色点 -->
-    <div v-if="collapsed" class="flex flex-wrap gap-1 px-4 pb-3">
-      <span
-        v-for="n in nodes"
-        :key="n.name"
-        class="h-2 w-2 rounded-full"
-        :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900']"
-        :title="n.name"
-      />
-    </div>
-
     <!-- 展开：节点网格 -->
     <div
-      v-else
+      v-if="!collapsed"
       class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:border-slate-800"
     >
       <ProxyNode
