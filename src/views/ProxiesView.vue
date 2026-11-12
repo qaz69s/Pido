@@ -31,6 +31,19 @@ const delayStore = useDelayStore()
 /* ---------- 状态 ---------- */
 const proxies = ref({}) // GET /proxies 的结果
 const providers = ref({}) // GET /providers/proxies 的结果
+
+/**
+ * 节点查找表：/proxies 只包含配置文件里的节点和策略组，
+ * 来自 proxy-providers（订阅）的节点不在其中，需要从 /providers/proxies 合并进来，
+ * 否则节点卡片拿不到协议类型（type）
+ */
+const allProxies = computed(() => {
+  const map = {}
+  for (const pv of Object.values(providers.value)) {
+    for (const n of pv.proxies || []) map[n.name] = n
+  }
+  return Object.assign(map, proxies.value)
+})
 const mode = ref('rule')
 const loading = ref(true)
 const loadError = ref(null)
@@ -349,7 +362,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         v-for="g in groups"
         :key="g.name"
         :group="g"
-        :proxies="proxies"
+        :proxies="allProxies"
         :delays="delays"
         :testing-nodes="testingNodes"
         :testing="!!testingGroups[g.name]"

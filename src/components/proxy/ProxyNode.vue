@@ -21,6 +21,27 @@ const props = defineProps({
 })
 const emit = defineEmits(['select', 'test'])
 
+/* 协议简写：卡片空间小（尤其系统字体放大时），长名字缩写，悬停 title 显示全称 */
+const TYPE_SHORT = {
+  Shadowsocks: 'SS',
+  ShadowsocksR: 'SSR',
+  Vmess: 'VMess',
+  Vless: 'VLESS',
+  Hysteria: 'HY',
+  Hysteria2: 'HY2',
+  WireGuard: 'WG',
+  Tuic: 'TUIC',
+  Socks5: 'SOCKS5',
+  Http: 'HTTP',
+  Ssh: 'SSH',
+  Selector: '选择',
+  URLTest: '自动',
+  Fallback: '故障转移',
+  LoadBalance: '负载均衡',
+  Relay: '链式',
+}
+const typeLabel = computed(() => TYPE_SHORT[props.type] || props.type)
+
 const delayClass = computed(() => DELAY_TEXT_CLASS[delayLevel(props.delay)])
 
 /* 只在变化时触发动画：用自增 key 重新挂载数字/切换选中动画类 */
@@ -68,7 +89,7 @@ function onSelect() {
       <span class="truncate text-sm font-medium" :title="name">{{ name }}</span>
     </span>
     <div class="flex items-center justify-between gap-2 text-xs">
-      <span class="truncate text-slate-400">{{ type }}</span>
+      <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
       <button
         type="button"
         class="shrink-0 rounded px-1 tabular-nums font-medium hover:bg-slate-100 dark:hover:bg-slate-800"
