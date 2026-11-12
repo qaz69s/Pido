@@ -6,10 +6,12 @@
  */
 import { computed } from 'vue'
 import { delayLevel, delayText, DELAY_TEXT_CLASS } from '@/utils/format'
+import ProxyIcon from './ProxyIcon.vue'
 
 const props = defineProps({
   name: { type: String, required: true },
   type: { type: String, default: '' },
+  icon: { type: String, default: '' }, // 成员是策略组时的图标
   delay: { type: Number, default: undefined },
   active: Boolean,
   selectable: Boolean,
@@ -39,7 +41,10 @@ function onSelect() {
     @click="onSelect"
     @keydown.enter="onSelect"
   >
-    <span class="truncate text-sm font-medium" :title="name">{{ name }}</span>
+    <span class="flex min-w-0 items-center gap-1.5">
+      <ProxyIcon v-if="icon" :icon="icon" :size="16" />
+      <span class="truncate text-sm font-medium" :title="name">{{ name }}</span>
+    </span>
     <div class="flex items-center justify-between gap-2 text-xs">
       <span class="truncate text-slate-400">{{ type }}</span>
       <button

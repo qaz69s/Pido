@@ -1,13 +1,14 @@
 <script setup>
 /**
  * 代理组卡片
- * - 标题栏：组名、类型、当前节点、节点数、整组测速、折叠
+ * - 标题栏：图标（配置里的 icon）、组名、类型、当前节点、节点数、整组测速、折叠
  * - 折叠时显示一排延迟色点，方便快速概览
  */
 import { computed } from 'vue'
 import { delayLevel, DELAY_BG_CLASS } from '@/utils/format'
 import Icon from '@/components/common/Icon.vue'
 import ProxyNode from './ProxyNode.vue'
+import ProxyIcon from './ProxyIcon.vue'
 
 const props = defineProps({
   group: { type: Object, required: true }, // { name, type, now, all }
@@ -27,6 +28,7 @@ const nodes = computed(() => {
   const list = (props.group.all || []).map((name) => ({
     name,
     type: props.proxies[name]?.type ?? '',
+    icon: props.proxies[name]?.icon ?? '', // 成员本身是策略组时显示它的图标
     delay: props.delays[name],
   }))
   if (props.sort === 'name') {
@@ -47,6 +49,7 @@ const nodes = computed(() => {
       class="flex cursor-pointer select-none items-center gap-3 px-4 py-3"
       @click="emit('toggle')"
     >
+      <ProxyIcon v-if="group.icon" :icon="group.icon" :size="32" />
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2">
           <h3 class="truncate font-semibold">{{ group.name }}</h3>
@@ -93,6 +96,7 @@ const nodes = computed(() => {
         :key="n.name"
         :name="n.name"
         :type="n.type"
+        :icon="n.icon"
         :delay="n.delay"
         :active="n.name === group.now"
         :selectable="selectable"
