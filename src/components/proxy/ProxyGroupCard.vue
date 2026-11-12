@@ -1,0 +1,105 @@
+<script setup>
+/**
+ * 代理组卡片
+ * - 标题栏：组名、类型、当前节点、节点数、整组测速、折叠
+ * - 折叠时显示一排延迟色点，方便快速概览
+ */
+import { computed } from 'vue'
+import { delayLevel, DELAY_BG_CLASS } from '@/utils/format'
+import Icon from '@/components/common/Icon.vue'
+import ProxyNode from './ProxyNode.vue'
+
+const props = defineProps({
+  group: { type: Object, required: true }, // { name, type, now, all }
+  proxies: { type: Object, required: true }, // 全部代理，用于查节点类型
+  delays: { type: Object, required: true }, // { 节点名: 延迟 }
+  testingNodes: { type: Object, required: true }, // { 节点名: true }
+  testing: Boolean, // 整组测速中
+  collapsed: Boolean,
+  sort: { type: String, default: 'default' }, // default | delay | name
+})
+const emit = defineEmits(['select', 'test-group', 'test-node', 'toggle'])
+
+/** 只有 Selector（含 GLOBAL）允许手动切换 */
+const selectable = computed(() => props.group.type === 'Selector')
+
+const nodes = computed(() => {
+  const list = (props.group.all || []).map((name) => ({
+    name,
+    type: props.proxies[name]?.type ?? '',
+    delay: props.delays[name],
+  }))
+  if (props.sort === 'name') {
+    list.sort((a, b) => a.name.localeCompare(b.name, 'zh-CN'))
+  } else if (props.sort === 'delay') {
+    // 有效延迟升序，超时和未测排最后
+    const key = (d) => (d > 0 ? d : d === 0 ? 1e9 : 2e9)
+    list.sort((a, b) => key(a.delay) - key(b.delay))
+  }
+  return list
+})
+</script>
+
+<template>
+  <section class="card overflow-hidden">
+    <!-- 标题栏 -->
+    <header
+      class="flex cursor-pointer select-none items-center gap-3 px-4 py-3"
+      @click="emit('toggle')"
+    >
+      <div class="min-w-0 flex-1">
+        <div class="flex items-center gap-2">
+          <h3 class="truncate font-semibold">{{ group.name }}</h3>
+          <span class="chip">{{ group.type }}</span>
+          <span class="text-xs text-slate-400">{{ group.all?.length || 0 }}</span>
+        </div>
+        <p class="mt-0.5 truncate text-xs text-slate-500">
+          当前：<span class="font-medium text-slate-700 dark:text-slate-300">{{ group.now || '--' }}</span>
+        </p>
+      </div>
+      <button
+        class="btn-icon"
+        :disabled="testing"
+        title="整组测速"
+        @click.stop="emit('test-group')"
+      >
+        <Icon name="zap" class="h-[18px] w-[18px]" :class="testing && 'animate-pulse text-brand-500'" />
+      </button>
+      <Icon
+        name="chevronDown"
+        class="h-5 w-5 text-slate-400 transition-transform"
+        :class="collapsed ? '' : 'rotate-180'"
+      />
+    </header>
+
+    <!-- 折叠时：延迟色点 -->
+    <div v-if="collapsed" class="flex flex-wrap gap-1 px-4 pb-3">
+      <span
+        v-for="n in nodes"
+        :key="n.name"
+        class="h-2 w-2 rounded-full"
+        :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900']"
+        :title="n.name"
+      />
+    </div>
+
+    <!-- 展开：节点网格 -->
+    <div
+      v-else
+      class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:border-slate-800"
+    >
+      <ProxyNode
+        v-for="n in nodes"
+        :key="n.name"
+        :name="n.name"
+        :type="n.type"
+        :delay="n.delay"
+        :active="n.name === group.now"
+        :selectable="selectable"
+        :testing="!!testingNodes[n.name] || testing"
+        @select="emit('select', n.name)"
+        @test="emit('test-node', n.name)"
+      />
+    </div>
+  </section>
+</template>

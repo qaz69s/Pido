@@ -1,0 +1,68 @@
+# Pido 自动构建与发布
+# - 推送到 main：构建并发布到 gh-pages 分支
+# - package.json 的 version 变化（对应的 v 标签还不存在）时：自动创建 Release，附带 dist.zip
+#
+# 稳定下载地址（填到 mihomo 的 external-ui-url）：
+#   https://github.com/<owner>/Pido/releases/latest/download/dist.zip
+#   https://github.com/<owner>/Pido/archive/refs/heads/gh-pages.zip
+name: Build & Release
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      # 版本号：package.json 的 version
+      - name: 读取版本号
+        id: ver
+        run: |
+          VERSION=$(node -p "require('./package.json').version")
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+          echo "$VERSION" > dist/version.txt
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "new=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "new=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # 打包：压缩包内为 dist/ 目录（与 zashboard 等面板一致，mihomo 会自动去掉单层根目录）
+      - name: 打包 dist.zip
+        run: zip -r dist.zip dist
+
+      - name: 发布到 gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./dist
+          publish_branch: gh-pages
+          force_orphan: true
+          commit_message: 'build: ${{ github.sha }}'
+
+      - name: 创建 Release
+        if: steps.ver.outputs.new == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: v${{ steps.ver.outputs.version }}
+          name: Pido v${{ steps.ver.outputs.version }}
+          files: dist.zip
+          generate_release_notes: true
+          make_latest: true
