@@ -18,6 +18,7 @@ import {
 import { getConfigs } from '@/api/configs'
 import { describeError, errorMessage } from '@/api/http'
 import { useToastStore } from '@/stores/toast'
+import { useDelayStore, latestFromBackend } from '@/stores/delays'
 import { loadJSON, saveJSON } from '@/utils/storage'
 import { formatBytes, formatDate, formatRelativeTime } from '@/utils/format'
 import ProxyGroupCard from '@/components/proxy/ProxyGroupCard.vue'
@@ -25,6 +26,7 @@ import EmptyState from '@/components/common/EmptyState.vue'
 import Icon from '@/components/common/Icon.vue'
 
 const toast = useToastStore()
+const delayStore = useDelayStore()
 
 /* ---------- 状态 ---------- */
 const proxies = ref({}) // GET /proxies 的结果
@@ -34,7 +36,20 @@ const loading = ref(true)
 const loadError = ref(null)
 const tab = ref('groups') // groups | providers
 
-const delays = reactive({}) // { 节点名: 延迟ms，0=超时 }
+/**
+ * 显示用的延迟表 { 名称: 延迟ms，0=超时 }，来自全局延迟缓存；
+ * 策略组跟随它当前选中的节点，所以子策略组也能显示延迟
+ */
+const delays = computed(() => {
+  const all = proxies.value
+  const out = {}
+  for (const name of Object.keys(all)) {
+    const d = delayStore.get(name, all)
+    if (d !== undefined) out[name] = d
+  }
+  for (const name of Object.keys(delayStore.map)) if (!(name in out)) out[name] = delayStore.map[name].delay
+  return out
+})
 const testingNodes = reactive({}) // { 节点名: true }
 const testingGroups = reactive({}) // { 组名: true }
 const busyProviders = reactive({}) // { 集合名: 'update' | 'check' }
@@ -52,13 +67,6 @@ const showSettings = ref(false)
 const testOpts = () => ({ url: prefs.testUrl || DEFAULT_TEST_URL, timeout: Number(prefs.timeout) || 5000 })
 
 /* ---------- 数据加载 ---------- */
-/** 从节点的 history 中取最近一次延迟（后端自动测速 / 健康检查的结果） */
-function syncDelaysFromHistory(all) {
-  for (const [name, p] of Object.entries(all)) {
-    const h = p.history
-    if (h?.length) delays[name] = h[h.length - 1].delay
-  }
-}
 
 async function load({ silent = false } = {}) {
   if (!silent) loading.value = true
@@ -71,7 +79,14 @@ async function load({ silent = false } = {}) {
     proxies.value = p?.proxies || {}
     providers.value = pp?.providers || {}
     if (c?.mode) mode.value = c.mode.toLowerCase()
-    syncDelaysFromHistory(proxies.value)
+    // 后端自动测速 / 健康检查的结果（history 与 extra 中较新的一条）
+    delayStore.syncFromProxies(proxies.value)
+    for (const pv of Object.values(providers.value)) {
+      for (const n of pv.proxies || []) {
+        const b = latestFromBackend(n)
+        if (b && (!delayStore.map[n.name] || b.t >= delayStore.map[n.name].t)) delayStore.map[n.name] = b
+      }
+    }
     loadError.value = null
   } catch (e) {
     loadError.value = e
@@ -115,9 +130,9 @@ async function onTestNode(name) {
   testingNodes[name] = true
   try {
     const res = await testProxyDelay(name, testOpts())
-    delays[name] = res?.delay ?? 0
+    delayStore.set(name, res?.delay ?? 0)
   } catch (e) {
-    if ([408, 503, 504].includes(e.status)) delays[name] = 0
+    if ([408, 503, 504].includes(e.status)) delayStore.set(name, 0)
     else toast.error(`${name} 测速失败：${errorMessage(e)}`)
   } finally {
     delete testingNodes[name]
@@ -129,7 +144,11 @@ async function onTestGroup(group, { quiet = false } = {}) {
   testingGroups[group.name] = true
   try {
     const res = (await testGroupDelay(group.name, testOpts())) || {}
-    for (const n of group.all || []) delays[n] = res[n] ?? 0
+    // 结果里没有的节点视为超时；成员是策略组的跳过（它跟随自己的当前节点显示）
+    for (const n of group.all || []) {
+      if (Array.isArray(proxies.value[n]?.all)) continue
+      delayStore.set(n, res[n] ?? 0)
+    }
     if (!quiet) toast.success(`${group.name} 测速完成`)
   } catch (e) {
     if (!quiet) toast.error(`${group.name} 测速失败：${errorMessage(e)}`)
@@ -218,7 +237,7 @@ async function onUpdateAllProviders() {
 /** 集合内节点的平均延迟（只算有效值），用于卡片概览 */
 function providerStats(p) {
   const list = p.proxies || []
-  const valid = list.map((n) => delays[n.name] ?? n.history?.at(-1)?.delay).filter((d) => d > 0)
+  const valid = list.map((n) => delays.value[n.name] ?? latestFromBackend(n)?.delay).filter((d) => d > 0)
   return {
     count: list.length,
     alive: valid.length,
