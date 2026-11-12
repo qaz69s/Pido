@@ -5,8 +5,10 @@
  * - Y 轴按 1024 进制自动取“整”刻度
  * - 适配高分屏（devicePixelRatio）和容器尺寸变化（ResizeObserver）
  * - 网格/文字颜色取自容器的 CSS color，因此会跟随深浅主题
+ * - 动画：新数据到来时曲线在 1 秒内平滑左移；右端有呼吸光点（动画关闭时静态绘制）
  */
-import { ref, watch, onMounted, onBeforeUnmount, onActivated, nextTick } from 'vue'
+import { ref, watch, onMounted, onBeforeUnmount, onActivated, onDeactivated, nextTick } from 'vue'
+import { motionEnabled } from '@/utils/motion'
 import { formatSpeed } from '@/utils/format'
 import { useThemeStore } from '@/stores/theme'
 
@@ -29,6 +31,10 @@ let cw = 0 // 画布 CSS 宽度
 let ch = 0 // 画布 CSS 高度
 let raf = 0
 let ro = null
+let loopRaf = 0 // 动画循环
+let shiftStart = 0 // 最近一次新数据到来的时间
+const SHIFT_MS = 1000 // 平移时长，与 /traffic 推送间隔一致
+let lead = [0, 0] // 上一帧最左边被挤出去的点（上传、下载），平移时补在左侧，避免左边露出空隙
 
 const PAD = { right: 8, top: 10, bottom: 22 }
 let padLeft = 64 // 左边距按 Y 轴刻度文字宽度动态计算，防止长刻度被裁切
@@ -85,10 +91,14 @@ function scheduleDraw() {
 }
 
 /** 根据数据生成平滑曲线（二次贝塞尔经过相邻点中点） */
-function buildPath(data, max, plotW, plotH) {
+function buildPath(data, max, plotW, plotH, offset = 0, leadValue = 0) {
   const n = data.length
   const step = n > 1 ? plotW / (n - 1) : 0
-  const pts = data.map((v, i) => [padLeft + i * step, PAD.top + plotH - (Math.min(v, max) / max) * plotH])
+  // offset：0~1，表示整条曲线还要向右多偏移几个“格”（平移动画用）
+  // 平移中在最左边补一个被挤出的旧点，x 为 padLeft + (offset - 1) * step
+  const series = offset > 0 ? [leadValue, ...data] : data
+  const base = offset > 0 ? offset - 1 : 0
+  const pts = series.map((v, i) => [padLeft + (i + base) * step, PAD.top + plotH - (Math.min(v, max) / max) * plotH])
   const path = new Path2D()
   if (!pts.length) return { path, pts }
   path.moveTo(pts[0][0], pts[0][1])
@@ -102,8 +112,8 @@ function buildPath(data, max, plotW, plotH) {
   return { path, pts }
 }
 
-function drawSeries(data, color, max, plotW, plotH) {
-  const { path, pts } = buildPath(data, max, plotW, plotH)
+function drawSeries(data, color, max, plotW, plotH, offset = 0, pulse = -1, leadValue = 0) {
+  const { path, pts } = buildPath(data, max, plotW, plotH, offset, leadValue)
   if (pts.length < 2) return
   const bottom = PAD.top + plotH
 
@@ -123,6 +133,23 @@ function drawSeries(data, color, max, plotW, plotH) {
   ctx.lineWidth = 2
   ctx.lineJoin = 'round'
   ctx.stroke(path)
+
+  // 右端呼吸光点：位于绘图区右边缘，y 在最后两点之间插值
+  if (pulse >= 0) {
+    const [x1, y1] = pts[pts.length - 2]
+    const [x2, y2] = pts[pts.length - 1]
+    const edge = padLeft + plotW
+    const t = x2 === x1 ? 1 : Math.min(1, Math.max(0, (edge - x1) / (x2 - x1)))
+    const y = y1 + (y2 - y1) * t
+    ctx.fillStyle = withAlpha(color, 0.25 * (1 - pulse))
+    ctx.beginPath()
+    ctx.arc(edge, y, 3 + 6 * pulse, 0, Math.PI * 2)
+    ctx.fill()
+    ctx.fillStyle = withAlpha(color, 1)
+    ctx.beginPath()
+    ctx.arc(edge, y, 3, 0, Math.PI * 2)
+    ctx.fill()
+  }
 }
 
 function draw() {
@@ -169,11 +196,53 @@ function draw() {
 
   const downColor = props.downColor || themeColor('--b-500', '#6366f1')
   const upColor = props.upColor || themeColor('--a-500', '#f59e0b')
-  drawSeries(props.down, downColor, max, plotW, plotH)
-  drawSeries(props.up, upColor, max, plotW, plotH)
+
+  // 动画：offset 从 1 平滑降到 0（新点从右边缘滑入），pulse 0~1 循环
+  const animate = motionEnabled()
+  const now = performance.now()
+  const offset = animate ? Math.max(0, 1 - (now - shiftStart) / SHIFT_MS) : 0
+  const pulse = animate ? (now % 1600) / 1600 : -1
+
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(padLeft, 0, plotW, ch) // 只在绘图区内画曲线，滑出的部分裁掉
+  ctx.clip()
+  drawSeries(props.down, downColor, max, plotW, plotH, offset, pulse, lead[1])
+  drawSeries(props.up, upColor, max, plotW, plotH, offset, pulse, lead[0])
+  ctx.restore()
 }
 
-watch(() => [props.up, props.down], scheduleDraw)
+/** 动画循环：页面可见、动画开启时每帧重绘；否则停下，仅在数据变化时重绘 */
+function loop() {
+  cancelAnimationFrame(loopRaf)
+  if (!motionEnabled() || document.hidden || cw <= 0) {
+    loopRaf = 0
+    return
+  }
+  draw()
+  loopRaf = requestAnimationFrame(loop)
+}
+function startLoop() {
+  if (!loopRaf) loopRaf = requestAnimationFrame(loop)
+}
+function stopLoop() {
+  cancelAnimationFrame(loopRaf)
+  loopRaf = 0
+}
+function onVisibility() {
+  if (document.hidden) stopLoop()
+  else startLoop()
+}
+
+watch(
+  () => [props.up, props.down],
+  (_, old) => {
+    lead = [old?.[0]?.[0] ?? 0, old?.[1]?.[0] ?? 0]
+    shiftStart = performance.now()
+    scheduleDraw()
+    startLoop()
+  },
+)
 // 深浅色或主题配色变化时重绘
 watch(() => [theme.isDark, theme.preset], () => nextTick(scheduleDraw))
 
@@ -182,11 +251,19 @@ onMounted(() => {
   ro = new ResizeObserver(resize)
   ro.observe(wrap.value)
   resize()
+  document.addEventListener('visibilitychange', onVisibility)
+  startLoop()
 })
-onActivated(resize)
+onActivated(() => {
+  resize()
+  startLoop()
+})
+onDeactivated(stopLoop)
 onBeforeUnmount(() => {
   ro?.disconnect()
   cancelAnimationFrame(raf)
+  stopLoop()
+  document.removeEventListener('visibilitychange', onVisibility)
 })
 </script>
 

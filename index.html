@@ -21,6 +21,10 @@
           // 配色方案
           document.documentElement.dataset.theme =
             (localStorage.getItem('mihomo-dashboard:preset') || 'default').replace(/^(matcha|jade)$/, 'neutral')
+          // 动画开关：没设置过时跟随系统「减少动画」
+          var motion = localStorage.getItem('mihomo-dashboard:motion')
+          document.documentElement.dataset.motion =
+            motion || (window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'off' : 'on')
         } catch (e) {}
       })()
     </script>

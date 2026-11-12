@@ -362,7 +362,7 @@ const STATUS_TEXT = {
 
     <!-- 空状态 -->
     <div v-if="!received && status !== 'error'" class="space-y-2">
-      <div v-for="i in 4" :key="i" class="card h-14 animate-pulse" />
+      <div v-for="i in 4" :key="i" class="card skeleton h-14" />
     </div>
     <div v-else-if="!filtered.length" class="card">
       <EmptyState
@@ -391,7 +391,8 @@ const STATUS_TEXT = {
               <th class="w-10 px-2" />
             </tr>
           </thead>
-          <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
+          <!-- 新连接滑入、关闭的淡出；切换标签时整体重建（:key），避免大量动画 -->
+          <TransitionGroup :key="tab" tag="tbody" name="conn" class="divide-y divide-slate-100 dark:divide-slate-800">
             <tr
               v-for="c in visible"
               :key="c.id"
@@ -432,12 +433,12 @@ const STATUS_TEXT = {
                 </button>
               </td>
             </tr>
-          </tbody>
+          </TransitionGroup>
         </table>
       </div>
 
       <!-- 手机端：卡片 -->
-      <div class="space-y-2 md:hidden">
+      <TransitionGroup :key="tab" tag="div" name="conn" class="space-y-2 md:hidden">
         <div v-for="c in visible" :key="c.id" class="card p-3 active:bg-slate-50 dark:active:bg-slate-800/50" @click="detail = c">
           <div class="flex items-start gap-2">
             <div class="min-w-0 flex-1">
@@ -471,7 +472,7 @@ const STATUS_TEXT = {
             </div>
           </div>
         </div>
-      </div>
+      </TransitionGroup>
 
       <!-- 加载更多 -->
       <div v-if="filtered.length > visible.length" class="text-center">

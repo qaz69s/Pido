@@ -22,7 +22,7 @@ const THEME_META = {
 const statusInfo = computed(() => {
   switch (backend.status) {
     case 'ok':
-      return { dot: 'bg-emerald-500', text: backend.version?.version || '已连接' }
+      return { dot: 'bg-emerald-500 anim-breathe', text: backend.version?.version || '已连接' }
     case 'checking':
     case 'unknown':
       return { dot: 'bg-amber-400 animate-pulse', text: '检测中' }
@@ -47,7 +47,8 @@ const statusInfo = computed(() => {
     <div class="ml-auto flex items-center gap-1">
       <RouterLink
         to="/setup"
-        class="mr-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+        class="press mr-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+        :class="backend.status === 'error' && 'anim-shake'"
         title="后端设置"
       >
         <span class="h-2 w-2 rounded-full" :class="statusInfo.dot" />
@@ -56,9 +57,11 @@ const statusInfo = computed(() => {
       <button
         class="btn-icon"
         :title="`主题：${THEME_META[theme.mode].label}（点击切换）`"
-        @click="theme.cycle()"
+        @click="theme.cycle($event)"
       >
-        <Icon :name="THEME_META[theme.mode].icon" class="h-5 w-5" />
+        <Transition name="page" mode="out-in">
+          <Icon :key="theme.mode" :name="THEME_META[theme.mode].icon" class="h-5 w-5" />
+        </Transition>
       </button>
     </div>
   </header>

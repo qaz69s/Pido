@@ -20,6 +20,7 @@ import {
 import { describeError, errorMessage } from '@/api/http'
 import { useBackendStore } from '@/stores/backend'
 import { useThemeStore } from '@/stores/theme'
+import { useMotionStore } from '@/stores/motion'
 import { useToastStore } from '@/stores/toast'
 import { useConfirmStore } from '@/stores/confirm'
 import EmptyState from '@/components/common/EmptyState.vue'
@@ -32,6 +33,7 @@ import { THEME_PRESETS } from '@/utils/themes'
 const router = useRouter()
 const backend = useBackendStore()
 const theme = useThemeStore()
+const motion = useMotionStore()
 const toast = useToastStore()
 const confirm = useConfirmStore()
 
@@ -475,7 +477,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                   :key="t.value"
                   class="flex items-center gap-1 rounded-md px-2 py-1 transition"
                   :class="theme.mode === t.value ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
-                  @click="theme.setMode(t.value)"
+                  @click="theme.setMode(t.value, $event)"
                 >
                   <Icon :name="t.icon" class="h-3.5 w-3.5" />
                   <span class="hidden sm:inline">{{ t.label }}</span>
@@ -496,7 +498,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                       : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
                   "
                   :title="p.desc"
-                  @click="theme.setPreset(p.id)"
+                  @click="theme.setPreset(p.id, $event)"
                 >
                   <div class="flex h-7 overflow-hidden rounded-md">
                     <span class="flex-[2]" :style="{ background: p.swatch[0] }" />
@@ -507,6 +509,9 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                 </button>
               </div>
             </div>
+            <SettingRow title="动画效果" description="页面切换、展开、数字滚动等动画；系统开了「减少动画」时默认关闭">
+              <Switch :model-value="motion.enabled" @update:model-value="motion.setEnabled" />
+            </SettingRow>
             <div class="flex items-center gap-3 px-4 py-3">
               <div class="min-w-0 flex-1">
                 <div class="text-sm font-medium">当前后端</div>

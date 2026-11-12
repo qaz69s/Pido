@@ -249,7 +249,8 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 </script>
 
 <template>
-  <div class="space-y-3">
+  <!-- stagger：代理组卡片首次出现时依次浮现 -->
+  <div class="stagger space-y-3">
     <!-- 工具栏：不换行，空间不够时标签先收缩（手机系统字体放大时也保持一行） -->
     <div class="flex items-center gap-2">
       <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
@@ -328,7 +329,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
     <!-- 加载中 -->
     <div v-if="loading" class="space-y-3">
-      <div v-for="i in 3" :key="i" class="card h-20 animate-pulse" />
+      <div v-for="i in 4" :key="i" class="card skeleton h-20" />
     </div>
 
     <!-- 加载失败 -->

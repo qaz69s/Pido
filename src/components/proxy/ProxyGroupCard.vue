@@ -3,12 +3,14 @@
  * 代理组卡片
  * - 标题栏：图标（配置里的 icon）、组名、类型、当前节点、节点数、整组测速、折叠
  * - 折叠时显示一排延迟色点，方便快速概览
+ * - 动画：展开/收起高度过渡；整组测速时色点依次亮起；延迟更新时数字轻闪
  */
 import { computed } from 'vue'
 import { delayLevel, delayText, DELAY_BG_CLASS, DELAY_TEXT_CLASS } from '@/utils/format'
 import Icon from '@/components/common/Icon.vue'
 import ProxyNode from './ProxyNode.vue'
 import ProxyIcon from './ProxyIcon.vue'
+import ExpandTransition from '@/components/common/ExpandTransition.vue'
 
 const props = defineProps({
   group: { type: Object, required: true }, // { name, type, now, all }
@@ -60,7 +62,7 @@ const nodes = computed(() => {
           <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ group.type }} · {{ group.all?.length || 0 }}</span>
           <!-- 右上角：当前节点延迟 -->
           <span v-if="nowDelay !== undefined" class="ml-auto shrink-0 text-xs font-medium tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]">
-            {{ delayText(nowDelay) }}
+            <span :key="delayText(nowDelay)" class="anim-pop">{{ delayText(nowDelay) }}</span>
           </span>
         </div>
         <!-- 第二行：当前节点 -->
@@ -74,44 +76,49 @@ const nodes = computed(() => {
         title="整组测速"
         @click.stop="emit('test-group')"
       >
-        <Icon name="zap" class="h-[18px] w-[18px]" :class="testing && 'animate-pulse text-brand-500'" />
+        <Icon name="zap" class="h-[18px] w-[18px]" :class="testing && 'anim-zap text-brand-500'" />
       </button>
       <Icon
         name="chevronDown"
-        class="h-5 w-5 text-slate-400 transition-transform"
+        class="h-5 w-5 text-slate-400 transition-transform duration-300"
         :class="collapsed ? '' : 'rotate-180'"
       />
     </header>
 
     <!-- 折叠时：延迟色点，左侧与文字对齐（图标只占前两行，与展开时一致） -->
-    <div v-if="collapsed" class="-mt-1 flex flex-wrap gap-1 pb-3 pr-4" :class="group.icon ? 'pl-[68px]' : 'pl-4'">
-      <span
-        v-for="n in nodes"
-        :key="n.name"
-        class="h-2 w-2 rounded-full"
-        :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900']"
-        :title="n.name"
-      />
-    </div>
+    <ExpandTransition>
+      <div v-if="collapsed" class="-mt-1 flex flex-wrap gap-1 pb-3 pr-4" :class="group.icon ? 'pl-[68px]' : 'pl-4'">
+        <span
+          v-for="(n, i) in nodes"
+          :key="n.name"
+          class="h-2 w-2 rounded-full transition-colors duration-300"
+          :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900', testing && 'anim-sweep']"
+          :style="testing ? { animationDelay: `${(i % 30) * 45}ms` } : null"
+          :title="n.name"
+        />
+      </div>
+    </ExpandTransition>
 
-    <!-- 展开：节点网格 -->
-    <div
-      v-if="!collapsed"
-      class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:border-slate-800"
-    >
-      <ProxyNode
-        v-for="n in nodes"
-        :key="n.name"
-        :name="n.name"
-        :type="n.type"
-        :icon="n.icon"
-        :delay="n.delay"
-        :active="n.name === group.now"
-        :selectable="selectable"
-        :testing="!!testingNodes[n.name] || testing"
-        @select="emit('select', n.name)"
-        @test="emit('test-node', n.name)"
-      />
-    </div>
+    <!-- 展开：节点网格（高度平滑拉开） -->
+    <ExpandTransition>
+      <div
+        v-if="!collapsed"
+        class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:border-slate-800"
+      >
+        <ProxyNode
+          v-for="n in nodes"
+          :key="n.name"
+          :name="n.name"
+          :type="n.type"
+          :icon="n.icon"
+          :delay="n.delay"
+          :active="n.name === group.now"
+          :selectable="selectable"
+          :testing="!!testingNodes[n.name] || testing"
+          @select="emit('select', n.name)"
+          @test="emit('test-node', n.name)"
+        />
+      </div>
+    </ExpandTransition>
   </section>
 </template>

@@ -3,6 +3,7 @@
  * 单个节点卡片
  * - 点击卡片：切换到该节点（仅 Selector 组可切换）
  * - 点击延迟：单独测该节点延迟
+ * - 动画：被选中时弹一下（.anim-select），延迟更新时数字轻闪（.anim-pop），按下轻微缩小
  */
 import { computed } from 'vue'
 import { delayLevel, delayText, DELAY_TEXT_CLASS } from '@/utils/format'
@@ -30,12 +31,12 @@ function onSelect() {
   <div
     role="button"
     :tabindex="selectable ? 0 : -1"
-    class="flex min-w-0 flex-col gap-1 rounded-xl border p-2.5 text-left transition"
+    class="flex min-w-0 flex-col gap-1 rounded-xl border p-2.5 text-left transition duration-200"
     :class="[
       active
-        ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
+        ? 'anim-select border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
         : 'border-slate-200 bg-white dark:border-slate-800 dark:bg-slate-900',
-      selectable && !active ? 'cursor-pointer hover:border-slate-300 hover:shadow-sm dark:hover:border-slate-600' : '',
+      selectable && !active ? 'press cursor-pointer hover:border-slate-300 hover:shadow-sm dark:hover:border-slate-600' : '',
       !selectable ? 'cursor-default' : '',
     ]"
     @click="onSelect"
@@ -56,7 +57,7 @@ function onSelect() {
         @click.stop="emit('test')"
       >
         <span v-if="testing" class="inline-block animate-pulse">测速中</span>
-        <span v-else>{{ delayText(delay) }}</span>
+        <span v-else :key="delayText(delay)" class="anim-pop">{{ delayText(delay) }}</span>
       </button>
     </div>
   </div>

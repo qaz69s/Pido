@@ -204,7 +204,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
     <!-- 加载中 -->
     <div v-if="loading" class="card divide-y divide-slate-100 dark:divide-slate-800">
-      <div v-for="i in 8" :key="i" class="h-12 animate-pulse" />
+      <div v-for="i in 8" :key="i" class="skeleton h-12" />
     </div>
 
     <!-- 加载失败 -->

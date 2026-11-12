@@ -6,6 +6,7 @@
  * - /connections 活动连接数与累计流量
  * - GET /configs 运行模式、端口、TUN 状态
  * 本页在 App.vue 中被 KeepAlive 缓存，切走再回来曲线不会清空
+ * 指标数字用 useTween 平滑滚动到新值，卡片首次进入依次浮现
  */
 import { computed, reactive, ref, onMounted, onActivated } from 'vue'
 import { useStream } from '@/composables/useStream'
@@ -14,6 +15,7 @@ import { getConfigs } from '@/api/configs'
 import { formatBytes, formatSpeed } from '@/utils/format'
 import TrafficChart from '@/components/charts/TrafficChart.vue'
 import Icon from '@/components/common/Icon.vue'
+import { useTween } from '@/composables/useTween'
 
 const MAX_POINTS = 60
 const backend = useBackendStore()
@@ -71,13 +73,21 @@ onActivated(loadConfigs)
 
 const MODE_LABEL = { rule: '规则', global: '全局', direct: '直连' }
 
+/* ---------- 数字补间（显示值平滑过渡到最新值） ---------- */
+const tUp = useTween(() => speed.up)
+const tDown = useTween(() => speed.down)
+const tUpTotal = useTween(() => conn.uploadTotal, { duration: 1200 })
+const tDownTotal = useTween(() => conn.downloadTotal, { duration: 1200 })
+const tMemory = useTween(() => memory.value)
+const tCount = useTween(() => conn.count)
+
 const stats = computed(() => [
-  { label: '上传速率', value: formatSpeed(speed.up), icon: 'arrowUp', color: 'text-amber-500 bg-amber-500/10' },
-  { label: '下载速率', value: formatSpeed(speed.down), icon: 'arrowDown', color: 'text-sky-500 bg-sky-500/10' },
-  { label: '上传总量', value: formatBytes(conn.uploadTotal), icon: 'upload', color: 'text-amber-500/80 bg-amber-500/5' },
-  { label: '下载总量', value: formatBytes(conn.downloadTotal), icon: 'download', color: 'text-sky-500/80 bg-sky-500/5' },
-  { label: '内存占用', value: formatBytes(memory.value), icon: 'cpu', color: 'text-emerald-500 bg-emerald-500/10' },
-  { label: '活动连接', value: String(conn.count), icon: 'link', color: 'text-violet-500 bg-violet-500/10' },
+  { label: '上传速率', value: formatSpeed(tUp.value), icon: 'arrowUp', color: 'text-amber-500 bg-amber-500/10' },
+  { label: '下载速率', value: formatSpeed(tDown.value), icon: 'arrowDown', color: 'text-sky-500 bg-sky-500/10' },
+  { label: '上传总量', value: formatBytes(tUpTotal.value), icon: 'upload', color: 'text-amber-500/80 bg-amber-500/5' },
+  { label: '下载总量', value: formatBytes(tDownTotal.value), icon: 'download', color: 'text-sky-500/80 bg-sky-500/5' },
+  { label: '内存占用', value: formatBytes(tMemory.value), icon: 'cpu', color: 'text-emerald-500 bg-emerald-500/10' },
+  { label: '活动连接', value: String(Math.round(tCount.value)), icon: 'link', color: 'text-violet-500 bg-violet-500/10' },
 ])
 
 const infoRows = computed(() => {
@@ -103,7 +113,7 @@ const infoRows = computed(() => {
     </div>
 
     <!-- 指标卡片 -->
-    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
+    <div class="stagger grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
       <div v-for="s in stats" :key="s.label" class="card flex items-center gap-3 p-3">
         <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl" :class="s.color">
           <Icon :name="s.icon" class="h-[18px] w-[18px]" />
@@ -115,7 +125,7 @@ const infoRows = computed(() => {
       </div>
     </div>
 
-    <div class="grid gap-3 lg:grid-cols-3">
+    <div class="stagger grid gap-3 lg:grid-cols-3">
       <!-- 流量曲线 -->
       <section class="card p-4 lg:col-span-2">
         <div class="mb-3 flex items-center justify-between">
