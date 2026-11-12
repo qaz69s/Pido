@@ -250,16 +250,16 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
 <template>
   <div class="space-y-3">
-    <!-- 工具栏 -->
-    <div class="flex flex-wrap items-center gap-2">
-      <div class="flex rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
+    <!-- 工具栏：不换行，空间不够时标签先收缩（手机系统字体放大时也保持一行） -->
+    <div class="flex items-center gap-2">
+      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
         <button
           v-for="t in [
             { key: 'groups', label: '代理组', count: groups.length },
             { key: 'providers', label: '代理集合', count: providerList.length },
           ]"
           :key="t.key"
-          class="rounded-md px-3 py-1 transition"
+          class="truncate whitespace-nowrap rounded-md transition"
           :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
           @click="tab = t.key"
         >
@@ -267,7 +267,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         </button>
       </div>
 
-      <div class="ml-auto flex items-center gap-1">
+      <div class="tb ml-auto flex shrink-0 items-center">
         <template v-if="tab === 'groups'">
           <button class="btn-icon" :title="allCollapsed ? '全部展开' : '全部折叠'" @click="toggleAll">
             <Icon name="chevronDown" class="h-5 w-5 transition-transform" :class="allCollapsed ? '' : 'rotate-180'" />

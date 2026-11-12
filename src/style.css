@@ -59,3 +59,24 @@
     scrollbar-width: none;
   }
 }
+
+/*
+ * 页面工具栏：按钮与标签使用固定像素尺寸，
+ * 避免手机系统「字体放大」时按钮内边距跟着 rem 变大，把工具栏挤成两行
+ */
+.tb {
+  gap: 4px;
+}
+.tb .btn-icon {
+  width: 34px;
+  height: 34px;
+}
+.tb .btn-primary,
+.tb .btn-danger,
+.tb .btn-outline {
+  height: 34px;
+  padding: 0 10px;
+}
+.tb-tabs > button {
+  padding: 4px 10px;
+}

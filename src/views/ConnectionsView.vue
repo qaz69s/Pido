@@ -254,16 +254,16 @@ const STATUS_TEXT = {
       </div>
     </div>
 
-    <!-- 工具栏 -->
-    <div class="flex flex-wrap items-center gap-2">
-      <div class="flex rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
+    <!-- 工具栏：标签与按钮一行不换行；手机上搜索框单独放在下一行 -->
+    <div class="flex items-center gap-2">
+      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
         <button
           v-for="t in [
             { key: 'active', label: '活动', count: active.length },
             { key: 'closed', label: '已关闭', count: closed.length },
           ]"
           :key="t.key"
-          class="rounded-md px-3 py-1 transition"
+          class="truncate whitespace-nowrap rounded-md transition"
           :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
           @click="tab = t.key"
         >
@@ -271,7 +271,7 @@ const STATUS_TEXT = {
         </button>
       </div>
 
-      <div class="relative order-last w-full sm:order-none sm:w-auto sm:flex-1">
+      <div class="relative hidden min-w-0 flex-1 sm:block">
         <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
         <input
           v-model="keyword"
@@ -281,7 +281,7 @@ const STATUS_TEXT = {
         />
       </div>
 
-      <div class="ml-auto flex items-center gap-1">
+      <div class="tb ml-auto flex shrink-0 items-center">
         <!-- 手机端排序：一个图标 + 小菜单（再点当前项切换升降序）；宽屏用表头排序 -->
         <div v-if="tab === 'active'" class="relative md:hidden">
           <button
@@ -325,6 +325,17 @@ const STATUS_TEXT = {
           <span class="hidden sm:inline">清空</span>
         </button>
       </div>
+    </div>
+
+    <!-- 手机端搜索框 -->
+    <div class="relative sm:hidden">
+      <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <input
+        v-model="keyword"
+        class="input py-1.5 pl-8"
+        placeholder="搜索主机、IP、进程、规则、节点（空格分隔多个词）"
+        type="search"
+      />
     </div>
 
     <!-- 状态提示 -->
