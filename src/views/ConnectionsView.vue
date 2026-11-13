@@ -267,7 +267,7 @@ const STATUS_TEXT = {
           :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
           @click="tab = t.key"
         >
-          {{ t.label }} <span class="text-xs text-slate-400">{{ t.count }}</span>
+          {{ t.label }} <span class="tab-count text-xs text-slate-400">{{ t.count }}</span>
         </button>
       </div>
 

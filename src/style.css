@@ -84,3 +84,13 @@
 .tb-tabs > button {
   padding: 4px 10px;
 }
+/* 标签上的数量：预留固定宽度，数字从 0 变成多位数时按钮不变宽、相邻标签不跳动 */
+.tab-count {
+  display: inline-block;
+  min-width: 3ch;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+.tab-count.w4 {
+  min-width: 4ch;
+}
