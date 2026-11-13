@@ -4,7 +4,7 @@
  * - 面板：POST /upgrade/ui，由内核下载 external-ui-url 指向的 zip 并覆盖面板目录，完成后刷新页面
  * - 内核：POST /upgrade?channel=release|alpha，内核下载新版本、替换自身并重启；之后轮询 /version 等它回来
  */
-import { computed, onMounted, reactive, ref, watch } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { getVersion, upgradeCore, upgradeUi } from '@/api/configs'
 import { errorMessage } from '@/api/http'
 import { useBackendStore } from '@/stores/backend'
@@ -18,8 +18,6 @@ import {
   fetchLatestRelease,
   fetchLatestAlpha,
   isAlphaVersion,
-  readLatestCache,
-  writeLatestCache,
 } from '@/utils/updates'
 
 const backend = useBackendStore()
@@ -30,29 +28,16 @@ const coreVersion = computed(() => backend.version?.version || '')
 
 /** 升级通道：默认跟随当前内核（Alpha 内核默认选 Alpha） */
 const channel = ref(isAlphaVersion(coreVersion.value) ? 'alpha' : 'release')
-// 内核版本可能在本组件创建后才拿到：第一次拿到时再按它选一次通道
-const stopChannelWatch = watch(coreVersion, (v) => {
-  if (!v) return
-  channel.value = isAlphaVersion(v) ? 'alpha' : 'release'
-  stopChannelWatch()
-})
 const CHANNELS = [
   { value: 'release', label: 'Release', desc: '正式版' },
   { value: 'alpha', label: 'Alpha', desc: '预览版' },
 ]
 
-/** GitHub 上的最新版本，null = 未知；errors 记录每项查询失败的原因，用于在界面上提示 */
+/** GitHub 上的最新版本，null = 未知 */
 const latest = reactive({ panel: null, release: null, alpha: null })
-const errors = reactive({ panel: '', release: '', alpha: '' })
 const checking = ref(false)
 
-/** force = true：用户点「检查更新」，跳过缓存 */
-async function checkLatest(force = false) {
-  const cached = !force && readLatestCache()
-  if (cached) {
-    Object.assign(latest, cached)
-    return
-  }
+async function checkLatest() {
   checking.value = true
   const tasks = [
     ['panel', fetchLatestPanelVersion],
@@ -63,21 +48,14 @@ async function checkLatest(force = false) {
     tasks.map(async ([k, fn]) => {
       try {
         latest[k] = await fn()
-        errors[k] = ''
-      } catch (e) {
+      } catch {
         latest[k] = null
-        errors[k] = e?.name === 'AbortError' ? '连接 GitHub 超时' : e?.message || '网络错误'
       }
     }),
   )
   checking.value = false
-  // 三项都成功才缓存，部分失败时下次打开再试
-  if (latest.panel && latest.release && latest.alpha) writeLatestCache({ ...latest })
 }
-onMounted(() => checkLatest())
-
-/** 「最新」一栏的显示：查询中 / 失败原因 */
-const latestHint = (k) => (checking.value ? '检查中…' : errors[k] ? `检查失败（${errors[k]}）` : '')
+onMounted(checkLatest)
 
 const latestCore = computed(() => latest[channel.value])
 const panelHasUpdate = computed(() => latest.panel && latest.panel !== PANEL_VERSION)
@@ -182,7 +160,7 @@ async function updateCore(force = false) {
   <section class="card divide-y divide-slate-100 dark:divide-slate-800">
     <div class="flex items-center gap-2 px-4 pb-2 pt-4">
       <h2 class="flex-1 font-semibold">更新</h2>
-      <button class="btn-ghost py-1 text-xs" :disabled="checking" @click="checkLatest(true)">
+      <button class="btn-ghost py-1 text-xs" :disabled="checking" @click="checkLatest">
         <Icon name="refresh" class="h-3.5 w-3.5" :class="checking && 'animate-spin'" />
         检查更新
       </button>
@@ -198,7 +176,6 @@ async function updateCore(force = false) {
         <div class="mt-0.5 text-xs text-slate-500">
           当前 <span class="font-mono">{{ PANEL_VERSION }}</span>
           <template v-if="latest.panel"> · 最新 <span class="font-mono">{{ latest.panel }}</span></template>
-          <template v-else-if="latestHint('panel')"> · {{ latestHint('panel') }}</template>
         </div>
       </div>
       <button class="btn-outline py-1 text-xs" :disabled="upgradingUi" @click="updatePanel">
@@ -218,7 +195,6 @@ async function updateCore(force = false) {
           <div class="mt-0.5 text-xs text-slate-500">
             当前 <span class="font-mono">{{ coreVersion || '--' }}</span>
             <template v-if="latestCore"> · 最新 <span class="font-mono">{{ latestCore }}</span></template>
-            <template v-else-if="latestHint(channel)"> · {{ latestHint(channel) }}</template>
           </div>
         </div>
         <button

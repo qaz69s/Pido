@@ -29,51 +29,22 @@ async function getJson(url) {
   }
 }
 
-/**
- * jsDelivr 的仓库版本列表：国内通常可直连、没有 GitHub API 每小时 60 次的限制，
- * 作为 GitHub API 失败时的备用来源（只含正式版标签，不含 Alpha）
- */
-async function latestFromJsdelivr(repo) {
-  const d = await getJson(`https://data.jsdelivr.com/v1/packages/gh/${repo}`)
-  const v = d.versions?.[0]?.version
-  if (!v) throw new Error('jsDelivr 无版本数据')
-  return v
-}
-
-/** 依次尝试多个来源，返回第一个成功的结果；全部失败时抛出第一个错误 */
-async function firstOk(fns) {
-  let first
-  for (const fn of fns) {
-    try {
-      return await fn()
-    } catch (e) {
-      first = first || e
-    }
-  }
-  throw first
-}
-
 /** 面板最新版本：最新 Release 的标签（去掉开头的 v），与 dist.zip 下载地址保持一致 */
 export async function fetchLatestPanelVersion() {
   if (!PANEL_REPO) throw new Error('构建时未设置仓库')
-  return firstOk([
-    async () => String((await getJson(`https://api.github.com/repos/${PANEL_REPO}/releases/latest`)).tag_name || '').replace(/^v/, ''),
-    () => latestFromJsdelivr(PANEL_REPO),
-  ])
+  const d = await getJson(`https://api.github.com/repos/${PANEL_REPO}/releases/latest`)
+  return String(d.tag_name || '').replace(/^v/, '')
 }
 
-const MIHOMO_REPO = 'MetaCubeX/mihomo'
-const MIHOMO_API = `https://api.github.com/repos/${MIHOMO_REPO}/releases`
+const MIHOMO_API = 'https://api.github.com/repos/MetaCubeX/mihomo/releases'
 
 /** mihomo Release 正式版最新版本，例如 v1.19.15 */
 export async function fetchLatestRelease() {
-  return firstOk([
-    async () => (await getJson(`${MIHOMO_API}/latest`)).tag_name,
-    async () => 'v' + (await latestFromJsdelivr(MIHOMO_REPO)),
-  ])
+  const d = await getJson(`${MIHOMO_API}/latest`)
+  return d.tag_name
 }
 
-/** mihomo Alpha 预览版最新版本，例如 alpha-1a2b3c4（从附件文件名中解析；只有 GitHub API 能查到） */
+/** mihomo Alpha 预览版最新版本，例如 alpha-1a2b3c4（从附件文件名中解析） */
 export async function fetchLatestAlpha() {
   const d = await getJson(`${MIHOMO_API}/tags/Prerelease-Alpha`)
   for (const a of d.assets || []) {
@@ -81,28 +52,6 @@ export async function fetchLatestAlpha() {
     if (m) return m[1]
   }
   return d.name || 'Alpha'
-}
-
-/* ---------- 结果缓存：30 分钟内重复打开配置页不再请求，避免触发 GitHub 频率限制 ---------- */
-const CACHE_KEY = 'mihomo-dashboard:latest-versions'
-const CACHE_TTL = 30 * 60 * 1000
-
-export function readLatestCache() {
-  try {
-    const c = JSON.parse(localStorage.getItem(CACHE_KEY) || 'null')
-    if (c && Date.now() - c.time < CACHE_TTL) return c.data
-  } catch {
-    /* 忽略损坏的缓存 */
-  }
-  return null
-}
-
-export function writeLatestCache(data) {
-  try {
-    localStorage.setItem(CACHE_KEY, JSON.stringify({ time: Date.now(), data }))
-  } catch {
-    /* 存储已满等情况忽略 */
-  }
 }
 
 /** 当前内核是否为 Alpha 版（mihomo 的 Alpha 版本号以 alpha 开头） */
