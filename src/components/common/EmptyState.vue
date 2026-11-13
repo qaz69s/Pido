@@ -14,7 +14,7 @@ defineProps({
 
 <template>
   <div class="flex flex-col items-center px-4 py-12 text-center">
-    <div class="mb-3 grid h-12 w-12 place-items-center rounded-full bg-slate-100 text-slate-400 dark:bg-slate-800">
+    <div class="mb-3 grid h-12 w-12 place-items-center rounded-full bg-tile text-slate-400">
       <Icon :name="icon" class="h-6 w-6" />
     </div>
     <h3 class="font-semibold">{{ title }}</h3>

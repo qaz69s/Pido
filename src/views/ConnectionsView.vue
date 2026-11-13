@@ -396,7 +396,7 @@ const STATUS_TEXT = {
             <tr
               v-for="c in visible"
               :key="c.id"
-              class="cursor-pointer transition hover:bg-slate-50 dark:hover:bg-slate-800/50"
+              class="cursor-pointer transition hover:bg-tile"
               @click="detail = c"
             >
               <td class="max-w-[16rem] px-3 py-2">
@@ -439,7 +439,7 @@ const STATUS_TEXT = {
 
       <!-- 手机端：卡片 -->
       <TransitionGroup :key="tab" tag="div" name="conn" class="space-y-2 md:hidden">
-        <div v-for="c in visible" :key="c.id" class="card p-3 active:bg-slate-50 dark:active:bg-slate-800/50" @click="detail = c">
+        <div v-for="c in visible" :key="c.id" class="card p-3 active:bg-tile" @click="detail = c">
           <div class="flex items-start gap-2">
             <div class="min-w-0 flex-1">
               <div class="truncate font-medium">{{ connTarget(c) }}</div>

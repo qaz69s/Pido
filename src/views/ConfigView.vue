@@ -309,7 +309,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                 :class="
                   mode === m.value
                     ? 'border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-500 dark:bg-brand-500/10 dark:text-brand-300'
-                    : 'border-slate-200 hover:bg-slate-50 dark:border-slate-700 dark:hover:bg-slate-800'
+                    : 'border-transparent bg-tile hover:brightness-95 dark:hover:brightness-110'
                 "
                 :disabled="saving.mode"
                 @click="setMode(m.value)"
@@ -471,12 +471,12 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <section class="card divide-y divide-slate-100 dark:divide-slate-800">
             <h2 class="px-4 pb-2 pt-4 font-semibold">面板</h2>
             <SettingRow title="外观">
-              <div class="flex rounded-lg bg-slate-200/70 p-0.5 text-xs dark:bg-slate-800">
+              <div class="flex rounded-lg bg-tile p-0.5 text-xs dark:bg-page">
                 <button
                   v-for="t in THEMES"
                   :key="t.value"
                   class="flex items-center gap-1 rounded-md px-2 py-1 transition"
-                  :class="theme.mode === t.value ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
+                  :class="theme.mode === t.value ? 'bg-white font-medium shadow-sm dark:bg-tile' : 'text-slate-500'"
                   @click="theme.setMode(t.value, $event)"
                 >
                   <Icon :name="t.icon" class="h-3.5 w-3.5" />

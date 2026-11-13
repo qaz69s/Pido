@@ -92,7 +92,7 @@ function onSelect() {
       <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
       <button
         type="button"
-        class="shrink-0 rounded px-1 tabular-nums font-semibold hover:bg-slate-100 dark:hover:bg-slate-800"
+        class="shrink-0 rounded px-1 tabular-nums font-semibold hover:bg-slate-200/60 dark:hover:bg-white/10"
         :class="delayClass"
         :disabled="testing"
         title="测试延迟"

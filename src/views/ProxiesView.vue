@@ -399,7 +399,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
               <span>{{ subscription(p).used }} / {{ subscription(p).total }}</span>
               <span>到期 {{ subscription(p).expire }}</span>
             </div>
-            <div class="h-1.5 overflow-hidden rounded-full bg-slate-100 dark:bg-slate-800">
+            <div class="h-1.5 overflow-hidden rounded-full bg-tile">
               <div
                 class="h-full rounded-full"
                 :class="subscription(p).percent > 90 ? 'bg-rose-500' : 'bg-brand-500'"

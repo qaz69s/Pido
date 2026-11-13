@@ -26,7 +26,7 @@ const LEVELS = [
 
 /** 各级别的标签样式 */
 const LEVEL_CLASS = {
-  debug: 'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
+  debug: 'bg-tile text-slate-500 dark:text-slate-400',
   info: 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300',
   warning: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
   error: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',

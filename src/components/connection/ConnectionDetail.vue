@@ -64,20 +64,20 @@ const metaRows = computed(() => {
     <template v-if="conn">
       <!-- 流量概要 -->
       <div class="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-        <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-800/60">
+        <div class="rounded-lg bg-tile p-2">
           <div class="text-xs text-slate-500">下载</div>
           <div class="font-medium">{{ formatBytes(conn.download) }}</div>
         </div>
-        <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-800/60">
+        <div class="rounded-lg bg-tile p-2">
           <div class="text-xs text-slate-500">上传</div>
           <div class="font-medium">{{ formatBytes(conn.upload) }}</div>
         </div>
-        <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-800/60">
+        <div class="rounded-lg bg-tile p-2">
           <div class="text-xs text-slate-500">速率 ↓/↑</div>
           <div class="truncate font-medium">{{ formatSpeed(conn.downSpeed || 0) }}</div>
           <div class="truncate text-xs text-slate-500">{{ formatSpeed(conn.upSpeed || 0) }}</div>
         </div>
-        <div class="rounded-lg bg-slate-50 p-2 dark:bg-slate-800/60">
+        <div class="rounded-lg bg-tile p-2">
           <div class="text-xs text-slate-500">{{ closed ? '持续时长' : '已连接' }}</div>
           <div class="font-medium">{{ formatDuration(conn.start, closed ? conn.closedAt : now) }}</div>
         </div>
