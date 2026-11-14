@@ -116,7 +116,7 @@ const isLarge = computed(() => nodes.value.length > LARGE)
       <div
         v-if="rendered"
         v-show="!collapsed"
-        class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 dark:border-slate-800"
+        class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3 dark:border-slate-800"
       >
         <ProxyNode
           v-for="n in nodes"

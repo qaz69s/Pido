@@ -341,7 +341,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     </div>
 
     <!-- 加载中 -->
-    <div v-if="loading" class="space-y-3">
+    <div v-if="loading" class="grid gap-3 lg:grid-cols-2">
       <div v-for="i in 4" :key="i" class="card skeleton h-20" />
     </div>
 
@@ -358,6 +358,8 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       <div v-if="!groups.length" class="card">
         <EmptyState icon="globe" title="没有代理组" description="配置文件中未定义 proxy-groups。" />
       </div>
+      <!-- 桌面端（lg 以上）两列排布，手机/平板保持单列；items-start 让左右卡片各自高度 -->
+      <div v-else class="grid items-start gap-3 lg:grid-cols-2">
       <ProxyGroupCard
         v-for="g in groups"
         :key="g.name"
@@ -373,6 +375,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         @test-node="onTestNode"
         @test-group="onTestGroup(g).catch(() => {})"
       />
+      </div>
     </template>
 
     <!-- 代理集合 -->
