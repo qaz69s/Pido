@@ -1,13 +1,20 @@
 <script setup>
 /**
  * 顶栏：页面标题、连接状态、主题切换、后端设置入口
- * - 连接 dae / honk（标准 API）时，版本前用淡色标出引擎名，如「dae 2.1.2」
+ * - 已连接时状态胶囊显示对应内核的图标（mihomo / dae / honk），右下角小圆点表示连接状态
  */
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBackendStore } from '@/stores/backend'
 import { useThemeStore } from '@/stores/theme'
 import Icon from '@/components/common/Icon.vue'
+import mihomoLogo from '@/assets/cores/mihomo.png'
+import daeLogo from '@/assets/cores/dae.png'
+import honkLogo from '@/assets/cores/honk.png'
+
+/** 内核图标；honk 暂无独立 Logo，使用 daeuniverse 组织图标 */
+const CORE_LOGOS = { mihomo: mihomoLogo, dae: daeLogo, honk: honkLogo }
+const CORE_NAMES = { mihomo: 'mihomo', dae: 'dae', honk: 'honk' }
 
 const route = useRoute()
 const backend = useBackendStore()
@@ -26,8 +33,8 @@ const statusInfo = computed(() => {
       return {
         dot: 'bg-emerald-500 anim-breathe',
         text: backend.version?.version || '已连接',
-        // 标准 API：引擎名单独淡色显示
-        engine: backend.isStandard ? backend.engine : '',
+        logo: CORE_LOGOS[backend.engine] || '',
+        engine: CORE_NAMES[backend.engine] || backend.engine,
       }
     case 'checking':
     case 'unknown':
@@ -54,11 +61,16 @@ const statusInfo = computed(() => {
       <RouterLink
         to="/setup"
         class="press mr-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-        :class="backend.status === 'error' && 'anim-shake'"
-        title="后端设置"
+        :class="[backend.status === 'error' && 'anim-shake', statusInfo.logo && 'pl-1']"
+        :title="statusInfo.engine ? `${statusInfo.engine} ${statusInfo.text} · 后端设置` : '后端设置'"
       >
-        <span class="h-2 w-2 rounded-full" :class="statusInfo.dot" />
-        <span class="max-w-[9rem] truncate"><span v-if="statusInfo.engine" class="mr-1 text-slate-400 dark:text-slate-500">{{ statusInfo.engine }}</span>{{ statusInfo.text }}</span>
+        <!-- 已连接：内核图标 + 状态小圆点；其他状态只显示圆点 -->
+        <span v-if="statusInfo.logo" class="relative h-5 w-5 shrink-0">
+          <img :src="statusInfo.logo" :alt="statusInfo.engine" class="h-5 w-5 rounded-full bg-white object-cover ring-1 ring-black/5 dark:ring-white/10" />
+          <span class="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-2 ring-white dark:ring-slate-900" :class="statusInfo.dot" />
+        </span>
+        <span v-else class="h-2 w-2 rounded-full" :class="statusInfo.dot" />
+        <span class="max-w-[9rem] truncate">{{ statusInfo.text }}</span>
       </RouterLink>
       <button
         class="btn-icon"

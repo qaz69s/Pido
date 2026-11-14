@@ -149,18 +149,15 @@ const infoRows = computed(() => {
       实时数据连接失败，正在自动重试。若持续出现，请检查 secret 或网络。
     </div>
 
-    <!-- 指标卡片
-      - 列数：手机 2 列，平板 / 常见桌面 3 列，超宽屏（2xl）才排成一行，避免 1280 左右的桌面上数值被截断
-      - 卡片内部用容器查询（style.css 的 .stat-tile）：卡片较窄时图标与标签同行、数值独占一行，
-        手机系统字体放大到 150% 时数值也不会被截断 -->
+    <!-- 指标卡片（排版同 v0.3；桌面 1280 左右用 3 列，超宽屏 2xl 才排成一行，避免数值被截断） -->
     <div class="stagger grid grid-cols-2 gap-3 sm:grid-cols-3" :class="stats.length === 5 ? '2xl:grid-cols-5' : '2xl:grid-cols-6'">
-      <div v-for="s in stats" :key="s.label" class="card stat-tile p-3">
-        <div class="stat-body">
-          <span class="stat-icon grid shrink-0 place-items-center rounded-xl" :class="s.color">
-            <Icon :name="s.icon" class="h-[18px] w-[18px]" />
-          </span>
-          <div class="stat-label truncate text-xs text-slate-500">{{ s.label }}</div>
-          <div class="stat-value whitespace-nowrap text-[17px] font-semibold tabular-nums">{{ s.value }}</div>
+      <div v-for="s in stats" :key="s.label" class="card flex items-center gap-3 p-3">
+        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl" :class="s.color">
+          <Icon :name="s.icon" class="h-[18px] w-[18px]" />
+        </span>
+        <div class="min-w-0">
+          <div class="text-xs text-slate-500">{{ s.label }}</div>
+          <div class="truncate text-[17px] font-semibold tabular-nums">{{ s.value }}</div>
         </div>
       </div>
     </div>

@@ -97,47 +97,4 @@
   min-width: 4ch;
 }
 
-/*
- * 概览页指标卡片（容器查询，按卡片自身宽度排版，不依赖屏幕断点）
- * - 宽卡片：图标在左，标签 / 数值上下两行
- * - 窄卡片（手机，或系统字体放大）：图标与标签同一行，数值独占整行 —— 数值永不截断
- * 阈值用 rem：字体放大时阈值同步变大，更早切换为窄排版
- */
-.stat-tile {
-  container-type: inline-size;
-}
-.stat-body {
-  display: grid;
-  grid-template-columns: auto minmax(0, 1fr);
-  grid-template-areas: 'icon label' 'icon value';
-  column-gap: 0.75rem;
-  align-items: center;
-}
-.stat-icon {
-  grid-area: icon;
-  width: 2.25rem;
-  height: 2.25rem;
-}
-.stat-label {
-  grid-area: label;
-  align-self: end;
-}
-.stat-value {
-  grid-area: value;
-  align-self: start;
-}
-@container (max-width: 11rem) {
-  .stat-body {
-    grid-template-areas: 'icon label' 'value value';
-    column-gap: 0.5rem;
-    row-gap: 0.375rem;
-  }
-  .stat-icon {
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: calc(0.5rem * var(--radius-scale, 1));
-  }
-  .stat-label {
-    align-self: center;
-  }
-}
+
