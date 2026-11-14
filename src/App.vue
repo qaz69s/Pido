@@ -41,7 +41,7 @@ onMounted(() => {
     <Sidebar />
     <div class="flex min-h-screen flex-col">
       <TopBar />
-      <main class="mx-auto w-full max-w-7xl flex-1 px-3 pb-24 pt-3 sm:px-4 md:pb-8">
+      <main class="mx-auto w-full min-w-0 max-w-7xl flex-1 overflow-x-clip px-3 pb-24 pt-3 sm:px-4 md:pb-8">
         <ErrorBanner class="mb-3" />
         <RouterView v-slot="{ Component }">
           <Transition name="page" mode="out-in">

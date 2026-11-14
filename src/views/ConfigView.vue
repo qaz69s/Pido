@@ -279,7 +279,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         这里的修改立即生效，但只作用于当前运行的内核；重启或重载配置后会恢复为配置文件中的值。
       </p>
 
-      <div class="grid gap-4 lg:grid-cols-2">
+      <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <!-- 左列 -->
         <div class="space-y-4">
           <!-- 运行模式：紧凑分段按钮，说明放在 title 里 -->

@@ -99,7 +99,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 </script>
 
 <template>
-  <div class="space-y-4">
+  <div class="min-w-0 space-y-4">
     <p class="flex items-start gap-1.5 text-xs text-slate-500">
       <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
       已连接 {{ backend.engine }} 的原生 API。运行模式、TUN、端口等 mihomo 专属设置不适用；配置在下方按文件编辑，保存后自动重载。
@@ -108,9 +108,9 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     <!-- 配置文件编辑 -->
     <ConfigEditor @reloaded="load({ silent: true })" />
 
-    <div class="grid gap-4 lg:grid-cols-2">
+    <div class="grid grid-cols-1 gap-4 lg:grid-cols-2">
       <!-- 左列 -->
-      <div class="space-y-4">
+      <div class="min-w-0 space-y-4">
         <!-- 后端信息 -->
         <section class="card">
           <div class="flex items-center gap-2 px-4 pb-2 pt-4">
@@ -155,7 +155,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       </div>
 
       <!-- 右列 -->
-      <div class="space-y-4">
+      <div class="min-w-0 space-y-4">
         <!-- 维护 -->
         <section class="card divide-y divide-slate-100 dark:divide-slate-800">
           <h2 class="px-4 pb-2 pt-4 font-semibold">维护</h2>

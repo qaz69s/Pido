@@ -292,7 +292,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
   <section class="card">
     <div class="flex flex-wrap items-center gap-2 px-4 pb-2 pt-4">
       <h2 class="flex-1 whitespace-nowrap font-semibold">配置文件</h2>
-      <span v-if="config?.revision" class="chip font-mono" title="配置 revision">rev {{ config.revision }}</span>
+      <span v-if="config?.revision" class="chip min-w-0 max-w-full truncate font-mono" title="配置 revision">rev {{ config.revision }}</span>
       <button class="btn-ghost py-1 text-xs" :disabled="loading" title="重新读取" @click="load({ silent: true })">
         <Icon name="refresh" class="h-3.5 w-3.5" :class="loading && 'animate-spin'" />
         刷新
@@ -307,9 +307,9 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
       <button class="btn-primary" @click="load()">重试</button>
     </EmptyState>
 
-    <div v-else-if="current" class="grid gap-3 px-4 pb-4 md:grid-cols-[13rem_minmax(0,1fr)]">
+    <div v-else-if="current" class="grid grid-cols-1 gap-3 px-4 pb-4 md:grid-cols-[13rem_minmax(0,1fr)]">
       <!-- 文件列表：桌面竖排，手机横向滚动 -->
-      <nav class="no-scrollbar -mx-4 flex gap-1 overflow-x-auto px-4 md:mx-0 md:flex-col md:overflow-visible md:px-0" aria-label="配置文件">
+      <nav class="no-scrollbar -mx-4 flex min-w-0 gap-1 overflow-x-auto px-4 md:mx-0 md:flex-col md:overflow-visible md:px-0" aria-label="配置文件">
         <button
           v-for="s in sources"
           :key="s.id"
