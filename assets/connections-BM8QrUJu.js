@@ -1,0 +1,1 @@
+import{S as n,T as o,am as e,an as t,ao as c}from"./index-CCwG7rKy.js";const i=()=>o()?c():n.get("/connections"),l=()=>o()?e():n.del("/connections"),C=s=>o()?t(s):n.del(`/connections/${encodeURIComponent(s)}`);export{l as a,C as c,i as g};
