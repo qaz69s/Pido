@@ -69,6 +69,19 @@ function barHeight(d) {
   if (d === 0) return 100
   return Math.max(18, Math.min(100, (d / maxDelay.value) * 100))
 }
+/** 延迟胶囊：淡底 + 亮一点的同色描边 */
+const DELAY_CHIP = {
+  good: 'bg-emerald-500/15 ring-emerald-400/60',
+  ok: 'bg-amber-400/15 ring-amber-300/60',
+  bad: 'bg-orange-500/15 ring-orange-400/60',
+  timeout: 'bg-rose-500/15 ring-rose-400/60',
+  none: 'bg-slate-500/15 ring-slate-400/50',
+}
+function barPx(d) {
+  if (d == null) return 4
+  if (d === 0) return 16
+  return Math.max(3, Math.min(16, Math.sqrt(d / maxDelay.value) * 16))
+}
 const isLarge = computed(() => nodes.value.length > LARGE)
 </script>
 
@@ -87,9 +100,8 @@ const isLarge = computed(() => nodes.value.length > LARGE)
           <h3 class="max-w-full shrink-0 truncate font-semibold">{{ group.name }}</h3>
           <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ group.type }} · {{ group.all?.length || 0 }}</span>
           <!-- 右上角：当前节点延迟 -->
-          <span v-if="nowDelay !== undefined" class="ml-auto shrink-0 text-[13px] font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]">
-            <span :key="delayText(nowDelay)" class="anim-pop">{{ delayText(nowDelay) }}</span>
-          </span>
+          <!-- 右上角：当前节点延迟，同色淡底 + 亮描边的胶囊 -->
+          <span v-if="nowDelay !== undefined" class="ml-auto shrink-0 rounded-full px-2 py-px text-[13px] font-semibold tabular-nums ring-1 ring-inset" :class="[DELAY_TEXT_CLASS[delayLevel(nowDelay)], DELAY_CHIP[delayLevel(nowDelay)]]">{{ delayText(nowDelay) }}</span>
         </div>
         <!-- 第二行：当前节点 -->
         <div class="mt-0.5 flex items-center gap-2 text-sm">
@@ -115,16 +127,24 @@ const isLarge = computed(() => nodes.value.length > LARGE)
     </header>
 
     <!-- 折叠时：迷你延迟柱，与文字左对齐；节点很多时柱子自动变细（最细 2px），不换行 -->
-    <div v-if="collapsed" class="-mt-1 px-4 pb-3">
-      <div class="flex h-4 items-end gap-[3px] overflow-hidden">
-      <span
-        v-for="(n, i) in nodes"
-        :key="n.name"
-        class="min-w-[2px] max-w-[5px] flex-1 rounded-sm transition-[height,background-color] duration-300"
-        :class="[n.name === group.now ? 'bg-brand-500' : [DELAY_BG_CLASS[delayLevel(n.delay)], 'opacity-80'], testing && 'anim-sweep']"
-        :style="{ height: barHeight(n.delay) + '%', animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
-        :title="`${n.name} · ${delayText(n.delay)}`"
-      />
+    <!-- 折叠时：迷你延迟柱（柱高 ∝ √延迟），当前节点下方一个主题色圆点；节点多时柱子自动变细，不换行 -->
+    <div v-if="collapsed" class="-mt-1 px-4 pb-2.5">
+      <div class="flex items-start gap-[3px] overflow-hidden">
+        <div
+          v-for="(n, i) in nodes"
+          :key="n.name"
+          class="flex min-w-[2px] max-w-[5px] flex-1 flex-col items-center"
+          :title="`${n.name} · ${delayText(n.delay)}`"
+        >
+          <div class="flex h-4 w-full items-end">
+            <span
+              class="w-full rounded-sm transition-[height,background-color] duration-300"
+              :class="[n.delay == null ? 'bg-slate-400/40' : DELAY_BG_CLASS[delayLevel(n.delay)], testing && 'anim-sweep']"
+              :style="{ height: barPx(n.delay) + 'px', animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
+            />
+          </div>
+          <span v-if="n.name === group.now" class="mt-[3px] h-1 w-1 shrink-0 rounded-full bg-brand-500 dark:bg-brand-400" />
+        </div>
       </div>
     </div>
 

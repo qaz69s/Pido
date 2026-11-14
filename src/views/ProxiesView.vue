@@ -21,6 +21,7 @@ import {
   DEFAULT_TEST_URL,
 } from '@/api/proxies'
 import { getConfigs } from '@/api/configs'
+import { getConnections, closeConnection } from '@/api/connections'
 import { describeError, errorMessage } from '@/api/http'
 import { useToastStore } from '@/stores/toast'
 import { useBackendStore } from '@/stores/backend'
@@ -33,6 +34,7 @@ import NodeManager from '@/components/proxy/NodeManager.vue'
 import GroupParamsDialog from '@/components/proxy/GroupParamsDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Icon from '@/components/common/Icon.vue'
+import Switch from '@/components/common/Switch.vue'
 
 const toast = useToastStore()
 const backend = useBackendStore()
@@ -82,6 +84,7 @@ const prefs = reactive({
   testUrl: DEFAULT_TEST_URL,
   timeout: 5000,
   sort: 'default',
+  closeOnSwitch: false, // 切换节点后断开仍走旧节点的连接
   collapsed: {},
   ...loadJSON('proxy-prefs', {}),
 })
@@ -147,11 +150,31 @@ async function onSelect(group, name) {
   try {
     await selectProxy(group.name, name)
     proxies.value[group.name] = { ...proxies.value[group.name], now: name }
-    toast.success(`${group.name} → ${name}`)
+    const closed = prefs.closeOnSwitch ? await closeOldConnections(group.name, name) : 0
+    toast.success(`${group.name} → ${name}${closed ? `，已断开 ${closed} 条旧连接` : ''}`)
     // 嵌套组的 now 可能联动变化，静默刷新一次
     load({ silent: true })
   } catch (e) {
     toast.error(`切换失败：${errorMessage(e)}`)
+  }
+}
+
+/**
+ * 切换后断开旧连接：经过该组、但链路里没有新节点的连接（chains 为 [节点, …, 组]）
+ * 已建立的长连接（如 Telegram、游戏、下载）不会自动换线，断开后客户端重连就会走新节点
+ * 返回成功断开的条数；失败只提示不抛错（切换本身已成功）
+ */
+async function closeOldConnections(groupName, newName) {
+  try {
+    const snap = await getConnections()
+    const ids = (snap?.connections || [])
+      .filter((c) => Array.isArray(c.chains) && c.chains.includes(groupName) && !c.chains.includes(newName))
+      .map((c) => c.id)
+    const res = await Promise.allSettled(ids.map((id) => closeConnection(id)))
+    return res.filter((r) => r.status === 'fulfilled').length
+  } catch (e) {
+    toast.error(`断开旧连接失败：${errorMessage(e)}`)
+    return 0
   }
 }
 
@@ -340,7 +363,8 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         </button>
       </div>
 
-      <div class="tb ml-auto flex shrink-0 items-center">
+      <!-- 工具栏：图标按钮在前，主操作（全部测速 / 全部更新）固定在最右 -->
+      <div class="tb ml-auto flex shrink-0 items-center gap-0.5 rounded-xl bg-tile p-0.5">
         <template v-if="tab === 'groups'">
           <button class="btn-icon" :title="allCollapsed ? '全部展开' : '全部折叠'" @click="toggleAll">
             <Icon name="chevronDown" class="h-5 w-5 transition-transform" :class="allCollapsed ? '' : 'rotate-180'" />
@@ -351,25 +375,36 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             title="显示与测速设置"
             @click="showSettings = !showSettings"
           >
-            <Icon name="settings" class="h-[18px] w-[18px]" />
-          </button>
-          <button class="btn-primary" :disabled="testingAll || !groups.length" @click="onTestAll">
-            <Icon name="zap" class="h-4 w-4" :class="testingAll && 'animate-pulse'" />
-            <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
+            <Icon name="settings" class="h-5 w-5" />
           </button>
         </template>
         <template v-else>
-          <button v-if="canManageNodes" class="btn-outline" title="通过分享链接添加节点" @click="openAddNode">
-            <Icon name="plus" class="h-4 w-4" />
-            <span class="hidden sm:inline">添加节点</span>
-          </button>
-          <button class="btn-primary" :disabled="updatingAll || !updatableProviders.length" @click="onUpdateAllProviders">
-            <Icon name="refresh" class="h-4 w-4" :class="updatingAll && 'animate-spin'" />
-            <span class="hidden sm:inline">全部更新</span>
+          <button v-if="canManageNodes" class="btn-icon" title="通过分享链接添加节点" @click="openAddNode">
+            <Icon name="plus" class="h-5 w-5" />
           </button>
         </template>
-        <button class="btn-icon" title="刷新" @click="load({ silent: true })">
-          <Icon name="refresh" class="h-[18px] w-[18px]" />
+        <button class="btn-icon" title="重新载入" @click="load({ silent: true })">
+          <Icon name="reload" class="h-5 w-5" />
+        </button>
+        <button
+          v-if="tab === 'groups'"
+          class="btn-icon bg-brand-500/15 text-brand-600 dark:text-brand-300 sm:w-auto sm:gap-1.5 sm:px-3"
+          title="全部测速"
+          :disabled="testingAll || !groups.length"
+          @click="onTestAll"
+        >
+          <Icon name="gauge" class="h-5 w-5" :class="testingAll && 'animate-pulse'" />
+          <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
+        </button>
+        <button
+          v-else
+          class="btn-icon bg-brand-500/15 text-brand-600 dark:text-brand-300 sm:w-auto sm:gap-1.5 sm:px-3"
+          title="全部更新订阅"
+          :disabled="updatingAll || !updatableProviders.length"
+          @click="onUpdateAllProviders"
+        >
+          <Icon name="cloudDown" class="h-5 w-5" :class="updatingAll && 'animate-pulse'" />
+          <span class="hidden sm:inline">全部更新</span>
         </button>
       </div>
     </div>
@@ -403,7 +438,15 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         测速由 {{ backend.engine }} 发起（HTTP 探测），测速地址与超时取后端配置
       </p>
-      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'">恢复默认</button>
+      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.closeOnSwitch = false">恢复默认</button>
+      <!-- 切换节点时断开旧连接 -->
+      <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-slate-200/70 pt-3 dark:border-slate-700/60">
+        <span class="min-w-0">
+          <span class="block text-sm font-medium">切换节点时断开旧连接</span>
+          <span class="block text-xs text-slate-500">已建立的连接不会自动换线；开启后切换即断开走旧节点的连接，应用重连后走新节点</span>
+        </span>
+        <Switch v-model="prefs.closeOnSwitch" />
+      </label>
     </div>
 
     <div
