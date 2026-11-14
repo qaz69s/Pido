@@ -4,12 +4,15 @@
  * - 填写地址和 secret，点击「连接」时先测试，成功才保存
  * - 支持 URL 参数预填：#/setup?hostname=192.168.1.2&port=9090&secret=xxx
  * - 开发模式下可一键使用 Vite 代理，避开 CORS
+ * - 自动识别后端类型：mihomo（Clash API）或 dae / honk（api-standardize 原生 API）
+ * - 面板由 dae 托管（api { ui: … }）时，自动填入当前站点作为后端地址
  */
-import { computed, reactive, ref } from 'vue'
+import { computed, onMounted, reactive, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { useBackendStore, guessDefaultUrl, DEFAULT_URL, DEV_PROXY_PATH } from '@/stores/backend'
+import { useBackendStore, guessDefaultUrl, hostedBackendCandidate, DEFAULT_URL, DEV_PROXY_PATH } from '@/stores/backend'
 import { useToastStore } from '@/stores/toast'
 import { describeError } from '@/api/http'
+import { fetchDiscovery } from '@/api/detect'
 import Icon from '@/components/common/Icon.vue'
 
 const route = useRoute()
@@ -34,12 +37,26 @@ const loading = ref(false)
 const error = ref(null)
 const errInfo = computed(() => (error.value ? describeError(error.value) : null))
 
+/** 当前页面由 dae / honk 托管时的提示 */
+const hostedHint = ref('')
+onMounted(async () => {
+  // URL 参数或已保存的配置优先，不覆盖
+  if (route.query.hostname || backend.url) return
+  const candidate = hostedBackendCandidate()
+  if (!candidate) return
+  const d = await fetchDiscovery(candidate, { timeout: 3000 })
+  if (d && !route.query.hostname && !backend.url) {
+    form.url = candidate
+    hostedHint.value = '检测到本面板由 dae / honk 托管，已填入当前地址，填写 api 段的 secret 即可'
+  }
+})
+
 async function submit() {
   loading.value = true
   error.value = null
   try {
     const v = await backend.save(form.url, form.secret.trim())
-    toast.success(`连接成功：mihomo ${v?.version ?? ''}`)
+    toast.success(v?.kind === 'standard' ? `连接成功：${backend.label}` : `连接成功：mihomo ${v?.version ?? ''}`)
     const redirect = typeof route.query.redirect === 'string' ? route.query.redirect : ''
     router.replace(redirect && !redirect.startsWith('/setup') ? redirect : '/overview')
   } catch (e) {
@@ -71,8 +88,8 @@ function clearConfig() {
           <Icon name="zap" class="h-6 w-6" />
         </span>
         <h1 class="text-xl font-semibold">Pido</h1>
-        <p class="mt-1 text-sm text-slate-500">连接到你的 mihomo 内核</p>
-        <p class="mt-0.5 text-xs text-slate-500">填写 external-controller 的地址和 secret</p>
+        <p class="mt-1 text-sm text-slate-500">连接到你的 mihomo 内核，或 dae / honk</p>
+        <p class="mt-0.5 text-xs text-slate-500">mihomo 填 external-controller 的地址和 secret；dae 填 api 段的 listen 与 secret</p>
       </div>
 
       <form class="card space-y-4 p-5" @submit.prevent="submit">
@@ -97,6 +114,9 @@ function clearConfig() {
           >
             使用开发代理（{{ DEV_PROXY_PATH }} → vite.config.js 中的 MIHOMO_TARGET）
           </button>
+          <p v-if="hostedHint" class="mt-1.5 flex items-start gap-1 text-xs text-emerald-700 dark:text-emerald-400">
+            <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />{{ hostedHint }}
+          </p>
         </div>
 
         <!-- Secret -->

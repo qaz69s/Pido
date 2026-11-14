@@ -16,7 +16,7 @@ const open = computed({
 </script>
 
 <template>
-  <Modal v-model="open" :title="confirm.options.title" width="md:max-w-sm">
+  <Modal v-model="open" :title="confirm.options.title" width="md:max-w-sm" z="z-[60]">
     <p v-if="confirm.options.message" class="whitespace-pre-line break-all text-sm text-slate-600 dark:text-slate-300">
       {{ confirm.options.message }}
     </p>

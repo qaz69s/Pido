@@ -1,6 +1,7 @@
 <script setup>
 /**
  * 顶栏：页面标题、连接状态、主题切换、后端设置入口
+ * - 连接 dae / honk（标准 API）时，版本前用淡色标出引擎名，如「dae 2.1.2」
  */
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -22,7 +23,12 @@ const THEME_META = {
 const statusInfo = computed(() => {
   switch (backend.status) {
     case 'ok':
-      return { dot: 'bg-emerald-500 anim-breathe', text: backend.version?.version || '已连接' }
+      return {
+        dot: 'bg-emerald-500 anim-breathe',
+        text: backend.version?.version || '已连接',
+        // 标准 API：引擎名单独淡色显示
+        engine: backend.isStandard ? backend.engine : '',
+      }
     case 'checking':
     case 'unknown':
       return { dot: 'bg-amber-400 animate-pulse', text: '检测中' }
@@ -52,7 +58,7 @@ const statusInfo = computed(() => {
         title="后端设置"
       >
         <span class="h-2 w-2 rounded-full" :class="statusInfo.dot" />
-        <span class="max-w-[9rem] truncate">{{ statusInfo.text }}</span>
+        <span class="max-w-[9rem] truncate"><span v-if="statusInfo.engine" class="mr-1 text-slate-400 dark:text-slate-500">{{ statusInfo.engine }}</span>{{ statusInfo.text }}</span>
       </RouterLink>
       <button
         class="btn-icon"

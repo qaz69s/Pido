@@ -6,7 +6,8 @@
  *
  * 状态：idle | connecting | open | reconnecting | error | closed
  */
-import { getHttpConfig } from './http'
+import { getHttpConfig, isStandard } from './http'
+import { createStandardStream } from './standard/streams'
 
 /** http(s)://host:port/base + path → ws(s)://host:port/base/path?token=xxx */
 export function buildWsUrl(path, query = {}, { baseUrl, secret } = getHttpConfig()) {
@@ -29,6 +30,9 @@ export function buildWsUrl(path, query = {}, { baseUrl, secret } = getHttpConfig
  * @returns {{ close: () => void }}
  */
 export function createStream(path, { query, onMessage, onStatus, maxRetryDelay = 15000 } = {}) {
+  // dae / honk（标准 API）没有 WebSocket，改用轮询 / SSE，消息形状保持一致
+  if (isStandard()) return createStandardStream(path, { query, onMessage, onStatus })
+
   let ws = null
   let timer = null
   let retry = 0 // 当前重试次数（决定退避时长）

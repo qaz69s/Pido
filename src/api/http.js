@@ -22,12 +22,19 @@ export class ApiError extends Error {
 }
 
 // 运行时配置，由 stores/backend.js 写入（避免 api 层反向依赖 store）
-const config = { baseUrl: '', secret: '' }
+// kind：后端类型 —— 'mihomo'（Clash API）| 'standard'（dae / honk 的 api-standardize 原生 API）
+const config = { baseUrl: '', secret: '', kind: 'mihomo' }
 let unauthorizedHandler = null
 
-export function configureHttp({ baseUrl, secret }) {
+export function configureHttp({ baseUrl, secret, kind }) {
   config.baseUrl = baseUrl || ''
   config.secret = secret || ''
+  config.kind = kind === 'standard' ? 'standard' : 'mihomo'
+}
+
+/** 当前后端是否为标准 API（dae / honk） */
+export function isStandard() {
+  return config.kind === 'standard'
 }
 
 export function getHttpConfig() {
@@ -57,7 +64,9 @@ function buildUrl(base, path, query) {
   const url = new URL(base + path)
   if (query) {
     for (const [k, v] of Object.entries(query)) {
-      if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, String(v))
+      // 数组按 form/explode 展开为重复参数（如标准 API 的 ?type=A&type=AAAA）
+      if (Array.isArray(v)) v.forEach((x) => x !== undefined && x !== null && x !== '' && url.searchParams.append(k, String(x)))
+      else if (v !== undefined && v !== null && v !== '') url.searchParams.set(k, String(v))
     }
   }
   return url.toString()
@@ -95,6 +104,9 @@ async function parseBody(res) {
  * @param {string} [opts.secret]  覆盖全局 secret
  * @param {AbortSignal} [opts.signal]
  * @param {boolean} [opts.skipAuthHandler] 401 时不触发全局回调
+ * @param {Record<string,string>} [opts.headers] 额外请求头（如标准 API 的 If-Match）
+ * @param {string} [opts.contentType] 请求体类型，默认 application/json（组配置补丁用 application/json-patch+json）
+ * @param {boolean} [opts.withMeta] 为 true 时返回 { data, status, etag }，用于需要读取 ETag 的条件写入
  */
 export async function request(path, opts = {}) {
   const {
@@ -104,13 +116,16 @@ export async function request(path, opts = {}) {
     timeout = 10000,
     signal,
     skipAuthHandler = false,
+    withMeta = false,
   } = opts
   const base = opts.baseUrl ?? config.baseUrl
   const token = opts.secret ?? config.secret
+  // 错误提示按后端类型给出排查建议（测试连接时由调用方指定）
+  const kind = opts.kind ?? config.kind
 
   if (!base) throw new ApiError('config', '尚未配置后端地址')
   if (isMixedContent(base)) {
-    throw new ApiError('mixed-content', 'HTTPS 页面无法访问 HTTP 后端')
+    throw tag(new ApiError('mixed-content', 'HTTPS 页面无法访问 HTTP 后端'), kind)
   }
 
   // 超时控制
@@ -125,11 +140,11 @@ export async function request(path, opts = {}) {
     else signal.addEventListener('abort', () => controller.abort(), { once: true })
   }
 
-  const headers = {}
+  const headers = { ...(opts.headers || {}) }
   if (token) headers.Authorization = `Bearer ${token}`
   let payload
   if (body !== undefined) {
-    headers['Content-Type'] = 'application/json'
+    headers['Content-Type'] = opts.contentType || 'application/json'
     payload = JSON.stringify(body)
   }
 
@@ -142,27 +157,40 @@ export async function request(path, opts = {}) {
       signal: controller.signal,
     })
   } catch (err) {
-    if (timedOut) throw new ApiError('timeout', `请求超时（${Math.round(timeout / 1000)} 秒）`)
+    if (timedOut) throw tag(new ApiError('timeout', `请求超时（${Math.round(timeout / 1000)} 秒）`), kind)
     if (signal?.aborted) throw new ApiError('aborted', '请求已取消')
     // fetch 抛 TypeError：后端不可达、CORS 拦截、证书错误等，浏览器不会告诉我们具体原因
-    throw new ApiError('network', '无法连接到后端', { detail: err?.message })
+    throw tag(new ApiError('network', '无法连接到后端', { detail: err?.message }), kind)
   } finally {
     clearTimeout(timer)
   }
 
   const data = await parseBody(res)
-  if (res.ok) return data
+  if (res.ok) return withMeta ? { data, status: res.status, etag: res.headers.get('ETag') } : data
 
   if (res.status === 401) {
-    const e = new ApiError('auth', 'Secret 错误或缺失', { status: 401 })
+    const e = tag(new ApiError('auth', 'Secret 错误或缺失', { status: 401 }), kind)
     if (!skipAuthHandler) unauthorizedHandler?.(e)
     throw e
   }
   const msg =
     (data && typeof data === 'object' && data.message) ||
+    // 标准 API 的错误体：{ error: { code, message, details } }
+    (data && typeof data === 'object' && data.error?.message) ||
     (typeof data === 'string' && data) ||
     res.statusText
-  throw new ApiError('http', `${res.status} ${msg}`.trim(), { status: res.status, detail: data })
+  const e = new ApiError('http', `${res.status} ${msg}`.trim(), { status: res.status, detail: data })
+  // 标准 API 的错误码（如 capability_not_supported、state_conflict），以及 Retry-After（秒）
+  if (data && typeof data === 'object' && data.error?.code) e.code = data.error.code
+  const ra = Number(res.headers.get('Retry-After'))
+  if (Number.isFinite(ra) && ra > 0) e.retryAfter = ra
+  throw tag(e, kind)
+}
+
+/** 给错误打上后端类型，describeError 据此给出对应的排查建议 */
+function tag(err, kind) {
+  err.backendKind = kind
+  return err
 }
 
 /** 便捷方法 */
@@ -181,6 +209,10 @@ export const http = {
 export function describeError(err) {
   if (!(err instanceof ApiError)) {
     return { title: err?.message || String(err) || '未知错误', tips: [] }
+  }
+  if (err.backendKind === 'standard') {
+    const t = describeStandardError(err)
+    if (t) return t
   }
   switch (err.type) {
     case 'network':
@@ -214,6 +246,33 @@ export function describeError(err) {
       return { title: err.message, tips: [] }
     default:
       return { title: err.message, tips: [] }
+  }
+}
+
+/** dae / honk（标准 API）的排查建议；返回 null 时沿用通用描述 */
+function describeStandardError(err) {
+  switch (err.type) {
+    case 'network':
+      return {
+        title: '无法连接到后端',
+        tips: [
+          '确认 dae / honk 已启用原生 API：配置中 api { enabled: true }，并检查 listen 的地址和端口（dae 默认 127.0.0.1:9527）',
+          '手机或其他设备访问时，listen 不能只绑定 127.0.0.1，且必须设置 secret',
+          '跨域访问需在 allow_origins 中加入当前页面的来源；也可以用 api { ui: \'/面板目录\' } 让 dae 直接托管本面板，通过 http://后端地址/ui/ 打开',
+        ],
+      }
+    case 'auth':
+      return {
+        title: 'Token 错误',
+        tips: ['填写 api 段中 secret 的值（以 Authorization: Bearer 方式发送）', '匿名 loopback 模式下随便填一个占位值即可'],
+      }
+    case 'mixed-content':
+      return {
+        title: 'HTTPS 页面无法访问 HTTP 后端',
+        tips: ['用 http:// 打开本面板，或让 dae 通过 api { ui: ... } 托管面板', '或在受信任的反向代理上为 API 终止 TLS，改用 https:// 地址'],
+      }
+    default:
+      return null
   }
 }
 

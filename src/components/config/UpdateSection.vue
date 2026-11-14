@@ -3,6 +3,8 @@
  * 更新：面板与 mihomo 内核
  * - 面板：POST /upgrade/ui，由内核下载 external-ui-url 指向的 zip 并覆盖面板目录，完成后刷新页面
  * - 内核：POST /upgrade?channel=release|alpha，内核下载新版本、替换自身并重启；之后轮询 /version 等它回来
+ * dae / honk（标准 API）：没有在线更新接口 —— 只显示面板版本与最新版本，提供 dist.zip 下载，
+ *   由用户解压到 api { ui: … } 指向的目录；内核升级不显示（随系统包管理器升级）
  */
 import { computed, onMounted, reactive, ref } from 'vue'
 import { getVersion, upgradeCore, upgradeUi } from '@/api/configs'
@@ -39,11 +41,14 @@ const checking = ref(false)
 
 async function checkLatest() {
   checking.value = true
-  const tasks = [
-    ['panel', fetchLatestPanelVersion],
-    ['release', fetchLatestRelease],
-    ['alpha', fetchLatestAlpha],
-  ]
+  // 标准 API 后端不查 mihomo 的版本
+  const tasks = backend.isStandard
+    ? [['panel', fetchLatestPanelVersion]]
+    : [
+        ['panel', fetchLatestPanelVersion],
+        ['release', fetchLatestRelease],
+        ['alpha', fetchLatestAlpha],
+      ]
   await Promise.all(
     tasks.map(async ([k, fn]) => {
       try {
@@ -178,14 +183,22 @@ async function updateCore(force = false) {
           <template v-if="latest.panel"> · 最新 <span class="font-mono">{{ latest.panel }}</span></template>
         </div>
       </div>
-      <button class="btn-outline py-1 text-xs" :disabled="upgradingUi" @click="updatePanel">
+      <button v-if="!backend.isStandard" class="btn-outline py-1 text-xs" :disabled="upgradingUi" @click="updatePanel">
         <Icon name="download" class="h-3.5 w-3.5" :class="upgradingUi && 'animate-pulse'" />
         {{ upgradingUi ? '更新中…' : '更新面板' }}
       </button>
+      <!-- 标准 API：后端不提供在线更新面板，给出下载链接 -->
+      <a v-else-if="PANEL_ZIP_URL" class="btn-outline py-1 text-xs" :href="PANEL_ZIP_URL" target="_blank" rel="noopener">
+        <Icon name="download" class="h-3.5 w-3.5" />
+        下载面板
+      </a>
     </div>
+    <p v-if="backend.isStandard" class="px-4 py-3 text-xs text-slate-500">
+      {{ backend.engine }} 不支持在线更新面板：下载 dist.zip 解压到 api 段 ui 指向的目录（覆盖原文件），然后刷新本页即可。
+    </p>
 
-    <!-- 内核 -->
-    <div class="space-y-3 px-4 py-3">
+    <!-- 内核（mihomo 专属） -->
+    <div v-if="!backend.isStandard" class="space-y-3 px-4 py-3">
       <div class="flex items-center gap-4">
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 text-sm font-medium">

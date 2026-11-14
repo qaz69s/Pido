@@ -1,7 +1,7 @@
 <script setup>
 /**
  * 代理组卡片
- * - 标题栏：图标（配置里的 icon）、组名、类型、当前节点、节点数、整组测速、折叠
+ * - 标题栏：图标（配置里的 icon）、组名、类型、当前节点、节点数、组参数（仅标准 API 可调的组）、整组测速、折叠
  * - 折叠时显示一排延迟色点，方便快速概览
  * - 动画：展开/收起高度过渡；整组测速时色点依次亮起；延迟更新时数字轻闪
  */
@@ -20,8 +20,10 @@ const props = defineProps({
   testing: Boolean, // 整组测速中
   collapsed: Boolean,
   sort: { type: String, default: 'default' }, // default | delay | name
+  /** 标准 API：该组可调整检查间隔 / 容差，标题栏显示「组参数」按钮 */
+  configurable: Boolean,
 })
-const emit = defineEmits(['select', 'test-group', 'test-node', 'toggle'])
+const emit = defineEmits(['select', 'test-group', 'test-node', 'toggle', 'settings'])
 
 /** 当前节点的延迟（子策略组会跟随它自己的当前节点） */
 const nowDelay = computed(() => (props.group.now ? props.delays[props.group.now] : undefined))
@@ -84,6 +86,9 @@ const isLarge = computed(() => nodes.value.length > LARGE)
           <span class="min-w-0 truncate text-slate-600 dark:text-slate-300" :title="group.now">{{ group.now || '--' }}</span>
         </div>
       </div>
+      <button v-if="configurable" class="btn-icon hidden sm:inline-flex" title="组参数（检查间隔 / 容差）" @click.stop="emit('settings')">
+        <Icon name="sliders" class="h-[17px] w-[17px]" />
+      </button>
       <button
         class="btn-icon"
         :disabled="testing"
@@ -133,5 +138,20 @@ const isLarge = computed(() => nodes.value.length > LARGE)
         />
       </div>
     </ExpandTransition>
+
+    <!-- 标准 API：组参数（展开时显示当前值；手机上标题栏放不下按钮，入口只在这里） -->
+    <div
+      v-if="configurable && !collapsed"
+      class="flex items-center gap-2 border-t border-slate-100 px-4 py-2 text-xs text-slate-500 dark:border-slate-800"
+    >
+      <span class="min-w-0 flex-1 truncate">
+        间隔 {{ group._config?.check_interval != null ? `${group._config.check_interval} 秒` : '默认' }}
+        <template v-if="group._policy === 'urltest'"> · 容差 {{ group._config?.tolerance != null ? `${group._config.tolerance} ms` : '默认' }}</template>
+      </span>
+      <button class="btn-ghost shrink-0 px-2 py-0.5 text-xs" @click="emit('settings')">
+        <Icon name="sliders" class="h-3.5 w-3.5" />
+        调整
+      </button>
+    </div>
   </section>
 </template>

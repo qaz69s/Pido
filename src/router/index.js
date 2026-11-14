@@ -8,12 +8,17 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 import { useBackendStore } from '@/stores/backend'
 import OverviewView from '@/views/OverviewView.vue'
 
-/** 导航菜单（侧栏 / 底部导航共用） */
+/**
+ * 导航菜单（侧栏 / 底部导航共用）
+ * - phone: false：不放进手机底部导航（底部最多 6 项，系统字体放大时也不换行）
+ * - also：手机底部导航中这些路径也算作本项选中（DNS 在手机上并入「规则」，见 PhoneSectionSwitch.vue）
+ */
 export const navItems = [
   { path: '/overview', title: '概览', icon: 'chart' },
   { path: '/proxies', title: '代理', icon: 'globe' },
   { path: '/connections', title: '连接', icon: 'link' },
-  { path: '/rules', title: '规则', icon: 'list' },
+  { path: '/rules', title: '规则', icon: 'list', also: ['/dns'] },
+  { path: '/dns', title: 'DNS', icon: 'compass', phone: false },
   { path: '/logs', title: '日志', icon: 'terminal' },
   { path: '/config', title: '配置', icon: 'sliders' },
 ]
@@ -44,6 +49,12 @@ const routes = [
     name: 'rules',
     component: () => import('@/views/RulesView.vue'),
     meta: { title: '规则' },
+  },
+  {
+    path: '/dns',
+    name: 'dns',
+    component: () => import('@/views/DnsView.vue'),
+    meta: { title: 'DNS' },
   },
   {
     path: '/logs',

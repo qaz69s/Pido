@@ -17,7 +17,7 @@ const STYLES = {
 
 <template>
   <div
-    class="pointer-events-none fixed inset-x-0 top-3 z-[60] flex flex-col items-center gap-2 px-3 md:inset-x-auto md:right-4 md:items-end"
+    class="pointer-events-none fixed inset-x-0 top-3 z-[70] flex flex-col items-center gap-2 px-3 md:inset-x-auto md:right-4 md:items-end"
   >
     <TransitionGroup name="toast">
       <div

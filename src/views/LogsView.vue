@@ -6,16 +6,20 @@
  * - 最新的在最上面；最多保留 MAX_LOGS 条
  * - 搜索、暂停（暂停期间缓存新日志）、清空、导出为 txt
  * 本页在 App.vue 中被 KeepAlive 缓存，切换页面后日志不会丢失
+ * dae / honk（标准 API）：由 ws.js 改为 SSE（GET /api/v1/logs），消息整理成相同的 { type, payload }，
+ *   并带上后端记录的时间（续传时补发的旧日志显示原始时间）
  */
 import { computed, ref, watch } from 'vue'
 import { useStream } from '@/composables/useStream'
 import { useInfiniteList } from '@/composables/useInfiniteList'
 import { loadString, saveString } from '@/utils/storage'
 import { formatClock } from '@/utils/format'
+import { useBackendStore } from '@/stores/backend'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Icon from '@/components/common/Icon.vue'
 
 const MAX_LOGS = 1000
+const backend = useBackendStore()
 
 const LEVELS = [
   { value: 'debug', label: '调试' },
@@ -56,7 +60,7 @@ function flush() {
 const { status } = useStream('/logs', {
   query: () => ({ level: level.value }),
   onMessage(d) {
-    const entry = { id: ++seq, time: Date.now(), type: d.type, payload: d.payload ?? '' }
+    const entry = { id: ++seq, time: d.time ?? Date.now(), type: d.type, payload: d.payload ?? '' }
     if (paused.value) {
       pending.push(entry)
       if (pending.length > MAX_LOGS) pending.shift()
@@ -102,7 +106,7 @@ function exportLogs() {
   const blob = new Blob([lines.join('\n')], { type: 'text/plain;charset=utf-8' })
   const a = document.createElement('a')
   a.href = URL.createObjectURL(blob)
-  a.download = `mihomo-logs-${Date.now()}.txt`
+  a.download = `${backend.engine}-logs-${Date.now()}.txt`
   a.click()
   setTimeout(() => URL.revokeObjectURL(a.href), 1000)
 }
@@ -112,6 +116,7 @@ const STATUS = {
   connecting: { dot: 'bg-amber-400 animate-pulse', text: '连接中' },
   reconnecting: { dot: 'bg-amber-400 animate-pulse', text: '重连中' },
   error: { dot: 'bg-rose-500', text: '连接失败' },
+  unsupported: { dot: 'bg-slate-400', text: '后端未开放日志' },
 }
 const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400', text: '未连接' })
 </script>

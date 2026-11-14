@@ -3,6 +3,11 @@
  * 代理页
  * Tab 1「代理组」：按 GLOBAL 中的顺序展示代理组，点击节点切换，单节点 / 整组 / 全部测速
  * Tab 2「代理集合」：proxy-providers 列表，显示订阅流量与到期时间，支持更新和健康检查
+ * dae / honk（标准 API）：数据由 api/standard/proxies.js 整理成相同形状；
+ *   只有 selector 组可点选，测速走 /probes（测速地址由后端配置决定），
+ *   Tab 2 显示 /providers（订阅可刷新，inline / file 只读，没有健康检查）
+ *   节点管理（开启 config_write 时）：订阅页工具栏「添加节点」、各来源卡片「节点」→ NodeManager
+ *   （内联节点可添加 / 改名换链接 / 删除，订阅节点只读）；可调参数的组在卡片标题栏有「组参数」按钮 → GroupParamsDialog
  */
 import { computed, reactive, ref, watch, onMounted } from 'vue'
 import {
@@ -18,14 +23,19 @@ import {
 import { getConfigs } from '@/api/configs'
 import { describeError, errorMessage } from '@/api/http'
 import { useToastStore } from '@/stores/toast'
+import { useBackendStore } from '@/stores/backend'
 import { useDelayStore, latestFromBackend } from '@/stores/delays'
 import { loadJSON, saveJSON } from '@/utils/storage'
 import { formatBytes, formatDate, formatRelativeTime } from '@/utils/format'
+import { getWriteCaps } from '@/api/standard/manage'
 import ProxyGroupCard from '@/components/proxy/ProxyGroupCard.vue'
+import NodeManager from '@/components/proxy/NodeManager.vue'
+import GroupParamsDialog from '@/components/proxy/GroupParamsDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Icon from '@/components/common/Icon.vue'
 
 const toast = useToastStore()
+const backend = useBackendStore()
 const delayStore = useDelayStore()
 
 /* ---------- 状态 ---------- */
@@ -81,8 +91,15 @@ const testOpts = () => ({ url: prefs.testUrl || DEFAULT_TEST_URL, timeout: Numbe
 
 /* ---------- 数据加载 ---------- */
 
+/** 标准 API 的写入能力（节点管理、组参数）；mihomo 为 null */
+const writeCaps = ref(null)
+async function loadWriteCaps() {
+  writeCaps.value = backend.isStandard ? await getWriteCaps({ force: true }).catch(() => null) : null
+}
+
 async function load({ silent = false } = {}) {
   if (!silent) loading.value = true
+  if (backend.isStandard) loadWriteCaps()
   try {
     const [p, pp, c] = await Promise.all([
       getProxies(),
@@ -196,6 +213,8 @@ function toggleAll() {
 const providerList = computed(() =>
   Object.values(providers.value).filter((p) => p.vehicleType !== 'Compatible'),
 )
+/** 可以更新的集合（标准 API 只有订阅能刷新；mihomo 全部可以） */
+const updatableProviders = computed(() => providerList.value.filter((p) => p._canUpdate !== false))
 
 function subscription(p) {
   const s = p.subscriptionInfo
@@ -239,11 +258,11 @@ async function onHealthcheck(name) {
 const updatingAll = ref(false)
 async function onUpdateAllProviders() {
   updatingAll.value = true
-  const results = await Promise.allSettled(providerList.value.map((p) => onUpdateProvider(p.name, { quiet: true })))
+  const results = await Promise.allSettled(updatableProviders.value.map((p) => onUpdateProvider(p.name, { quiet: true })))
   updatingAll.value = false
   const failed = results.filter((r) => r.status === 'rejected').length
   if (failed) toast.warning(`更新完成，${failed} 个失败`)
-  else toast.success('全部代理集合已更新')
+  else toast.success(backend.isStandard ? '全部订阅已更新' : '全部代理集合已更新')
   load({ silent: true })
 }
 
@@ -258,6 +277,37 @@ function providerStats(p) {
   }
 }
 
+/* ---------- 节点管理 / 组参数（标准 API） ---------- */
+const canManageNodes = computed(() => backend.isStandard && !!writeCaps.value?.nodesManage)
+const nodeDialog = reactive({ open: false, mode: 'list', provider: null })
+function openNodes(p) {
+  nodeDialog.provider = p
+  nodeDialog.mode = 'list'
+  nodeDialog.open = true
+}
+function openAddNode() {
+  // 新节点写入内联来源（node 段）：有内联来源卡片时一起带上，添加完回到它的列表
+  nodeDialog.provider = providerList.value.find((p) => p._kind === 'inline') || null
+  nodeDialog.mode = 'add'
+  nodeDialog.open = true
+}
+// 列表打开期间数据刷新：弹窗里的来源跟着换成最新的对象
+watch(providers, () => {
+  if (nodeDialog.provider) nodeDialog.provider = providerList.value.find((p) => p._id === nodeDialog.provider._id) || nodeDialog.provider
+})
+
+/** 组是否可调参数：后端允许组配置补丁，且该组的 mutable_config 含 check_interval / tolerance */
+function groupConfigurable(g) {
+  if (!backend.isStandard || !writeCaps.value?.groupPatch) return false
+  const m = g._mutable || []
+  return m.includes('check_interval') || (m.includes('tolerance') && g._policy === 'urltest')
+}
+const groupDialog = reactive({ open: false, group: null })
+function openGroupParams(g) {
+  groupDialog.group = g
+  groupDialog.open = true
+}
+
 const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.value) : null))
 </script>
 
@@ -270,7 +320,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <button
           v-for="t in [
             { key: 'groups', label: '代理组', count: groups.length },
-            { key: 'providers', label: '代理集合', count: providerList.length },
+            { key: 'providers', label: backend.isStandard ? '订阅' : '代理集合', count: providerList.length },
           ]"
           :key="t.key"
           class="truncate whitespace-nowrap rounded-md transition"
@@ -300,7 +350,11 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </button>
         </template>
         <template v-else>
-          <button class="btn-primary" :disabled="updatingAll || !providerList.length" @click="onUpdateAllProviders">
+          <button v-if="canManageNodes" class="btn-outline" title="通过分享链接添加节点" @click="openAddNode">
+            <Icon name="plus" class="h-4 w-4" />
+            <span class="hidden sm:inline">添加节点</span>
+          </button>
+          <button class="btn-primary" :disabled="updatingAll || !updatableProviders.length" @click="onUpdateAllProviders">
             <Icon name="refresh" class="h-4 w-4" :class="updatingAll && 'animate-spin'" />
             <span class="hidden sm:inline">全部更新</span>
           </button>
@@ -312,7 +366,11 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     </div>
 
     <!-- 显示与测速设置（排序收在这里，手机上工具栏才能放在一行） -->
-    <div v-if="showSettings && tab === 'groups'" class="card grid gap-3 p-4 sm:grid-cols-[9rem_1fr_10rem_auto] sm:items-end">
+    <div
+      v-if="showSettings && tab === 'groups'"
+      class="card grid gap-3 p-4 sm:items-end"
+      :class="backend.isStandard ? 'sm:grid-cols-[9rem_1fr_auto]' : 'sm:grid-cols-[9rem_1fr_10rem_auto]'"
+    >
       <div>
         <label class="label">节点排序</label>
         <select v-model="prefs.sort" class="input">
@@ -321,14 +379,21 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <option value="name">按名称</option>
         </select>
       </div>
-      <div>
-        <label class="label">测速地址</label>
-        <input v-model.trim="prefs.testUrl" class="input font-mono" :placeholder="DEFAULT_TEST_URL" />
-      </div>
-      <div>
-        <label class="label">超时（毫秒）</label>
-        <input v-model.number="prefs.timeout" type="number" min="500" step="500" class="input" />
-      </div>
+      <template v-if="!backend.isStandard">
+        <div>
+          <label class="label">测速地址</label>
+          <input v-model.trim="prefs.testUrl" class="input font-mono" :placeholder="DEFAULT_TEST_URL" />
+        </div>
+        <div>
+          <label class="label">超时（毫秒）</label>
+          <input v-model.number="prefs.timeout" type="number" min="500" step="500" class="input" />
+        </div>
+      </template>
+      <!-- 标准 API：测速由后端发起，地址取各组的 check_url / 节点配置 -->
+      <p v-else class="flex items-start gap-1.5 text-xs text-slate-500 sm:pb-2.5">
+        <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
+        测速由 {{ backend.engine }} 发起（HTTP 探测），测速地址与超时取后端配置
+      </p>
       <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'">恢复默认</button>
     </div>
 
@@ -356,7 +421,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     <!-- 代理组 -->
     <template v-else-if="tab === 'groups'">
       <div v-if="!groups.length" class="card">
-        <EmptyState icon="globe" title="没有代理组" description="配置文件中未定义 proxy-groups。" />
+        <EmptyState icon="globe" title="没有代理组" :description="backend.isStandard ? '后端配置中没有定义策略组（group）。' : '配置文件中未定义 proxy-groups。'" />
       </div>
       <!-- 桌面端（lg 以上）两列排布，手机/平板保持单列；items-start 让左右卡片各自高度 -->
       <div v-else class="grid items-start gap-3 lg:grid-cols-2">
@@ -370,7 +435,9 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         :testing="!!testingGroups[g.name]"
         :collapsed="!!prefs.collapsed[g.name]"
         :sort="prefs.sort"
+        :configurable="groupConfigurable(g)"
         @toggle="toggleGroup(g.name)"
+        @settings="openGroupParams(g)"
         @select="(name) => onSelect(g, name)"
         @test-node="onTestNode"
         @test-group="onTestGroup(g).catch(() => {})"
@@ -381,7 +448,11 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     <!-- 代理集合 -->
     <template v-else>
       <div v-if="!providerList.length" class="card">
-        <EmptyState icon="box" title="没有代理集合" description="配置文件中未定义 proxy-providers。" />
+        <EmptyState
+          icon="box"
+          :title="backend.isStandard ? '没有订阅' : '没有代理集合'"
+          :description="backend.isStandard ? '后端配置中没有订阅（subscription）。' : '配置文件中未定义 proxy-providers。'"
+        />
       </div>
       <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
         <section v-for="p in providerList" :key="p.name" class="card flex flex-col gap-3 p-4">
@@ -392,6 +463,10 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                 <span class="chip">{{ p.vehicleType }}</span>
                 <span>{{ providerStats(p).count }} 个节点</span>
                 <span>· 更新于 {{ formatRelativeTime(p.updatedAt) }}</span>
+              </div>
+              <!-- 标准 API：订阅拉取失败时保留上次的节点，并给出原因 -->
+              <div v-if="p._lastError || p._status === 'stale'" class="mt-1 truncate text-xs text-amber-600 dark:text-amber-400" :title="p._lastError?.message || p._lastError || ''">
+                {{ p._lastError?.message || p._lastError || '订阅未产出节点（stale）' }}
               </div>
             </div>
           </div>
@@ -416,8 +491,9 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             <template v-if="providerStats(p).avg">· 平均 {{ providerStats(p).avg }} ms</template>
           </div>
 
-          <div class="mt-auto flex gap-2">
+          <div v-if="p._canUpdate !== false || p._canHealthcheck !== false || backend.isStandard" class="mt-auto flex gap-2">
             <button
+              v-if="p._canUpdate !== false"
               class="btn-outline flex-1"
               :disabled="!!busyProviders[p.name]"
               @click="onUpdateProvider(p.name).catch(() => {})"
@@ -425,13 +501,31 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
               <Icon name="refresh" class="h-4 w-4" :class="busyProviders[p.name] === 'update' && 'animate-spin'" />
               更新
             </button>
-            <button class="btn-outline flex-1" :disabled="!!busyProviders[p.name]" @click="onHealthcheck(p.name)">
+            <button v-if="p._canHealthcheck !== false" class="btn-outline flex-1" :disabled="!!busyProviders[p.name]" @click="onHealthcheck(p.name)">
               <Icon name="activity" class="h-4 w-4" :class="busyProviders[p.name] === 'check' && 'animate-pulse'" />
               健康检查
+            </button>
+            <!-- 标准 API：查看 / 管理该来源的节点（内联可编辑，订阅只读） -->
+            <button v-if="backend.isStandard" class="btn-outline flex-1" @click="openNodes(p)">
+              <Icon :name="p._kind === 'inline' && canManageNodes ? 'pencil' : 'list'" class="h-4 w-4" />
+              {{ p._kind === 'inline' && canManageNodes ? '管理节点' : '节点' }}
             </button>
           </div>
         </section>
       </div>
+    </template>
+
+    <!-- 标准 API：节点管理、组参数 -->
+    <template v-if="backend.isStandard">
+      <NodeManager
+        v-model="nodeDialog.open"
+        :mode="nodeDialog.mode"
+        :provider="nodeDialog.provider"
+        :can-manage="canManageNodes"
+        :delays="delays"
+        @changed="load({ silent: true })"
+      />
+      <GroupParamsDialog v-model="groupDialog.open" :group="groupDialog.group" @changed="load({ silent: true })" />
     </template>
   </div>
 </template>

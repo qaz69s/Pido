@@ -1,9 +1,15 @@
+<script>
+/** 所有 Modal 实例共享的“打开栈” */
+const stack = []
+</script>
+
 <script setup>
 /**
  * 通用弹窗
  * - 手机端：底部抽屉；桌面端：居中对话框
  * - 点击遮罩或按 Esc 关闭；打开时锁定页面滚动
  * 用法：<Modal v-model="open" title="标题"> 内容 <template #footer>按钮</template></Modal>
+ * - 可叠加：确认框（ConfirmDialog）层级更高；滚动锁按打开的弹窗计数，关掉上层不会解锁下层；Esc 只关最上层
  */
 import { watch, onBeforeUnmount } from 'vue'
 import Icon from './Icon.vue'
@@ -13,25 +19,44 @@ const props = defineProps({
   title: { type: String, default: '' },
   /** 对话框最大宽度（Tailwind 类） */
   width: { type: String, default: 'md:max-w-lg' },
+  /** 层级（Tailwind 类）；确认框用更高的层级，压在其他弹窗之上 */
+  z: { type: String, default: 'z-50' },
 })
 const emit = defineEmits(['update:modelValue'])
 
 const close = () => emit('update:modelValue', false)
 
+/* 打开中的弹窗栈（模块级共享）：滚动锁与 Esc 都只看栈顶 */
+const token = Symbol('modal')
+function push() {
+  stack.push(token)
+  document.body.style.overflow = 'hidden'
+}
+function pop() {
+  const i = stack.indexOf(token)
+  if (i >= 0) stack.splice(i, 1)
+  if (!stack.length) document.body.style.overflow = ''
+}
+
 function onKey(e) {
-  if (e.key === 'Escape') close()
+  if (e.key === 'Escape' && stack[stack.length - 1] === token) close()
 }
 
 watch(
   () => props.modelValue,
   (open) => {
-    document.body.style.overflow = open ? 'hidden' : ''
-    if (open) window.addEventListener('keydown', onKey)
-    else window.removeEventListener('keydown', onKey)
+    if (open) {
+      push()
+      window.addEventListener('keydown', onKey)
+    } else {
+      pop()
+      window.removeEventListener('keydown', onKey)
+    }
   },
+  { immediate: true },
 )
 onBeforeUnmount(() => {
-  document.body.style.overflow = ''
+  pop()
   window.removeEventListener('keydown', onKey)
 })
 </script>
@@ -39,7 +64,7 @@ onBeforeUnmount(() => {
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 z-50 flex items-end justify-center md:items-center md:p-4">
+      <div v-if="modelValue" class="fixed inset-0 flex items-end justify-center md:items-center md:p-4" :class="z">
         <!-- 遮罩 -->
         <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]" @click="close" />
         <!-- 面板 -->

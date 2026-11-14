@@ -1,13 +1,22 @@
 /**
  * 版本、配置与内核维护相关接口
  */
-import { http } from './http'
+import { http, isStandard } from './http'
+import * as std from './standard/data'
 
-/** GET /version → { version: 'v1.19.x', meta: true } */
-export const getVersion = (opts) => http.get('/version', opts)
+/**
+ * GET /version → { version: 'v1.19.x', meta: true }
+ * 标准 API：GET /api/v1/version → 整理为 { version, engine: 'dae' | 'honk', kind: 'standard' }
+ * opts.kind 可显式指定后端类型（测试连接时尚未保存配置）
+ */
+export const getVersion = (opts) =>
+  (opts?.kind ?? (isStandard() ? 'standard' : 'mihomo')) === 'standard' ? std.getVersion(opts) : http.get('/version', opts)
 
-/** GET /configs → 当前运行配置（mode、端口、tun 等） */
-export const getConfigs = () => http.get('/configs')
+/** GET /configs → 当前运行配置（mode、端口、tun 等）；标准 API 没有对应资源，返回 null */
+export const getConfigs = () => (isStandard() ? Promise.resolve(null) : http.get('/configs'))
+
+/** 标准 API：POST /api/v1/operations/reload，等待重载完成 */
+export const reloadStandard = () => std.reloadConfig()
 
 /**
  * PATCH /configs  局部修改运行配置（不写回配置文件，重启内核后失效）

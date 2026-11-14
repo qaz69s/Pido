@@ -4,10 +4,10 @@
  * - 运行模式、日志级别、入站端口、局域网 / IPv6、TUN 等：PATCH /configs（只改运行时，重启内核后恢复为配置文件的值）
  * - 维护操作：重载配置、更新 GEO 数据库、清空 FakeIP / DNS 缓存、重启内核
  * - 更新：在线更新面板、升级内核（Release / Alpha，见 UpdateSection.vue）
- * - 面板设置：主题、当前后端、更换 / 断开后端
+ * - 面板设置：主题、当前后端、更换 / 断开后端（PanelSettings.vue）
+ * - dae / honk（标准 API）：整页换成 StandardConfig.vue（运行信息、重载配置；模式 / TUN / 端口等 mihomo 专属项不显示）
  */
 import { computed, reactive, ref, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
 import {
   getConfigs,
   patchConfigs,
@@ -19,8 +19,6 @@ import {
 } from '@/api/configs'
 import { describeError, errorMessage } from '@/api/http'
 import { useBackendStore } from '@/stores/backend'
-import { useThemeStore } from '@/stores/theme'
-import { useMotionStore } from '@/stores/motion'
 import { useToastStore } from '@/stores/toast'
 import { useConfirmStore } from '@/stores/confirm'
 import EmptyState from '@/components/common/EmptyState.vue'
@@ -28,12 +26,10 @@ import Icon from '@/components/common/Icon.vue'
 import Switch from '@/components/common/Switch.vue'
 import SettingRow from '@/components/common/SettingRow.vue'
 import UpdateSection from '@/components/config/UpdateSection.vue'
-import { THEME_PRESETS } from '@/utils/themes'
+import PanelSettings from '@/components/config/PanelSettings.vue'
+import StandardConfig from '@/components/config/StandardConfig.vue'
 
-const router = useRouter()
 const backend = useBackendStore()
-const theme = useThemeStore()
-const motion = useMotionStore()
 const toast = useToastStore()
 const confirm = useConfirmStore()
 
@@ -43,6 +39,11 @@ const loading = ref(true)
 const loadError = ref(null)
 
 async function load({ silent = false } = {}) {
+  // dae / honk（标准 API）没有 /configs，整页交给 StandardConfig
+  if (backend.isStandard) {
+    loading.value = false
+    return
+  }
   if (!silent) loading.value = true
   try {
     cfg.value = await getConfigs()
@@ -252,30 +253,13 @@ async function runAction(a) {
   }
 }
 
-/* ---------- 面板设置 ---------- */
-const THEMES = [
-  { value: 'system', label: '跟随系统', icon: 'monitor' },
-  { value: 'light', label: '浅色', icon: 'sun' },
-  { value: 'dark', label: '深色', icon: 'moon' },
-]
-
-async function disconnect() {
-  const ok = await confirm.ask({
-    title: '断开当前后端？',
-    message: '会清除本机保存的后端地址和 secret，之后需要重新填写。',
-    confirmText: '断开',
-    danger: true,
-  })
-  if (!ok) return
-  backend.clear()
-  router.replace('/setup')
-}
-
 const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.value) : null))
 </script>
 
 <template>
-  <div class="space-y-4">
+  <!-- dae / honk：只读运行信息 + 重载配置 + 更新 + 面板设置 -->
+  <StandardConfig v-if="backend.isStandard" />
+  <div v-else class="space-y-4">
     <!-- 加载中 -->
     <div v-if="loading" class="space-y-3">
       <div v-for="i in 3" :key="i" class="card h-32 animate-pulse" />
@@ -467,63 +451,8 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <!-- 更新：面板 + 内核（Release / Alpha） -->
           <UpdateSection />
 
-          <!-- 面板 -->
-          <section class="card divide-y divide-slate-100 dark:divide-slate-800">
-            <h2 class="px-4 pb-2 pt-4 font-semibold">面板</h2>
-            <SettingRow title="外观">
-              <div class="flex rounded-lg bg-tile p-0.5 text-xs dark:bg-page">
-                <button
-                  v-for="t in THEMES"
-                  :key="t.value"
-                  class="flex items-center gap-1 rounded-md px-2 py-1 transition"
-                  :class="theme.mode === t.value ? 'bg-white font-medium shadow-sm dark:bg-tile' : 'text-slate-500'"
-                  @click="theme.setMode(t.value, $event)"
-                >
-                  <Icon :name="t.icon" class="h-3.5 w-3.5" />
-                  <span class="hidden sm:inline">{{ t.label }}</span>
-                </button>
-              </div>
-            </SettingRow>
-            <!-- 配色方案：色块预览 + 名称，点击立即生效 -->
-            <div class="px-4 py-3">
-              <div class="mb-2 text-sm font-medium">配色</div>
-              <div class="grid grid-cols-3 gap-2 sm:grid-cols-6">
-                <button
-                  v-for="p in THEME_PRESETS"
-                  :key="p.id"
-                  class="group rounded-xl border p-2 text-left transition"
-                  :class="
-                    theme.preset === p.id
-                      ? 'border-brand-500 ring-2 ring-brand-500/25'
-                      : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
-                  "
-                  :title="p.desc"
-                  @click="theme.setPreset(p.id, $event)"
-                >
-                  <div class="flex h-7 overflow-hidden rounded-md">
-                    <span class="flex-[2]" :style="{ background: p.swatch[0] }" />
-                    <span class="flex-[2]" :style="{ background: p.swatch[1] }" />
-                    <span class="flex-1" :style="{ background: p.swatch[2] }" />
-                  </div>
-                  <div class="mt-1.5 text-xs font-medium">{{ p.name }}</div>
-                </button>
-              </div>
-            </div>
-            <SettingRow title="动画效果" description="页面切换、展开、数字滚动等动画；系统开了「减少动画」时默认关闭">
-              <Switch :model-value="motion.enabled" @update:model-value="motion.setEnabled" />
-            </SettingRow>
-            <div class="flex items-center gap-3 px-4 py-3">
-              <div class="min-w-0 flex-1">
-                <div class="text-sm font-medium">当前后端</div>
-                <div class="mt-0.5 truncate font-mono text-xs text-slate-500">{{ backend.url }}</div>
-                <div class="text-xs text-slate-500">
-                  内核 {{ backend.version?.version || '--' }}{{ backend.version?.meta ? '（Meta）' : '' }}
-                </div>
-              </div>
-              <RouterLink to="/setup" class="btn-outline py-1 text-xs">更换</RouterLink>
-              <button class="btn-ghost py-1 text-xs text-rose-600 dark:text-rose-400" @click="disconnect">断开</button>
-            </div>
-          </section>
+          <!-- 面板：外观、配色、动画、当前后端 -->
+          <PanelSettings />
         </div>
       </div>
     </template>

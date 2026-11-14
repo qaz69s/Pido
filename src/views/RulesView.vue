@@ -3,17 +3,22 @@
  * 规则页
  * Tab 1「规则」：GET /rules，按配置顺序显示，支持搜索、按目标筛选，长列表分批渲染
  * Tab 2「规则集合」：GET /providers/rules，显示条目数与更新时间，支持单个 / 全部更新
+ * 手机端顶部有「分流规则 / DNS」切换条（DNS 页不占底部导航位）
+ * dae / honk（标准 API）：GET /api/v1/rules，只读（配置态规则，含最后的 fallback）；没有规则集合，隐藏 Tab 2
  */
 import { computed, reactive, ref, watch, onMounted } from 'vue'
 import { getRules, getRuleProviders, updateRuleProvider } from '@/api/rules'
 import { describeError, errorMessage } from '@/api/http'
 import { useToastStore } from '@/stores/toast'
+import { useBackendStore } from '@/stores/backend'
 import { useInfiniteList } from '@/composables/useInfiniteList'
 import { formatRelativeTime } from '@/utils/format'
 import EmptyState from '@/components/common/EmptyState.vue'
 import Icon from '@/components/common/Icon.vue'
+import PhoneSectionSwitch from '@/components/layout/PhoneSectionSwitch.vue'
 
 const toast = useToastStore()
+const backend = useBackendStore()
 
 /* ---------- 数据加载 ---------- */
 const rules = ref([])
@@ -77,7 +82,7 @@ function ruleSize(r) {
 function targetClass(name) {
   const n = (name || '').toUpperCase()
   if (n === 'DIRECT') return 'text-emerald-600 dark:text-emerald-400'
-  if (n.startsWith('REJECT')) return 'text-rose-600 dark:text-rose-400'
+  if (n.startsWith('REJECT') || n === 'BLOCK') return 'text-rose-600 dark:text-rose-400' // BLOCK：dae 的拒绝出站
   return 'text-brand-600 dark:text-brand-400'
 }
 
@@ -164,14 +169,19 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
 <template>
   <div class="space-y-3">
+    <!-- 手机端：规则 / DNS 切换（DNS 不占底部导航位） -->
+    <PhoneSectionSwitch />
+
     <!-- 工具栏：固定一行不换行（系统字体放大时标签先截断）；手机端搜索框单独一行 -->
     <div class="flex flex-nowrap items-center gap-2">
       <div class="tb-tabs flex min-w-0 shrink-0 overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
         <button
-          v-for="t in [
-            { key: 'rules', label: '规则', count: rules.length },
-            { key: 'providers', label: '规则集合', count: providerList.length },
-          ]"
+          v-for="t in backend.isStandard
+            ? [{ key: 'rules', label: '规则', count: rules.length }]
+            : [
+                { key: 'rules', label: '规则', count: rules.length },
+                { key: 'providers', label: '规则集合', count: providerList.length },
+              ]"
           :key="t.key"
           class="min-w-0 shrink truncate whitespace-nowrap rounded-md transition"
           :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"

@@ -6,6 +6,8 @@
  * - 快照中消失的连接移入「已关闭」（最多保留 MAX_CLOSED 条）
  * - 搜索、排序、暂停刷新、断开单条 / 全部、查看详情
  * - 桌面端表格，手机端卡片
+ * dae / honk（标准 API）：由 ws.js 改为每秒轮询 GET /api/v1/connections，快照形状相同；
+ *   每条连接自带速率（upRate / downRate），累计流量可能为 null（UDP、内核直连），显示 "--"
  */
 import { computed, reactive, ref, watch } from 'vue'
 import { useStream } from '@/composables/useStream'
@@ -50,8 +52,9 @@ const { status } = useStream('/connections', {
       const p = prevMap.get(c.id)
       const item = {
         ...c,
-        upSpeed: p ? Math.max(0, (c.upload - p.upload) / seconds) : 0,
-        downSpeed: p ? Math.max(0, (c.download - p.download) / seconds) : 0,
+        // 后端直接给出速率时用后端的（标准 API），否则用两次快照的流量差计算（mihomo）
+        upSpeed: c.upRate ?? (p ? Math.max(0, (c.upload - p.upload) / seconds) : 0),
+        downSpeed: c.downRate ?? (p ? Math.max(0, (c.download - p.download) / seconds) : 0),
         _search: connSearchText(c),
       }
       nextMap.set(c.id, item)
@@ -204,6 +207,9 @@ watch(active, (list) => {
     if (latest) detail.value = latest
   }
 })
+
+/** 流量：null 表示后端不统计这条连接（标准 API），显示 "--" */
+const bytes = (v) => (v === null ? '--' : formatBytes(v))
 
 /** 时长：活动连接算到现在，已关闭的算到关闭时刻 */
 const duration = (c) => formatDuration(c.start, c.closedAt || now.value)
@@ -418,8 +424,8 @@ const STATUS_TEXT = {
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.upSpeed > 0 && 'text-amber-600 dark:text-amber-400'">
                 {{ formatSpeed(c.upSpeed) }}
               </td>
-              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ formatBytes(c.download) }}</td>
-              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ formatBytes(c.upload) }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ bytes(c.download) }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ bytes(c.upload) }}</td>
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums text-slate-500">{{ duration(c) }}</td>
               <td class="max-w-[9rem] truncate px-3 py-2 text-slate-500" :title="connSource(c)">{{ connSource(c) }}</td>
               <td class="px-2 py-2">
@@ -464,11 +470,11 @@ const STATUS_TEXT = {
           <div class="mt-1.5 grid grid-cols-2 gap-2 text-xs tabular-nums">
             <div>
               <span class="text-brand-600 dark:text-brand-400">↓ {{ formatSpeed(c.downSpeed) }}</span>
-              <span class="text-slate-400"> · {{ formatBytes(c.download) }}</span>
+              <span class="text-slate-400"> · {{ bytes(c.download) }}</span>
             </div>
             <div class="text-right">
               <span class="text-amber-600 dark:text-amber-400">↑ {{ formatSpeed(c.upSpeed) }}</span>
-              <span class="text-slate-400"> · {{ formatBytes(c.upload) }}</span>
+              <span class="text-slate-400"> · {{ bytes(c.upload) }}</span>
             </div>
           </div>
         </div>

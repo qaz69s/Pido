@@ -48,6 +48,10 @@ const LABELS = {
   specialProxy: '特殊代理',
   specialRules: '特殊规则',
   dscp: 'DSCP',
+  // 标准 API（dae / honk）补充字段
+  domainSource: '域名来源',
+  observedBy: '统计来源',
+  ruleSource: '规则来源',
 }
 
 /** 只保留有意义的字段（去掉空字符串、null、0 端口等） */
@@ -66,11 +70,11 @@ const metaRows = computed(() => {
       <div class="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
         <div class="rounded-lg bg-tile p-2">
           <div class="text-xs text-slate-500">下载</div>
-          <div class="font-medium">{{ formatBytes(conn.download) }}</div>
+          <div class="font-medium">{{ conn.download === null ? '--' : formatBytes(conn.download) }}</div>
         </div>
         <div class="rounded-lg bg-tile p-2">
           <div class="text-xs text-slate-500">上传</div>
-          <div class="font-medium">{{ formatBytes(conn.upload) }}</div>
+          <div class="font-medium">{{ conn.upload === null ? '--' : formatBytes(conn.upload) }}</div>
         </div>
         <div class="rounded-lg bg-tile p-2">
           <div class="text-xs text-slate-500">速率 ↓/↑</div>
