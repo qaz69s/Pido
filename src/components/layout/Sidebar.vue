@@ -5,17 +5,21 @@
 import { navItems } from '@/router'
 import { useBackendStore } from '@/stores/backend'
 import Icon from '@/components/common/Icon.vue'
+import { useCoreLogo } from '@/composables/useCoreLogo'
 
 const backend = useBackendStore()
+/** 已连接时 Logo 显示对应内核图标 */
+const coreLogo = useCoreLogo()
 </script>
 
 <template>
   <aside
     class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-slate-200 bg-surface md:flex dark:border-slate-800 "
   >
-    <!-- Logo -->
+    <!-- Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
     <div class="flex h-14 items-center gap-2 px-5 text-lg font-semibold">
-      <span class="grid h-7 w-7 place-items-center rounded-lg bg-brand-600 text-on-brand">
+      <img v-if="coreLogo" :src="coreLogo.src" :alt="coreLogo.name" :title="coreLogo.name" class="h-7 w-7 shrink-0 rounded-lg object-contain" />
+      <span v-else class="grid h-7 w-7 place-items-center rounded-lg bg-brand-600 text-on-brand">
         <Icon name="zap" class="h-4 w-4" />
       </span>
       Pido
