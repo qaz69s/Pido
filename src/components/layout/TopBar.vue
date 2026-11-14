@@ -1,7 +1,7 @@
 <script setup>
 /**
  * 顶栏：页面标题、连接状态、主题切换、后端设置入口
- * - 已连接时状态胶囊显示对应内核的图标（mihomo / dae / honk），右下角小圆点表示连接状态
+ * - 手机端左上角 Logo：已连接时显示对应内核的图标（mihomo / dae / honk），未连接时显示 Pido 闪电图标
  */
 import { computed } from 'vue'
 import { useRoute } from 'vue-router'
@@ -51,8 +51,15 @@ const statusInfo = computed(() => {
   <header
     class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200/80 bg-page/80 px-4 backdrop-blur dark:border-slate-800/80 "
   >
-    <!-- 手机端显示 Logo -->
-    <span class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-600 text-on-brand md:hidden">
+    <!-- 手机端显示 Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
+    <img
+      v-if="statusInfo.logo"
+      :src="statusInfo.logo"
+      :alt="statusInfo.engine"
+      :title="statusInfo.engine"
+      class="h-7 w-7 shrink-0 rounded-lg object-contain md:hidden"
+    />
+    <span v-else class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-600 text-on-brand md:hidden">
       <Icon name="zap" class="h-4 w-4" />
     </span>
     <h1 class="shrink-0 whitespace-nowrap text-base font-semibold">{{ route.meta.title }}</h1>
@@ -61,15 +68,10 @@ const statusInfo = computed(() => {
       <RouterLink
         to="/setup"
         class="press mr-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
-        :class="[backend.status === 'error' && 'anim-shake', statusInfo.logo && 'pl-1']"
+        :class="backend.status === 'error' && 'anim-shake'"
         :title="statusInfo.engine ? `${statusInfo.engine} ${statusInfo.text} · 后端设置` : '后端设置'"
       >
-        <!-- 已连接：内核图标 + 状态小圆点；其他状态只显示圆点 -->
-        <span v-if="statusInfo.logo" class="relative h-5 w-5 shrink-0">
-          <img :src="statusInfo.logo" :alt="statusInfo.engine" class="h-5 w-5 rounded-full bg-white object-cover ring-1 ring-black/5 dark:ring-white/10" />
-          <span class="absolute -bottom-0.5 -right-0.5 h-2 w-2 rounded-full ring-2 ring-white dark:ring-slate-900" :class="statusInfo.dot" />
-        </span>
-        <span v-else class="h-2 w-2 rounded-full" :class="statusInfo.dot" />
+        <span class="h-2 w-2 rounded-full" :class="statusInfo.dot" />
         <span class="max-w-[9rem] truncate">{{ statusInfo.text }}</span>
       </RouterLink>
       <button
