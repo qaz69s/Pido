@@ -363,8 +363,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         </button>
       </div>
 
-      <!-- 工具栏：图标按钮在前，主操作（全部测速 / 全部更新）固定在最右 -->
-      <div class="tb ml-auto flex shrink-0 items-center gap-0.5 rounded-xl bg-tile p-0.5">
+      <div class="tb ml-auto flex shrink-0 items-center">
         <template v-if="tab === 'groups'">
           <button class="btn-icon" :title="allCollapsed ? '全部展开' : '全部折叠'" @click="toggleAll">
             <Icon name="chevronDown" class="h-5 w-5 transition-transform" :class="allCollapsed ? '' : 'rotate-180'" />
@@ -375,36 +374,25 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             title="显示与测速设置"
             @click="showSettings = !showSettings"
           >
-            <Icon name="settings" class="h-5 w-5" />
+            <Icon name="settings" class="h-[18px] w-[18px]" />
+          </button>
+          <button class="btn-primary" :disabled="testingAll || !groups.length" @click="onTestAll">
+            <Icon name="zap" class="h-4 w-4" :class="testingAll && 'animate-pulse'" />
+            <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
           </button>
         </template>
         <template v-else>
-          <button v-if="canManageNodes" class="btn-icon" title="通过分享链接添加节点" @click="openAddNode">
-            <Icon name="plus" class="h-5 w-5" />
+          <button v-if="canManageNodes" class="btn-outline" title="通过分享链接添加节点" @click="openAddNode">
+            <Icon name="plus" class="h-4 w-4" />
+            <span class="hidden sm:inline">添加节点</span>
+          </button>
+          <button class="btn-primary" :disabled="updatingAll || !updatableProviders.length" @click="onUpdateAllProviders">
+            <Icon name="refresh" class="h-4 w-4" :class="updatingAll && 'animate-spin'" />
+            <span class="hidden sm:inline">全部更新</span>
           </button>
         </template>
-        <button class="btn-icon" title="重新载入" @click="load({ silent: true })">
-          <Icon name="reload" class="h-5 w-5" />
-        </button>
-        <button
-          v-if="tab === 'groups'"
-          class="btn-icon bg-brand-500/15 text-brand-600 dark:text-brand-300 sm:w-auto sm:gap-1.5 sm:px-3"
-          title="全部测速"
-          :disabled="testingAll || !groups.length"
-          @click="onTestAll"
-        >
-          <Icon name="gauge" class="h-5 w-5" :class="testingAll && 'animate-pulse'" />
-          <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
-        </button>
-        <button
-          v-else
-          class="btn-icon bg-brand-500/15 text-brand-600 dark:text-brand-300 sm:w-auto sm:gap-1.5 sm:px-3"
-          title="全部更新订阅"
-          :disabled="updatingAll || !updatableProviders.length"
-          @click="onUpdateAllProviders"
-        >
-          <Icon name="cloudDown" class="h-5 w-5" :class="updatingAll && 'animate-pulse'" />
-          <span class="hidden sm:inline">全部更新</span>
+        <button class="btn-icon" title="刷新" @click="load({ silent: true })">
+          <Icon name="reload" class="h-[18px] w-[18px]" />
         </button>
       </div>
     </div>
