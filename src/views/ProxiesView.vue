@@ -87,8 +87,8 @@ const prefs = reactive({
   sort: 'default',
   closeOnSwitch: false, // 切换节点后断开仍走旧节点的连接
   collapsed: {},
-  providerOpen: {},
-  overview: 'bars', // 折叠时延迟概览样式 bars | dots | stack // 代理集合卡片的展开状态（默认收起）
+  providerOpen: {}, // 代理集合卡片的展开状态（默认收起）
+  overview: 'stack', // 折叠时延迟概览样式 stack 分段条 | bars 迷你柱 | dots 圆点
   ...loadJSON('proxy-prefs', {}),
 })
 watch(prefs, (v) => saveJSON('proxy-prefs', v), { deep: true })
@@ -421,9 +421,9 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       <div>
         <label class="label">延迟概览</label>
         <select v-model="prefs.overview" class="input">
+          <option value="stack">分段条</option>
           <option value="bars">迷你柱</option>
           <option value="dots">圆点</option>
-          <option value="stack">分段条</option>
         </select>
       </div>
       <template v-if="!backend.isStandard">
@@ -441,7 +441,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         测速由 {{ backend.engine }} 发起（HTTP 探测），测速地址与超时取后端配置
       </p>
-      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'bars'; prefs.closeOnSwitch = false">恢复默认</button>
+      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'stack'; prefs.closeOnSwitch = false">恢复默认</button>
       <!-- 切换节点时断开旧连接 -->
       <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-slate-200/70 pt-3 dark:border-slate-700/60">
         <span class="min-w-0">

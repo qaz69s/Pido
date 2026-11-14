@@ -23,7 +23,7 @@ const props = defineProps({
   /** 标准 API：该组可调整检查间隔 / 容差，标题栏显示「组参数」按钮 */
   configurable: Boolean,
   /** 折叠时的延迟概览样式：bars 迷你柱 | dots 圆点 | stack 分段条 */
-  overview: { type: String, default: 'bars' },
+  overview: { type: String, default: 'stack' },
 })
 const emit = defineEmits(['select', 'test-group', 'test-node', 'toggle', 'settings'])
 
