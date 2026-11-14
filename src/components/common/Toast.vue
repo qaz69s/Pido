@@ -7,11 +7,13 @@ import Icon from './Icon.vue'
 
 const toast = useToastStore()
 
+// 底色跟随主题（卡片表面色 + 中性边框），只用图标颜色区分类型；成功用主题主色
+const BASE = 'border-slate-200 bg-surface text-slate-700 dark:border-slate-700 dark:text-slate-200'
 const STYLES = {
-  info: { cls: 'border-slate-200 bg-white text-slate-700 dark:border-slate-700 dark:bg-slate-800 dark:text-slate-200', icon: 'info' },
-  success: { cls: 'border-emerald-200 bg-emerald-50 text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950 dark:text-emerald-200', icon: 'check' },
-  warning: { cls: 'border-amber-200 bg-amber-50 text-amber-800 dark:border-amber-900 dark:bg-amber-950 dark:text-amber-200', icon: 'alert' },
-  error: { cls: 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950 dark:text-rose-200', icon: 'alert' },
+  info: { cls: BASE, icon: 'info', ic: 'text-slate-400' },
+  success: { cls: BASE, icon: 'check', ic: 'text-brand-500' },
+  warning: { cls: BASE, icon: 'alert', ic: 'text-amber-500' },
+  error: { cls: BASE, icon: 'alert', ic: 'text-rose-500' },
 }
 </script>
 
@@ -27,7 +29,7 @@ const STYLES = {
         :class="STYLES[t.type]?.cls"
         @click="toast.remove(t.id)"
       >
-        <Icon :name="STYLES[t.type]?.icon" class="mt-0.5 h-4 w-4 shrink-0" />
+        <Icon :name="STYLES[t.type]?.icon" class="mt-0.5 h-4 w-4 shrink-0" :class="STYLES[t.type]?.ic" />
         <span class="break-all">{{ t.message }}</span>
       </div>
     </TransitionGroup>

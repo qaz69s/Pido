@@ -203,7 +203,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         </select>
         <div class="tb flex shrink-0 items-center">
           <button class="btn-icon" title="刷新列表" @click="load({ silent: true })">
-            <Icon name="refresh" class="h-[18px] w-[18px]" />
+            <Icon name="reload" class="h-[18px] w-[18px]" />
           </button>
         </div>
       </template>
@@ -303,7 +303,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
               查看引用
             </button>
             <button class="btn-outline flex-1" :disabled="!!busy[p.name]" @click="onUpdateProvider(p.name).catch(() => {})">
-              <Icon name="refresh" class="h-4 w-4" :class="busy[p.name] && 'animate-spin'" />
+              <Icon name="reload" class="h-4 w-4" :class="busy[p.name] && 'animate-spin'" />
               更新
             </button>
           </div>

@@ -282,25 +282,25 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       <div class="grid gap-4 lg:grid-cols-2">
         <!-- 左列 -->
         <div class="space-y-4">
-          <!-- 运行模式 -->
-          <section class="card p-4">
-            <h2 class="mb-3 font-semibold">运行模式</h2>
-            <div class="grid grid-cols-3 gap-2">
+          <!-- 运行模式：紧凑分段按钮，说明放在 title 里 -->
+          <section class="card flex items-center gap-3 px-4 py-3">
+            <h2 class="shrink-0 font-semibold">运行模式</h2>
+            <div class="ml-auto grid flex-1 grid-cols-3 gap-1 rounded-xl bg-tile p-1 sm:max-w-xs">
               <button
                 v-for="m in MODES"
                 :key="m.value"
-                class="flex flex-col items-center gap-1 rounded-xl border px-2 py-3 text-center transition"
+                class="flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-sm transition"
                 :class="
                   mode === m.value
-                    ? 'border-brand-500 bg-brand-50 text-brand-700 ring-1 ring-brand-500 dark:bg-brand-500/10 dark:text-brand-300'
-                    : 'border-transparent bg-tile hover:brightness-95 dark:hover:brightness-110'
+                    ? 'bg-brand-600 font-medium text-on-brand shadow-sm'
+                    : 'text-slate-600 hover:bg-surface dark:text-slate-300'
                 "
+                :title="m.desc"
                 :disabled="saving.mode"
                 @click="setMode(m.value)"
               >
-                <Icon :name="m.icon" class="h-5 w-5" />
-                <span class="text-sm font-medium">{{ m.label }}</span>
-                <span class="text-xs text-slate-500">{{ m.desc }}</span>
+                <Icon :name="m.icon" class="h-4 w-4" />
+                {{ m.label }}
               </button>
             </div>
           </section>
