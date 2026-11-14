@@ -156,10 +156,19 @@ async function onSelect(group, name) {
 }
 
 /** 单节点测速；后端在超时/失败时返回 408/504/503，统一记为“超时” */
+/** 节点所在的 proxy-provider 名称；配置文件里直接定义的节点返回 undefined */
+function providerOf(name) {
+  if (proxies.value[name]) return undefined
+  for (const [pname, pv] of Object.entries(providers.value)) {
+    if ((pv.proxies || []).some((n) => n.name === name)) return pv.name || pname
+  }
+  return undefined
+}
+
 async function onTestNode(name) {
   testingNodes[name] = true
   try {
-    const res = await testProxyDelay(name, testOpts())
+    const res = await testProxyDelay(name, { ...testOpts(), provider: providerOf(name) })
     delayStore.set(name, res?.delay ?? 0)
   } catch (e) {
     if ([408, 503, 504].includes(e.status)) delayStore.set(name, 0)

@@ -17,15 +17,23 @@ export const selectProxy = (group, name) =>
   isStandard() ? std.selectProxy(group, name) : http.put(`/proxies/${enc(group)}`, { name })
 
 /**
- * GET /proxies/{name}/delay  测单个节点延迟
+ * 测单个节点延迟
+ * - 配置文件里的节点：GET /proxies/{name}/delay
+ * - proxy-provider（订阅）里的节点：mihomo 的 /proxies/{name} 找不到它们（返回 404），
+ *   要走 GET /providers/proxies/{provider}/{name}/healthcheck，传入 provider 即可
  * @returns {Promise<{delay: number}>}
  * 超时时后端返回 408/504，失败返回 503，由调用方转成“超时”
  */
-export const testProxyDelay = (name, { url = DEFAULT_TEST_URL, timeout = 5000 } = {}) =>
-  isStandard() ? std.testProxyDelay(name) : http.get(`/proxies/${enc(name)}/delay`, {
+export const testProxyDelay = (name, { url = DEFAULT_TEST_URL, timeout = 5000, provider } = {}) => {
+  if (isStandard()) return std.testProxyDelay(name)
+  const path = provider
+    ? `/providers/proxies/${enc(provider)}/${enc(name)}/healthcheck`
+    : `/proxies/${enc(name)}/delay`
+  return http.get(path, {
     query: { url, timeout },
     timeout: timeout + 5000, // HTTP 超时要比测速超时长，否则会先被前端掐断
   })
+}
 
 /**
  * GET /group/{name}/delay  整组一键测速（mihomo 扩展接口）
