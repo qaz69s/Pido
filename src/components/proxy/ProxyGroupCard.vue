@@ -2,8 +2,8 @@
 /**
  * 代理组卡片
  * - 标题栏：图标（配置里的 icon）、组名、类型、当前节点、节点数、组参数（仅标准 API 可调的组）、整组测速、折叠
- * - 折叠时显示一排延迟色点，方便快速概览
- * - 动画：展开/收起高度过渡；整组测速时色点依次亮起；延迟更新时数字轻闪
+ * - 折叠时显示一排迷你延迟柱（柱高 = 延迟，越矮越快；当前节点用品牌色），方便快速概览
+ * - 动画：展开/收起淡入；整组测速时延迟柱依次闪动；延迟更新时数字轻闪
  */
 import { computed, ref, watch } from 'vue'
 import { delayLevel, delayText, DELAY_BG_CLASS, DELAY_TEXT_CLASS } from '@/utils/format'
@@ -60,6 +60,15 @@ watch(
 )
 // 一律只做淡入淡出 + 轻微位移，不做高度动画：高度动画每帧都要重新排版整页，用户真机（Android Chrome）上即使 10 个节点也掉帧
 const LARGE = 0
+
+/* ---------- 迷你延迟柱 ----------
+ * 柱高按组内最大延迟（至少 300ms）归一化，最矮 18%；超时 = 满高（红色），未测 = 20%（灰色） */
+const maxDelay = computed(() => Math.max(300, ...nodes.value.map((n) => n.delay || 0)))
+function barHeight(d) {
+  if (d == null) return 20
+  if (d === 0) return 100
+  return Math.max(18, Math.min(100, (d / maxDelay.value) * 100))
+}
 const isLarge = computed(() => nodes.value.length > LARGE)
 </script>
 
@@ -70,10 +79,11 @@ const isLarge = computed(() => nodes.value.length > LARGE)
       class="flex cursor-pointer select-none items-center gap-3 px-4 py-3"
       @click="emit('toggle')"
     >
-      <ProxyIcon v-if="group.icon" :icon="group.icon" :size="40" />
       <div class="min-w-0 flex-1">
         <!-- 第一行：组名 + 淡色的类型与节点数 -->
         <div class="flex items-baseline gap-2">
+          <!-- 组图标：小尺寸贴在组名前，与组名同一行居中 -->
+          <ProxyIcon v-if="group.icon" :icon="group.icon" :size="20" class="self-center" />
           <h3 class="max-w-full shrink-0 truncate font-semibold">{{ group.name }}</h3>
           <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ group.type }} · {{ group.all?.length || 0 }}</span>
           <!-- 右上角：当前节点延迟 -->
@@ -104,16 +114,18 @@ const isLarge = computed(() => nodes.value.length > LARGE)
       />
     </header>
 
-    <!-- 折叠时：延迟色点，左侧与文字对齐（图标只占前两行，与展开时一致） -->
-    <div v-if="collapsed" class="-mt-1 flex flex-wrap gap-1 pb-3 pr-4" :class="group.icon ? 'pl-[68px]' : 'pl-4'">
+    <!-- 折叠时：迷你延迟柱，与文字左对齐；节点很多时柱子自动变细（最细 2px），不换行 -->
+    <div v-if="collapsed" class="-mt-1 px-4 pb-3">
+      <div class="flex h-4 items-end gap-[3px] overflow-hidden">
       <span
         v-for="(n, i) in nodes"
         :key="n.name"
-        class="h-2 w-2 rounded-full transition-colors duration-300"
-        :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-500 ring-offset-1 dark:ring-offset-slate-900', testing && 'anim-sweep']"
-        :style="testing ? { animationDelay: `${(i % 30) * 45}ms` } : null"
-        :title="n.name"
+        class="min-w-[2px] max-w-[5px] flex-1 rounded-sm transition-[height,background-color] duration-300"
+        :class="[n.name === group.now ? 'bg-brand-500' : [DELAY_BG_CLASS[delayLevel(n.delay)], 'opacity-80'], testing && 'anim-sweep']"
+        :style="{ height: barHeight(n.delay) + '%', animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
+        :title="`${n.name} · ${delayText(n.delay)}`"
       />
+      </div>
     </div>
 
     <!-- 展开：节点网格（高度平滑拉开） -->
