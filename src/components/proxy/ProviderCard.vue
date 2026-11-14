@@ -1,7 +1,7 @@
 <script setup>
 /**
  * 代理集合（proxy-provider / 订阅）卡片，外观与代理组卡片保持一致
- * - 标题栏：名称、来源类型、节点数、更新时间；右侧图标按钮：更新订阅（云下载）、健康检查（闪电）、折叠
+ * - 标题栏：名称、来源类型、节点数、更新时间；右侧图标按钮：更新订阅（云下载）、健康检查（心电图）、折叠
  * - 订阅流量条、可用数 / 平均延迟
  * - 折叠时显示迷你延迟柱；展开后列出订阅里的全部节点（只读，点延迟可单测）
  *   订阅节点不能直接选中，要在「代理组」里引用它的组中切换
@@ -93,7 +93,7 @@ function barHeight(d) {
         <Icon name="cloudDown" class="h-[18px] w-[18px]" :class="busy === 'update' && 'animate-pulse text-brand-500'" />
       </button>
       <button v-if="canCheck" class="btn-icon" :disabled="!!busy" title="健康检查（测试全部节点延迟）" @click.stop="emit('healthcheck')">
-        <Icon name="zap" class="h-[18px] w-[18px]" :class="busy === 'check' && 'anim-zap text-brand-500'" />
+        <Icon name="activity" class="h-[18px] w-[18px]" :class="busy === 'check' && 'animate-pulse text-brand-500'" />
       </button>
       <Icon
         name="chevronDown"

@@ -87,7 +87,8 @@ const prefs = reactive({
   sort: 'default',
   closeOnSwitch: false, // 切换节点后断开仍走旧节点的连接
   collapsed: {},
-  providerOpen: {}, // 代理集合卡片的展开状态（默认收起）
+  providerOpen: {},
+  overview: 'bars', // 折叠时延迟概览样式 bars | dots | stack // 代理集合卡片的展开状态（默认收起）
   ...loadJSON('proxy-prefs', {}),
 })
 watch(prefs, (v) => saveJSON('proxy-prefs', v), { deep: true })
@@ -382,8 +383,8 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           >
             <Icon name="settings" class="h-[18px] w-[18px]" />
           </button>
-          <button class="btn-primary" :disabled="testingAll || !groups.length" @click="onTestAll">
-            <Icon name="zap" class="h-4 w-4" :class="testingAll && 'animate-pulse'" />
+          <button class="btn-primary" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
+            <Icon name="gauge" class="h-4 w-4" :class="testingAll && 'animate-pulse'" />
             <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
           </button>
         </template>
@@ -407,7 +408,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     <div
       v-if="showSettings && tab === 'groups'"
       class="card grid gap-3 p-4 sm:items-end"
-      :class="backend.isStandard ? 'sm:grid-cols-[9rem_1fr_auto]' : 'sm:grid-cols-[9rem_1fr_10rem_auto]'"
+      :class="backend.isStandard ? 'sm:grid-cols-[9rem_9rem_1fr_auto]' : 'sm:grid-cols-[9rem_9rem_1fr_10rem_auto]'"
     >
       <div>
         <label class="label">节点排序</label>
@@ -415,6 +416,14 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <option value="default">默认顺序</option>
           <option value="delay">按延迟</option>
           <option value="name">按名称</option>
+        </select>
+      </div>
+      <div>
+        <label class="label">延迟概览</label>
+        <select v-model="prefs.overview" class="input">
+          <option value="bars">迷你柱</option>
+          <option value="dots">圆点</option>
+          <option value="stack">分段条</option>
         </select>
       </div>
       <template v-if="!backend.isStandard">
@@ -432,7 +441,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         测速由 {{ backend.engine }} 发起（HTTP 探测），测速地址与超时取后端配置
       </p>
-      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.closeOnSwitch = false">恢复默认</button>
+      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'bars'; prefs.closeOnSwitch = false">恢复默认</button>
       <!-- 切换节点时断开旧连接 -->
       <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-slate-200/70 pt-3 dark:border-slate-700/60">
         <span class="min-w-0">
@@ -482,6 +491,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         :collapsed="!!prefs.collapsed[g.name]"
         :sort="prefs.sort"
         :configurable="groupConfigurable(g)"
+        :overview="prefs.overview"
         @toggle="toggleGroup(g.name)"
         @settings="openGroupParams(g)"
         @select="(name) => onSelect(g, name)"

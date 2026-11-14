@@ -22,6 +22,8 @@ const props = defineProps({
   sort: { type: String, default: 'default' }, // default | delay | name
   /** 标准 API：该组可调整检查间隔 / 容差，标题栏显示「组参数」按钮 */
   configurable: Boolean,
+  /** 折叠时的延迟概览样式：bars 迷你柱 | dots 圆点 | stack 分段条 */
+  overview: { type: String, default: 'bars' },
 })
 const emit = defineEmits(['select', 'test-group', 'test-node', 'toggle', 'settings'])
 
@@ -70,6 +72,20 @@ function barHeight(d) {
   return Math.max(18, Math.min(100, (d / maxDelay.value) * 100))
 }
 const isLarge = computed(() => nodes.value.length > LARGE)
+
+/* ---------- 分段条：按延迟等级统计节点数 ---------- */
+const LEVELS = [
+  { key: 'good', label: '快' },
+  { key: 'ok', label: '中' },
+  { key: 'bad', label: '慢' },
+  { key: 'timeout', label: '超时' },
+  { key: 'none', label: '未测' },
+]
+const levelCounts = computed(() => {
+  const c = { good: 0, ok: 0, bad: 0, timeout: 0, none: 0 }
+  for (const n of nodes.value) c[delayLevel(n.delay)]++
+  return LEVELS.map((l) => ({ ...l, count: c[l.key] })).filter((l) => l.count > 0)
+})
 </script>
 
 <template>
@@ -86,10 +102,6 @@ const isLarge = computed(() => nodes.value.length > LARGE)
           <ProxyIcon v-if="group.icon" :icon="group.icon" :size="20" class="self-center" />
           <h3 class="max-w-full shrink-0 truncate font-semibold">{{ group.name }}</h3>
           <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ group.type }} · {{ group.all?.length || 0 }}</span>
-          <!-- 右上角：当前节点延迟 -->
-          <span v-if="nowDelay !== undefined" class="ml-auto shrink-0 text-[13px] font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]">
-            <span :key="delayText(nowDelay)" class="anim-pop">{{ delayText(nowDelay) }}</span>
-          </span>
         </div>
         <!-- 第二行：当前节点 -->
         <div class="mt-0.5 flex items-center gap-2 text-sm">
@@ -99,13 +111,17 @@ const isLarge = computed(() => nodes.value.length > LARGE)
       <button v-if="configurable" class="btn-icon hidden sm:inline-flex" title="组参数（检查间隔 / 容差）" @click.stop="emit('settings')">
         <Icon name="sliders" class="h-[17px] w-[17px]" />
       </button>
+      <!-- 延迟胶囊：显示当前节点延迟，点击整组测速（不再单独放闪电按钮，避免和工具栏「全部测速」撞脸） -->
       <button
-        class="btn-icon"
+        class="flex shrink-0 items-center gap-1 rounded-full bg-tile px-2.5 py-1 text-[13px] font-semibold tabular-nums transition hover:brightness-110 disabled:opacity-100"
+        :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         :disabled="testing"
         title="整组测速"
         @click.stop="emit('test-group')"
       >
-        <Icon name="zap" class="h-[18px] w-[18px]" :class="testing && 'anim-zap text-brand-500'" />
+        <Icon name="zap" class="h-3.5 w-3.5" :class="testing && 'anim-zap'" />
+        <span v-if="testing" class="animate-pulse">测速中</span>
+        <span v-else :key="delayText(nowDelay)" class="anim-pop">{{ nowDelay !== undefined ? delayText(nowDelay) : '测速' }}</span>
       </button>
       <Icon
         name="chevronDown"
@@ -114,17 +130,40 @@ const isLarge = computed(() => nodes.value.length > LARGE)
       />
     </header>
 
-    <!-- 折叠时：迷你延迟柱，与文字左对齐；节点很多时柱子自动变细（最细 2px），不换行 -->
+    <!-- 折叠时：延迟概览（三种样式，设置里切换） -->
     <div v-if="collapsed" class="-mt-1 px-4 pb-3">
-      <div class="flex h-4 items-end gap-[3px] overflow-hidden">
-      <span
-        v-for="(n, i) in nodes"
-        :key="n.name"
-        class="min-w-[2px] max-w-[5px] flex-1 rounded-sm transition-[height,background-color] duration-300"
-        :class="[n.name === group.now ? 'bg-brand-500' : [DELAY_BG_CLASS[delayLevel(n.delay)], 'opacity-80'], testing && 'anim-sweep']"
-        :style="{ height: barHeight(n.delay) + '%', animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
-        :title="`${n.name} · ${delayText(n.delay)}`"
-      />
+      <!-- bars：迷你柱，柱高 = 延迟 -->
+      <div v-if="overview === 'bars'" class="flex h-4 items-end gap-[3px] overflow-hidden">
+        <span
+          v-for="(n, i) in nodes"
+          :key="n.name"
+          class="min-w-[2px] max-w-[5px] flex-1 rounded-sm transition-[height,background-color] duration-300"
+          :class="[n.name === group.now ? 'bg-brand-500' : [DELAY_BG_CLASS[delayLevel(n.delay)], 'opacity-80'], testing && 'anim-sweep']"
+          :style="{ height: barHeight(n.delay) + '%', animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
+          :title="`${n.name} · ${delayText(n.delay)}`"
+        />
+      </div>
+      <!-- dots：等大圆点按颜色分级，当前节点带外圈 -->
+      <div v-else-if="overview === 'dots'" class="flex flex-wrap items-center gap-[5px]">
+        <span
+          v-for="(n, i) in nodes"
+          :key="n.name"
+          class="h-2 w-2 rounded-full transition-colors duration-300"
+          :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-400 ring-offset-1 ring-offset-transparent', testing && 'anim-sweep']"
+          :style="{ animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
+          :title="`${n.name} · ${delayText(n.delay)}`"
+        />
+      </div>
+      <!-- stack：一条分段条 + 各等级数量 -->
+      <div v-else class="flex items-center gap-3">
+        <div class="flex h-1.5 min-w-0 flex-1 gap-[2px] overflow-hidden rounded-full" :class="testing && 'animate-pulse'">
+          <span v-for="l in levelCounts" :key="l.key" class="h-full" :class="DELAY_BG_CLASS[l.key]" :style="{ flexGrow: l.count }" />
+        </div>
+        <span class="flex shrink-0 gap-2 text-[11px] text-slate-500">
+          <span v-for="l in levelCounts" :key="l.key" class="flex items-center gap-1">
+            <span class="h-1.5 w-1.5 rounded-full" :class="DELAY_BG_CLASS[l.key]" />{{ l.count }}
+          </span>
+        </span>
       </div>
     </div>
 

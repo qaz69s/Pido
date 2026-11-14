@@ -19,6 +19,7 @@ const PATHS = {
   monitor: 'M3 4h18v12H3zM8 20h8M12 16v4',
   server: 'M4 4h16v6H4zM4 14h16v6H4zM8 7h.01M8 17h.01',
   zap: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+  gauge: 'M3.5 18a9 9 0 1117 0M12 14l4.5-4.5M12 14a1.5 1.5 0 100 .01',
   refresh: 'M21 12a9 9 0 01-15.5 6.2M3 12A9 9 0 0118.5 5.8M21 4v5h-5M3 20v-5h5',
   chevronDown: 'M6 9l6 6 6-6',
   sort: 'M3 6h11M3 12h7M3 18h4M18 6v14M15 17l3 3 3-3',
