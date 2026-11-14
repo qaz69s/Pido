@@ -8,6 +8,8 @@
     --font-sans: ui-sans-serif, system-ui, -apple-system, 'PingFang SC', 'HarmonyOS Sans SC', 'MiSans', 'OPPO Sans',
       'Noto Sans SC', 'Noto Sans CJK SC', 'Source Han Sans SC', 'Microsoft YaHei', sans-serif;
     -webkit-tap-highlight-color: transparent;
+    /* 始终为滚动条预留位置：展开/收起策略组使页面在“有/无滚动条”之间切换时，整页不再左右跳动（桌面浏览器） */
+    scrollbar-gutter: stable;
   }
   body {
     @apply bg-page text-slate-800 antialiased dark:text-slate-200;
