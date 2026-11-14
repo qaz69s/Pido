@@ -2,7 +2,7 @@
 /**
  * 代理页
  * Tab 1「代理组」：按 GLOBAL 中的顺序展示代理组，点击节点切换，单节点 / 整组 / 全部测速
- * Tab 2「代理集合」：proxy-providers 列表，显示订阅流量与到期时间，支持更新和健康检查
+ * Tab 2「代理集合」：proxy-providers 列表（ProviderCard），显示订阅流量与到期时间，支持更新、健康检查，展开查看订阅节点
  * dae / honk（标准 API）：数据由 api/standard/proxies.js 整理成相同形状；
  *   只有 selector 组可点选，测速走 /probes（测速地址由后端配置决定），
  *   Tab 2 显示 /providers（订阅可刷新，inline / file 只读，没有健康检查）
@@ -30,6 +30,7 @@ import { loadJSON, saveJSON } from '@/utils/storage'
 import { formatBytes, formatDate, formatRelativeTime } from '@/utils/format'
 import { getWriteCaps } from '@/api/standard/manage'
 import ProxyGroupCard from '@/components/proxy/ProxyGroupCard.vue'
+import ProviderCard from '@/components/proxy/ProviderCard.vue'
 import NodeManager from '@/components/proxy/NodeManager.vue'
 import GroupParamsDialog from '@/components/proxy/GroupParamsDialog.vue'
 import EmptyState from '@/components/common/EmptyState.vue'
@@ -86,6 +87,7 @@ const prefs = reactive({
   sort: 'default',
   closeOnSwitch: false, // 切换节点后断开仍走旧节点的连接
   collapsed: {},
+  providerOpen: {}, // 代理集合卡片的展开状态（默认收起）
   ...loadJSON('proxy-prefs', {}),
 })
 watch(prefs, (v) => saveJSON('proxy-prefs', v), { deep: true })
@@ -245,6 +247,10 @@ function toggleAll() {
 const providerList = computed(() =>
   Object.values(providers.value).filter((p) => p.vehicleType !== 'Compatible'),
 )
+function toggleProvider(name) {
+  prefs.providerOpen = { ...prefs.providerOpen, [name]: !prefs.providerOpen[name] }
+}
+
 /** 可以更新的集合（标准 API 只有订阅能刷新；mihomo 全部可以） */
 const updatableProviders = computed(() => providerList.value.filter((p) => p._canUpdate !== false))
 
@@ -363,7 +369,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         </button>
       </div>
 
-      <div class="tb ml-auto flex shrink-0 items-center">
+      <div class="tb ml-auto flex shrink-0 items-center md:ml-1">
         <template v-if="tab === 'groups'">
           <button class="btn-icon" :title="allCollapsed ? '全部展开' : '全部折叠'" @click="toggleAll">
             <Icon name="chevronDown" class="h-5 w-5 transition-transform" :class="allCollapsed ? '' : 'rotate-180'" />
@@ -386,12 +392,12 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             <Icon name="plus" class="h-4 w-4" />
             <span class="hidden sm:inline">添加节点</span>
           </button>
-          <button class="btn-primary" :disabled="updatingAll || !updatableProviders.length" @click="onUpdateAllProviders">
-            <Icon name="refresh" class="h-4 w-4" :class="updatingAll && 'animate-spin'" />
+          <button class="btn-primary" :disabled="updatingAll || !updatableProviders.length" title="更新全部订阅" @click="onUpdateAllProviders">
+            <Icon name="cloudDown" class="h-4 w-4" :class="updatingAll && 'animate-pulse'" />
             <span class="hidden sm:inline">全部更新</span>
           </button>
         </template>
-        <button class="btn-icon" title="刷新" @click="load({ silent: true })">
+        <button class="btn-icon" title="刷新页面数据" @click="load({ silent: true })">
           <Icon name="reload" class="h-[18px] w-[18px]" />
         </button>
       </div>
@@ -494,64 +500,27 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           :description="backend.isStandard ? '后端配置中没有订阅（subscription）。' : '配置文件中未定义 proxy-providers。'"
         />
       </div>
-      <div class="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-        <section v-for="p in providerList" :key="p.name" class="card flex flex-col gap-3 p-4">
-          <div class="flex items-start gap-2">
-            <div class="min-w-0 flex-1">
-              <h3 class="truncate font-semibold">{{ p.name }}</h3>
-              <div class="mt-1 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
-                <span class="chip">{{ p.vehicleType }}</span>
-                <span>{{ providerStats(p).count }} 个节点</span>
-                <span>· 更新于 {{ formatRelativeTime(p.updatedAt) }}</span>
-              </div>
-              <!-- 标准 API：订阅拉取失败时保留上次的节点，并给出原因 -->
-              <div v-if="p._lastError || p._status === 'stale'" class="mt-1 truncate text-xs text-amber-600 dark:text-amber-400" :title="p._lastError?.message || p._lastError || ''">
-                {{ p._lastError?.message || p._lastError || '订阅未产出节点（stale）' }}
-              </div>
-            </div>
-          </div>
-
-          <!-- 订阅流量 -->
-          <div v-if="subscription(p)" class="text-xs">
-            <div class="mb-1 flex justify-between text-slate-500">
-              <span>{{ subscription(p).used }} / {{ subscription(p).total }}</span>
-              <span>到期 {{ subscription(p).expire }}</span>
-            </div>
-            <div class="h-1.5 overflow-hidden rounded-full bg-tile">
-              <div
-                class="h-full rounded-full"
-                :class="subscription(p).percent > 90 ? 'bg-rose-500' : 'bg-brand-500'"
-                :style="{ width: `${subscription(p).percent}%` }"
-              />
-            </div>
-          </div>
-
-          <div class="text-xs text-slate-500">
-            可用 {{ providerStats(p).alive }} / {{ providerStats(p).count }}
-            <template v-if="providerStats(p).avg">· 平均 {{ providerStats(p).avg }} ms</template>
-          </div>
-
-          <div v-if="p._canUpdate !== false || p._canHealthcheck !== false || backend.isStandard" class="mt-auto flex gap-2">
-            <button
-              v-if="p._canUpdate !== false"
-              class="btn-outline flex-1"
-              :disabled="!!busyProviders[p.name]"
-              @click="onUpdateProvider(p.name).catch(() => {})"
-            >
-              <Icon name="refresh" class="h-4 w-4" :class="busyProviders[p.name] === 'update' && 'animate-spin'" />
-              更新
-            </button>
-            <button v-if="p._canHealthcheck !== false" class="btn-outline flex-1" :disabled="!!busyProviders[p.name]" @click="onHealthcheck(p.name)">
-              <Icon name="activity" class="h-4 w-4" :class="busyProviders[p.name] === 'check' && 'animate-pulse'" />
-              健康检查
-            </button>
-            <!-- 标准 API：查看 / 管理该来源的节点（内联可编辑，订阅只读） -->
-            <button v-if="backend.isStandard" class="btn-outline flex-1" @click="openNodes(p)">
-              <Icon :name="p._kind === 'inline' && canManageNodes ? 'pencil' : 'list'" class="h-4 w-4" />
-              {{ p._kind === 'inline' && canManageNodes ? '管理节点' : '节点' }}
-            </button>
-          </div>
-        </section>
+      <div v-else class="grid items-start gap-3 lg:grid-cols-2">
+        <ProviderCard
+          v-for="p in providerList"
+          :key="p.name"
+          :provider="p"
+          :delays="delays"
+          :testing-nodes="testingNodes"
+          :busy="busyProviders[p.name] || ''"
+          :collapsed="!prefs.providerOpen[p.name]"
+          :sort="prefs.sort"
+          :subscription="subscription(p)"
+          :stats="providerStats(p)"
+          :updated-text="p.updatedAt ? formatRelativeTime(p.updatedAt) : ''"
+          :show-manage="backend.isStandard"
+          :can-manage="p._kind === 'inline' && canManageNodes"
+          @toggle="toggleProvider(p.name)"
+          @update="onUpdateProvider(p.name).catch(() => {})"
+          @healthcheck="onHealthcheck(p.name)"
+          @test-node="onTestNode"
+          @manage="openNodes(p)"
+        />
       </div>
     </template>
 
