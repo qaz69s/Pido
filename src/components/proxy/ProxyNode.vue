@@ -18,6 +18,8 @@ const props = defineProps({
   active: Boolean,
   selectable: Boolean,
   testing: Boolean,
+  /** false：只显示延迟，不能点击测速（dae / honk 由后端自动健康检查） */
+  testable: { type: Boolean, default: true },
 })
 const emit = defineEmits(['select', 'test'])
 
@@ -90,7 +92,11 @@ function onSelect() {
     </span>
     <div class="flex items-center justify-between gap-2 text-[13px]">
       <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
+      <span v-if="!testable" class="shrink-0 px-1 font-semibold tabular-nums" :class="delayClass">
+        <span :key="popKey" :class="popping && 'anim-pop'">{{ delayText(delay) }}</span>
+      </span>
       <button
+        v-else
         type="button"
         class="shrink-0 rounded px-1 tabular-nums font-semibold hover:bg-slate-200/60 dark:hover:bg-white/10"
         :class="delayClass"

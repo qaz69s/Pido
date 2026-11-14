@@ -25,6 +25,8 @@ const props = defineProps({
   /** 标准 API：显示「节点 / 管理节点」入口 */
   showManage: Boolean,
   canManage: Boolean,
+  /** false：节点延迟只显示、不能点击测速（dae / honk） */
+  testable: { type: Boolean, default: true },
 })
 const emit = defineEmits(['toggle', 'update', 'healthcheck', 'test-node', 'manage'])
 
@@ -146,6 +148,7 @@ function barHeight(d) {
             :delay="n.delay"
             :selectable="false"
             :testing="!!testingNodes[n.name] || busy === 'check'"
+            :testable="testable"
             @test="emit('test-node', n.name)"
           />
         </div>

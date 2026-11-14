@@ -9,7 +9,7 @@
  *   节点管理（开启 config_write 时）：订阅页工具栏「添加节点」、各来源卡片「节点」→ NodeManager
  *   （内联节点可添加 / 改名换链接 / 删除，订阅节点只读）；可调参数的组在卡片标题栏有「组参数」按钮 → GroupParamsDialog
  */
-import { computed, reactive, ref, watch, onMounted } from 'vue'
+import { computed, reactive, ref, watch, onMounted, onBeforeUnmount } from 'vue'
 import {
   getProxies,
   selectProxy,
@@ -132,6 +132,19 @@ async function load({ silent = false } = {}) {
   }
 }
 onMounted(load)
+
+/**
+ * dae / honk：延迟来自后端自动健康检查，面板不提供手动测速（POST /probes 慢且受限流），
+ * 改为每 30 秒静默刷新一次，显示最新的检查结果
+ */
+const canTest = computed(() => !backend.isStandard)
+let healthTimer = null
+onMounted(() => {
+  healthTimer = setInterval(() => {
+    if (backend.isStandard && !document.hidden && !loading.value) load({ silent: true }).catch(() => {})
+  }, 30000)
+})
+onBeforeUnmount(() => clearInterval(healthTimer))
 
 /* ---------- 代理组 ---------- */
 /**
@@ -383,7 +396,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           >
             <Icon name="settings" class="h-[18px] w-[18px]" />
           </button>
-          <button class="btn-primary" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
+          <button v-if="canTest" class="btn-primary" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
             <Icon name="gauge" class="h-4 w-4" :class="testingAll && 'animate-pulse'" />
             <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
           </button>
@@ -492,6 +505,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         :sort="prefs.sort"
         :configurable="groupConfigurable(g)"
         :overview="prefs.overview"
+        :testable="canTest"
         @toggle="toggleGroup(g.name)"
         @settings="openGroupParams(g)"
         @select="(name) => onSelect(g, name)"
@@ -525,6 +539,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           :updated-text="p.updatedAt ? formatRelativeTime(p.updatedAt) : ''"
           :show-manage="backend.isStandard"
           :can-manage="p._kind === 'inline' && canManageNodes"
+          :testable="canTest"
           @toggle="toggleProvider(p.name)"
           @update="onUpdateProvider(p.name).catch(() => {})"
           @healthcheck="onHealthcheck(p.name)"

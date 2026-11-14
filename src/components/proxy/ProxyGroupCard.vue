@@ -24,6 +24,8 @@ const props = defineProps({
   configurable: Boolean,
   /** 折叠时的延迟概览样式：bars 迷你柱 | dots 圆点 | stack 分段条 */
   overview: { type: String, default: 'stack' },
+  /** false：延迟胶囊只显示、不能点击测速（dae / honk） */
+  testable: { type: Boolean, default: true },
 })
 const emit = defineEmits(['select', 'test-group', 'test-node', 'toggle', 'settings'])
 
@@ -112,7 +114,16 @@ const levelCounts = computed(() => {
         <Icon name="sliders" class="h-[17px] w-[17px]" />
       </button>
       <!-- 延迟胶囊：显示当前节点延迟，点击整组测速（不再单独放闪电按钮，避免和工具栏「全部测速」撞脸） -->
+      <span
+        v-if="!testable"
+        class="flex shrink-0 items-center rounded-full bg-tile px-2.5 py-1 text-[13px] font-semibold tabular-nums"
+        :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
+        title="后端自动健康检查的延迟"
+      >
+        <span :key="delayText(nowDelay)" class="anim-pop">{{ nowDelay !== undefined ? delayText(nowDelay) : '--' }}</span>
+      </span>
       <button
+        v-else
         class="flex shrink-0 items-center gap-1 rounded-full bg-tile px-2.5 py-1 text-[13px] font-semibold tabular-nums transition hover:brightness-110 disabled:opacity-100"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         :disabled="testing"
@@ -184,6 +195,7 @@ const levelCounts = computed(() => {
           :active="n.name === group.now"
           :selectable="selectable"
           :testing="!!testingNodes[n.name] || testing"
+          :testable="testable"
           @select="emit('select', n.name)"
           @test="emit('test-node', n.name)"
         />
