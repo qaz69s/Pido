@@ -171,6 +171,7 @@ export async function waitOperation(accepted, { timeout = 60000 } = {}) {
       const msg = op.error?.message || op.error?.code || '操作失败'
       const err = new ApiError('http', msg, { detail: op.error })
       err.backendKind = 'standard'
+      if (op.error?.code) err.code = op.error.code
       throw err
     }
     delay = 1000

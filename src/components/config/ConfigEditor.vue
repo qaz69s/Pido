@@ -454,7 +454,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
           :readonly="!!readOnlyReason || saving"
           :marks="marks"
           :focus-line="focusLine"
-          class="h-[min(60vh,32rem)] min-h-[16rem]"
+          class="h-[min(50svh,32rem)] min-h-[16rem]"
         />
       </div>
     </div>

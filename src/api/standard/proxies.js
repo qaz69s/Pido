@@ -95,6 +95,8 @@ function mapNode(n) {
 
 /** 组信息（测速 / 切换要用 id 和成员列表），按组名缓存 */
 const groupInfo = new Map()
+/** { 节点 id: 协议 }，测速时据此给 direct / block 选 http、其他协议可退回 tcp_connect */
+const nodeProtocol = new Map()
 
 /** GET /groups + 每组详情 + 全部节点 → { proxies } */
 export async function getProxies() {
@@ -104,7 +106,11 @@ export async function getProxies() {
 
   const proxies = {}
   groupInfo.clear()
-  for (const n of nodes) rememberName(n.id, n.name, 'node')
+  nodeProtocol.clear()
+  for (const n of nodes) {
+    rememberName(n.id, n.name, 'node')
+    nodeProtocol.set(n.id, String(n.protocol || '').toLowerCase())
+  }
   for (const g of list) rememberName(g.id, g.name, 'group')
   markNamesFresh()
 
@@ -224,23 +230,35 @@ function mergeResults(items) {
   return out
 }
 
+/** 422 unsupported_value 且后端提示改用 tcp_connect（该协议没有 HTTP 探测路径） */
+function wantsTcpConnect(e) {
+  const d = e?.detail?.error?.details || e?.detail?.details
+  return e?.code === 'unsupported_value' && (!d?.allowed || d.allowed.includes('tcp_connect'))
+}
+const isDirectLike = (id) => ['direct', 'block', 'reject'].includes(nodeProtocol.get(id))
+
 /**
  * 单节点测速：POST /probes { target: node }
+ * 先用 http（与自动健康检查一致）；后端说该协议没有 HTTP 探测路径时退回 tcp_connect
  * @returns {Promise<{delay: number}>}  不可用时抛出 status=503 的错误（界面记为“超时”）
  */
 export async function testProxyDelay(name) {
   const dims = await probeDims()
   const nodeId = idOf(name)
-  const items = await runProbe(
-    {
-      target: { type: 'node', node_id: nodeId },
-      kind: dims.kind,
-      transport: ['tcp'],
-      ip_version: dims.ip_version,
-      warmth: 'cold',
-    },
-    dims.jobTimeout,
-  )
+  const body = (kind) => ({
+    target: { type: 'node', node_id: nodeId },
+    kind,
+    transport: ['tcp'],
+    ip_version: dims.ip_version,
+    warmth: 'cold',
+  })
+  let items
+  try {
+    items = await runProbe(body(dims.kind), dims.jobTimeout)
+  } catch (e) {
+    if (dims.kind === 'tcp_connect' || !wantsTcpConnect(e) || isDirectLike(nodeId)) throw e
+    items = await runProbe(body('tcp_connect'), dims.jobTimeout)
+  }
   const merged = mergeResults(items)
   const d = merged.get(nodeId) ?? [...merged.values()][0]
   if (d > 0) return { delay: d }
@@ -250,7 +268,9 @@ export async function testProxyDelay(name) {
 
 /**
  * 整组测速：POST /probes { target: group, members }
- * 成员数超过 max_members_per_job 时分批（显式列出成员 id）
+ * - 成员数超过 max_members_per_job 时分批（显式列出成员 id）
+ * - 整批被 422 拒绝（组里有不支持 HTTP 探测的协议）时：direct / block / 子组继续用 http，
+ *   其余节点改用 tcp_connect，各自一批；某一批仍失败只丢掉那一批，不让整组报错
  * @returns {Promise<Record<string, number>>} { 成员名: 延迟 }，与 mihomo /group/{name}/delay 一致
  */
 export async function testGroupDelay(group) {
@@ -258,21 +278,38 @@ export async function testGroupDelay(group) {
   const info = groupInfo.get(group)
   const gid = info?.id ?? idOf(group)
   const members = info?.members || []
-  const base = {
+  const body = (kind, ids) => ({
     target: { type: 'group', group_id: gid },
-    kind: dims.kind,
+    kind,
     transport: ['tcp'],
     ip_version: dims.ip_version,
     warmth: 'cold',
+    members: ids || 'direct',
+  })
+  const chunks = (ids) => {
+    const out = []
+    for (let i = 0; i < ids.length; i += dims.maxMembers) out.push(ids.slice(i, i + dims.maxMembers))
+    return out
   }
-  const batches = []
-  if (!members.length || members.length <= dims.maxMembers) batches.push({ ...base, members: 'direct' })
-  else {
-    for (let i = 0; i < members.length; i += dims.maxMembers) {
-      batches.push({ ...base, members: members.slice(i, i + dims.maxMembers).map((m) => m.id) })
-    }
+  const run = (kind, ids) => Promise.all(chunks(ids).map((c) => runProbe(body(kind, c), dims.jobTimeout))).then((r) => r.flat())
+
+  let items
+  try {
+    items =
+      !members.length || members.length <= dims.maxMembers
+        ? await runProbe(body(dims.kind), dims.jobTimeout)
+        : await run(dims.kind, members.map((m) => m.id))
+  } catch (e) {
+    if (!members.length || e?.code !== 'unsupported_value') throw e
+    const httpIds = members.filter((m) => m.kind === 'group' || isDirectLike(m.id)).map((m) => m.id)
+    const tcpIds = members.filter((m) => !httpIds.includes(m.id)).map((m) => m.id)
+    const parts = await Promise.allSettled([
+      httpIds.length ? run(dims.kind, httpIds) : [],
+      tcpIds.length ? run('tcp_connect', tcpIds) : [],
+    ])
+    if (parts.every((p) => p.status === 'rejected')) throw parts[0].reason
+    items = parts.flatMap((p) => (p.status === 'fulfilled' ? p.value : []))
   }
-  const items = (await Promise.all(batches.map((b) => runProbe(b, dims.jobTimeout)))).flat()
   const merged = mergeResults(items)
   const out = {}
   for (const [id, d] of merged) {

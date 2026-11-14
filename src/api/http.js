@@ -271,9 +271,28 @@ function describeStandardError(err) {
         title: 'HTTPS 页面无法访问 HTTP 后端',
         tips: ['用 http:// 打开本面板，或让 dae 通过 api { ui: ... } 托管面板', '或在受信任的反向代理上为 API 终止 TLS，改用 https:// 地址'],
       }
+    case 'http': {
+      const zh = STANDARD_CODE_ZH[err.code]
+      return zh ? { title: zh, tips: [] } : null
+    }
     default:
       return null
   }
+}
+
+/** 标准 API 常见错误码 → 中文说明（后端原文是英文） */
+const STANDARD_CODE_ZH = {
+  rate_limited: '请求太频繁（测速每分钟最多 30 次），请稍后再试',
+  temporarily_unavailable: '后端暂时繁忙（测速队列已满），请稍后再试',
+  resource_not_found: '在当前配置中找不到该节点或组，刷新页面后再试',
+  request_too_large: '成员太多，超出后端单次测速上限',
+  unsupported_value: '该节点不支持这种测速方式',
+  invalid_request: '后端拒绝了这个请求（参数不符合接口要求）',
+  probe_deadline: '测速超时（后端限 30 秒）',
+  probe_cancelled: '测速被取消（可能正在重载配置）',
+  engine_unavailable: '内核还没就绪，请稍后再试',
+  capability_not_supported: '当前后端不支持这个操作',
+  state_conflict: '已有同类操作在进行，请稍后再试',
 }
 
 /** 一行简短的错误文字，用于 Toast */

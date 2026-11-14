@@ -69,7 +69,7 @@ onBeforeUnmount(() => {
         <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]" @click="close" />
         <!-- 面板 -->
         <div
-          class="modal-panel relative flex max-h-[85vh] w-full flex-col rounded-t-2xl border border-slate-200 bg-white shadow-xl md:rounded-2xl dark:border-slate-800 dark:bg-slate-900"
+          class="modal-panel relative flex max-h-[85svh] w-full flex-col rounded-t-2xl border border-slate-200 bg-white shadow-xl md:rounded-2xl dark:border-slate-800 dark:bg-slate-900"
           :class="width"
           role="dialog"
           aria-modal="true"
