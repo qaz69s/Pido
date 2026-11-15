@@ -1,6 +1,6 @@
 # Pido
 
-简约的 mihomo (Clash.Meta) Web 管理面板，Vue 3 + Vite + TailwindCSS 编写。
+简约的 mihomo (Clash.Meta) Web 管理面板，Vue 3 + Vite + TailwindCSS + daisyUI 编写。
 
 ## 功能
 - 概览：实时上下行曲线、内存、连接数、累计流量、运行信息
@@ -15,16 +15,30 @@
 ## 主题配色
 配置页「面板 → 配色」可切换 6 套配色，每套都有浅色和深色，跟随「外观」里的系统 / 浅色 / 深色设置：
 
-| 配色 | 风格 |
-| --- | --- |
-| 靛夜（默认） | 沉稳的靛蓝 |
-| 北境 | Nord 冷色调，低饱和护眼 |
-| 素墨 | 纯中性灰，黑白极简（参考 zashboard dark-neutral） |
-| 樱花 | 粉紫双光晕，最圆润 |
-| 赛博 | 霓虹色、等宽字体、网格底纹、直角 |
-| 暖阳 | 暖橙与米色 |
+| 配色 | 风格 | daisyUI 主题 |
+| --- | --- | --- |
+| 靛夜（默认） | 沉稳的靛蓝 | `default-light` / `default-dark` |
+| 北境 | Nord 冷色调，低饱和护眼 | `nord-light` / `nord-dark` |
+| 素墨 | 纯中性灰，黑白极简（参考 zashboard dark-neutral） | `neutral-light` / `neutral-dark` |
+| 樱花 | 粉紫双光晕，最圆润 | `sakura-light` / `sakura-dark` |
+| 赛博 | 霓虹色、等宽字体、网格底纹、直角 | `cyber-light` / `cyber-dark` |
+| 暖阳 | 暖橙与米色 | `sunset-light` / `sunset-dark` |
 
-实现方式：`tailwind.config.js` 中的 `slate`（中性色）、`brand`（主色）、`accent`（强调色）和圆角都指向 CSS 变量，变量在 `src/themes.css` 里按 `<html data-theme="...">` 定义。新增配色只需在 `themes.css` 加一组变量，并在 `src/utils/themes.js` 登记。
+### 实现方式
+界面的颜色与组件全部使用 [daisyUI 4](https://v4.daisyui.com/)（Tailwind CSS 3 插件）：
+
+- **主题**：`src/utils/themes.js` 的 `DAISY_THEMES` 定义了 12 个 daisyUI 主题（每套配色 `-light` / `-dark` 各一个），`tailwind.config.js` 通过 `daisyui.themes` 注册。
+  `stores/theme.js` 把 `<html data-theme>` 设为「配色 + 外观」，例如 `nord-dark`；`index.html` 的内联脚本在 Vue 挂载前先写好，避免闪白。设置仍保存在原来的 `localStorage` 键（`theme` / `preset`）里。
+- **颜色语义**：`primary` 主色（按钮、选中、下载曲线）、`accent` 强调色（上传曲线）、`base-100` 卡片、`base-200` 卡片内的小块、`base-300` 页面底色、`base-content` 正文（次要文字用 `text-base-content/70` 等透明度），`info` / `success` / `warning` / `error` 状态色。组件里只用这些语义类（如 `bg-base-100`、`text-primary`、`border-base-content/10`），不写死颜色。
+- **组件**：按钮 `btn`、弹窗 `modal`（手机底部抽屉 `modal-bottom`，桌面居中 `md:modal-middle`）、开关 `toggle`、提示 `toast` + `alert`、卡片 `card`、徽标 `badge`、分段切换 `tabs tabs-boxed`、输入框 `input` / `select` / `textarea`、菜单 `menu`、下拉 `dropdown`、表格 `table`、进度条 `progress`、加载 `loading` / `skeleton`。
+- **圆角与字体**：每个主题带 `--rounded-box`（卡片、弹窗）、`--rounded-btn`（按钮、分段）、`--rounded-badge`（徽标），Tailwind 的 `rounded-md / lg / xl / 2xl / 3xl` 也按这两个变量换算；赛博主题用 `--font-body` 换成等宽字体。
+- **其他**：各配色的背景质感（光晕、网格、渐变）在 `src/style.css`，按 `[data-theme^='sakura-']` 等选择器生效；流量曲线读取主题变量 `--p` / `--a`，随主题变色。
+
+### 新增配色
+1. 在 `src/utils/themes.js` 的 `DAISY_THEMES` 里加 `<id>-light` 与 `<id>-dark` 两个主题（颜色写 hex，daisyUI 构建时转成 oklch），可选设置圆角、`--font-body`。
+2. 在同文件的 `PRESETS` 里登记 `id`、名称、说明和地址栏颜色 `meta`（色块预览自动从主题取色）。
+3. 在 `index.html` 内联脚本的配色白名单里加上 `id`。
+4. 运行 `node scripts/theme-contrast.mjs` 检查对比度（主按钮、主色文字 ≥ 4.5:1，正文 ≥ 7:1）。
 
 ## 运行（开发）
 ```bash
@@ -84,6 +98,6 @@ src/
   composables/  useStream（订阅 WebSocket）useInfiniteList（长列表分批渲染）
   components/   common（Icon Modal Switch …）layout charts proxy connection
   views/        Setup Overview Proxies Connections Rules Logs Config
-  utils/        format storage connection themes（配色列表）
-themes.css      各配色的 CSS 变量
+  utils/        format storage connection themes（配色列表与 daisyUI 主题）
+style.css       daisyUI 组件的项目级默认、各配色的背景质感
 ```
