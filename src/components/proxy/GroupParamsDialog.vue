@@ -121,7 +121,7 @@ async function save() {
 <template>
   <Modal v-model="open" :title="group ? `组参数 · ${group.name}` : '组参数'">
     <div v-if="loading" class="space-y-2 py-2">
-      <div v-for="i in 3" :key="i" class="skeleton h-9 rounded" />
+      <div v-for="i in 3" :key="i" class="skeleton h-9 rounded-md" />
     </div>
     <form v-else id="group-params" class="space-y-4" @submit.prevent="save">
       <div class="flex items-center justify-between gap-3 text-sm">
@@ -140,13 +140,13 @@ async function save() {
             min="1"
             step="1"
             class="input tabular-nums"
-            :class="fieldErrors.check_interval && '!border-rose-500'"
+            :class="fieldErrors.check_interval && '!border-danger'"
             :disabled="!canInterval || saving"
             placeholder="留空则沿用 global 设置"
           />
           <span class="shrink-0 text-sm text-slate-500">秒</span>
         </div>
-        <p class="mt-1 text-xs" :class="fieldErrors.check_interval ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500'">
+        <p class="mt-1 text-xs" :class="fieldErrors.check_interval ? 'text-danger' : 'text-slate-500'">
           {{ fieldErrors.check_interval || (canInterval ? 'check_interval：多久探测一次组内节点' : '后端不允许修改此项') }}
         </p>
       </div>
@@ -162,13 +162,13 @@ async function save() {
             min="0"
             step="1"
             class="input tabular-nums"
-            :class="fieldErrors.tolerance && '!border-rose-500'"
+            :class="fieldErrors.tolerance && '!border-danger'"
             :disabled="!canTolerance || saving"
             placeholder="留空则沿用 global 设置"
           />
           <span class="shrink-0 text-sm text-slate-500">毫秒</span>
         </div>
-        <p class="mt-1 text-xs" :class="fieldErrors.tolerance ? 'text-rose-600 dark:text-rose-400' : 'text-slate-500'">
+        <p class="mt-1 text-xs" :class="fieldErrors.tolerance ? 'text-danger' : 'text-slate-500'">
           {{
             fieldErrors.tolerance ||
             (canTolerance
@@ -187,7 +187,7 @@ async function save() {
       <div
         v-if="error"
         class="flex items-start gap-2 rounded-lg px-3 py-2 text-sm"
-        :class="stale ? 'bg-amber-50 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'"
+        :class="stale ? 'bg-warn-soft text-warn' : 'bg-danger-soft text-danger'"
       >
         <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
         <span class="min-w-0 flex-1">{{ error }}</span>

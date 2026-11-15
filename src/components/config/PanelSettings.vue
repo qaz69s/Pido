@@ -40,7 +40,7 @@ async function disconnect() {
 
 <template>
   <!-- 面板 -->
-  <section class="card divide-y divide-slate-100 dark:divide-slate-800">
+  <section class="card divide-y divide-line">
     <h2 class="px-4 pb-2 pt-4 font-semibold">面板</h2>
     <SettingRow title="外观">
       <div class="flex rounded-lg bg-tile p-0.5 text-xs dark:bg-page">
@@ -67,7 +67,7 @@ async function disconnect() {
           :class="
             theme.preset === p.id
               ? 'border-brand-500 ring-2 ring-brand-500/25'
-              : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
+              : 'border-line hover:border-line-strong'
           "
           :title="p.desc"
           @click="theme.setPreset(p.id, $event)"
@@ -96,7 +96,7 @@ async function disconnect() {
         </div>
       </div>
       <RouterLink to="/setup" class="btn-outline py-1 text-xs">更换</RouterLink>
-      <button class="btn-ghost py-1 text-xs text-rose-600 dark:text-rose-400" @click="disconnect">断开</button>
+      <button class="btn-ghost py-1 text-xs text-danger" @click="disconnect">断开</button>
     </div>
   </section>
 </template>

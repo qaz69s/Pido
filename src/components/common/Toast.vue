@@ -8,12 +8,12 @@ import Icon from './Icon.vue'
 const toast = useToastStore()
 
 // 底色跟随主题（卡片表面色 + 中性边框），只用图标颜色区分类型；成功用主题主色
-const BASE = 'border-slate-200 bg-surface text-slate-700 dark:border-slate-700 dark:text-slate-200'
+const BASE = 'border-line bg-surface text-slate-700 dark:text-slate-200'
 const STYLES = {
   info: { cls: BASE, icon: 'info', ic: 'text-slate-400' },
   success: { cls: BASE, icon: 'check', ic: 'text-brand-500' },
-  warning: { cls: BASE, icon: 'alert', ic: 'text-amber-500' },
-  error: { cls: BASE, icon: 'alert', ic: 'text-rose-500' },
+  warning: { cls: BASE, icon: 'alert', ic: 'text-warn' },
+  error: { cls: BASE, icon: 'alert', ic: 'text-danger' },
 }
 </script>
 

@@ -22,7 +22,7 @@
 /* ---------- 可复用组件类 ---------- */
 @layer components {
   .card {
-    @apply rounded-2xl border border-slate-200/80 bg-surface dark:border-white/[0.06];
+    @apply rounded-2xl border border-line bg-surface;
   }
   /* 中性提示条：浅底 + 彩色小图标，只有报错才用满色横幅 */
   .notice {
@@ -39,19 +39,19 @@
     @apply btn bg-brand-600 text-on-brand hover:bg-brand-700 active:bg-brand-800;
   }
   .btn-outline {
-    @apply btn border border-slate-300 bg-raised text-slate-700 hover:bg-slate-100 disabled:text-slate-400 disabled:opacity-100 dark:border-white/10 dark:text-slate-200 dark:hover:bg-tile dark:disabled:text-slate-600;
+    @apply btn border border-line-strong bg-raised text-slate-700 hover:bg-slate-100 disabled:text-slate-400 disabled:opacity-100 dark:text-slate-200 dark:hover:bg-tile dark:disabled:text-slate-600;
   }
   .btn-ghost {
-    @apply btn text-slate-600 hover:bg-slate-200/70 disabled:text-slate-400 disabled:opacity-100 disabled:hover:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800 dark:disabled:text-slate-600;
+    @apply btn text-slate-600 hover:bg-slate-200/70 disabled:text-slate-400 disabled:opacity-100 disabled:hover:bg-transparent dark:text-slate-300 dark:hover:bg-white/[0.06] dark:disabled:text-slate-600;
   }
   .btn-danger {
-    @apply btn bg-rose-600 text-white hover:bg-rose-700;
+    @apply btn bg-danger text-white hover:bg-danger/90;
   }
   .btn-icon {
     @apply btn-ghost h-9 w-9 p-0;
   }
   .input {
-    @apply w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:border-slate-700 dark:bg-page dark:placeholder:text-slate-500;
+    @apply w-full rounded-lg border border-line-strong bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:bg-page dark:placeholder:text-slate-500;
   }
   .label {
     @apply mb-1 block text-sm font-medium text-slate-600 dark:text-slate-300;
@@ -126,7 +126,6 @@
 
 /* ---------- 深色：卡片发丝描边 + 顶部内高光，靠光线而不是粗边框分层 ---------- */
 .dark .card {
-  border-color: rgb(255 255 255 / 0.07);
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
 }
 /* 北境 / 暖阳的主色偏浅，白字对比不足 4.5:1，深色下主按钮改用深一级主色 */
@@ -179,4 +178,35 @@
 /* ---------- 选中文字跟随主题色 ---------- */
 ::selection {
   background: rgb(var(--b-500) / 0.25);
+}
+
+/* ---------- 线条与语义状态色（浅色 / 深色各一套，主题无关） ---------- */
+:root {
+  --line: rgb(var(--n-900) / 0.09);
+  --line-strong: rgb(var(--n-900) / 0.2);
+  --danger: 225 29 72;
+  --danger-tx: 225 29 72;
+  --danger-soft: rgb(255 236 238);
+  --danger-line: rgb(254 205 211);
+  --warn: 245 158 11;
+  --warn-tx: 180 83 9;
+  --warn-soft: rgb(254 246 220);
+  --warn-line: rgb(253 230 138);
+  --ok: 16 185 129;
+  --ok-tx: 4 120 87;
+  --ok-soft: rgb(220 250 235);
+  --ok-line: rgb(167 243 208);
+}
+.dark {
+  --line: rgb(255 255 255 / 0.08);
+  --line-strong: rgb(255 255 255 / 0.15);
+  --danger-tx: 251 113 133;
+  --danger-soft: rgb(244 63 94 / 0.14);
+  --danger-line: rgb(244 63 94 / 0.3);
+  --warn-tx: 251 191 36;
+  --warn-soft: rgb(245 158 11 / 0.14);
+  --warn-line: rgb(245 158 11 / 0.3);
+  --ok-tx: 52 211 153;
+  --ok-soft: rgb(16 185 129 / 0.14);
+  --ok-line: rgb(16 185 129 / 0.3);
 }

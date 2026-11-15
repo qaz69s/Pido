@@ -81,8 +81,8 @@ function ruleSize(r) {
 /** 目标的颜色：直连绿、拒绝红、其它主色 */
 function targetClass(name) {
   const n = (name || '').toUpperCase()
-  if (n === 'DIRECT') return 'text-emerald-600 dark:text-emerald-400'
-  if (n.startsWith('REJECT') || n === 'BLOCK') return 'text-rose-600 dark:text-rose-400' // BLOCK：dae 的拒绝出站
+  if (n === 'DIRECT') return 'text-ok'
+  if (n.startsWith('REJECT') || n === 'BLOCK') return 'text-danger' // BLOCK：dae 的拒绝出站
   return 'text-brand-600 dark:text-brand-400'
 }
 
@@ -222,7 +222,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       <input v-model="keyword" type="search" class="input py-1.5 pl-8" placeholder="搜索规则内容、类型或目标" />
     </div>
 
-    <div v-if="loading" class="card divide-y divide-slate-100 dark:divide-slate-800">
+    <div v-if="loading" class="card divide-y divide-line">
       <div v-for="i in 8" :key="i" class="skeleton h-12" />
     </div>
 
@@ -242,7 +242,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           :title="keyword || target ? '没有匹配的规则' : '没有规则'"
         />
       </div>
-      <div v-else class="card divide-y divide-slate-100 dark:divide-slate-800">
+      <div v-else class="card divide-y divide-line">
         <div
           v-for="r in visible"
           :key="r.index"
@@ -251,7 +251,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <span class="w-8 shrink-0 text-right text-xs tabular-nums text-slate-400">{{ r.index }}</span>
           <div class="min-w-0 flex-1">
             <div class="flex min-w-0 items-center gap-2">
-              <span class="truncate font-mono text-[13px]" :title="r.payload">{{ r.payload || '（全部流量）' }}</span>
+              <span class="truncate font-mono text-sm" :title="r.payload">{{ r.payload || '（全部流量）' }}</span>
               <span v-if="ruleSize(r) != null" class="shrink-0 text-xs text-slate-400">{{ ruleSize(r) }} 条</span>
             </div>
             <div class="mt-0.5 flex items-center gap-2 sm:hidden">

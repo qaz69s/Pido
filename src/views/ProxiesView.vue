@@ -390,7 +390,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </button>
           <button
             class="btn-icon"
-            :class="showSettings && 'bg-slate-200/70 dark:bg-slate-800'"
+            :class="showSettings && 'bg-slate-200/70 dark:bg-white/[0.08]'"
             title="显示与测速设置"
             @click="showSettings = !showSettings"
           >
@@ -456,7 +456,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       </p>
       <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'stack'; prefs.closeOnSwitch = false">恢复默认</button>
       <!-- 切换节点时断开旧连接 -->
-      <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-slate-200/70 pt-3 dark:border-slate-700/60">
+      <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-line/70 pt-3">
         <span class="min-w-0">
           <span class="block text-sm font-medium">切换节点时断开旧连接</span>
           <span class="block text-xs text-slate-500">已建立的连接不会自动换线；开启后切换即断开走旧节点的连接，应用重连后走新节点</span>

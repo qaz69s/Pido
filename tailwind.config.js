@@ -32,6 +32,10 @@ export default {
       colors: {
         slate: palette('n'),
         brand: palette('b'),
+        // 语义状态色（见 style.css 的 --danger / --warn / --ok）：实色、浅底；文字与描边见 textColor / borderColor
+        danger: { DEFAULT: 'rgb(var(--danger) / <alpha-value>)', soft: 'var(--danger-soft)' },
+        warn: { DEFAULT: 'rgb(var(--warn) / <alpha-value>)', soft: 'var(--warn-soft)' },
+        ok: { DEFAULT: 'rgb(var(--ok) / <alpha-value>)', soft: 'var(--ok-soft)' },
         accent: palette('a'),
         // 表面层级（见 themes.css 末尾 --s-*）：页面底色 / 卡片 / 卡片内的小块
         page: 'rgb(var(--s-page) / <alpha-value>)',
@@ -46,6 +50,32 @@ export default {
       textColor: {
         slate: textPalette('tx', 'n'),
         brand: textPalette('txb', 'b'),
+        danger: 'rgb(var(--danger-tx) / <alpha-value>)',
+        warn: 'rgb(var(--warn-tx) / <alpha-value>)',
+        ok: 'rgb(var(--ok-tx) / <alpha-value>)',
+      },
+      // 线条只有两档：line（分隔、卡片、弹窗）、line-strong（输入框、描边按钮）
+      borderColor: {
+        line: 'var(--line)',
+        'line-strong': 'var(--line-strong)',
+        danger: { DEFAULT: 'rgb(var(--danger) / <alpha-value>)', soft: 'var(--danger-line)' },
+        warn: { DEFAULT: 'rgb(var(--warn) / <alpha-value>)', soft: 'var(--warn-line)' },
+        ok: { DEFAULT: 'rgb(var(--ok) / <alpha-value>)', soft: 'var(--ok-line)' },
+      },
+      // 三档浮起：sm 贴面（分段选中块）、DEFAULT/md 浮动（菜单、Toast）、lg/xl 弹层（弹窗）；均为近实 + 远虚两层
+      boxShadow: {
+        sm: '0 1px 2px rgb(15 23 42 / 0.06), 0 1px 1px rgb(15 23 42 / 0.04)',
+        DEFAULT: '0 2px 4px -1px rgb(15 23 42 / 0.06), 0 8px 20px -4px rgb(15 23 42 / 0.10)',
+        md: '0 2px 4px -1px rgb(15 23 42 / 0.06), 0 8px 20px -4px rgb(15 23 42 / 0.10)',
+        lg: '0 4px 8px -2px rgb(15 23 42 / 0.08), 0 24px 48px -12px rgb(15 23 42 / 0.22)',
+        xl: '0 4px 8px -2px rgb(15 23 42 / 0.08), 0 24px 48px -12px rgb(15 23 42 / 0.22)',
+      },
+      // 字号四档：12 / 13 / 15 / 18（行高按中文略放宽）
+      fontSize: {
+        xs: ['12px', '16px'],
+        sm: ['13px', '20px'],
+        base: ['15px', '22px'],
+        lg: ['18px', '26px'],
       },
       // 统一动效：所有 transition 类默认同一条缓动曲线和时长（与 style.css 的 --ease / --dur-* 一致）
       transitionTimingFunction: { DEFAULT: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },

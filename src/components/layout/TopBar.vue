@@ -31,16 +31,16 @@ const statusInfo = computed(() => {
   switch (backend.status) {
     case 'ok':
       return {
-        dot: 'bg-emerald-500',
+        dot: 'bg-ok',
         text: backend.version?.version || '已连接',
         logo: CORE_LOGOS[backend.engine] || '',
         engine: CORE_NAMES[backend.engine] || backend.engine,
       }
     case 'checking':
     case 'unknown':
-      return { dot: 'bg-amber-400 animate-pulse', text: '检测中' }
+      return { dot: 'bg-warn animate-pulse', text: '检测中' }
     case 'error':
-      return { dot: 'bg-rose-500', text: '连接异常' }
+      return { dot: 'bg-danger', text: '连接异常' }
     default:
       return { dot: 'bg-slate-400', text: '未配置' }
   }
@@ -59,7 +59,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 <template>
   <header
     class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 transition-[background-color,border-color] duration-200"
-    :class="scrolled ? 'border-slate-200/80 bg-page/80 backdrop-blur dark:border-slate-800/80' : 'border-transparent bg-page'"
+    :class="scrolled ? 'border-line bg-page/80 backdrop-blur' : 'border-transparent bg-page'"
   >
     <!-- 手机端显示 Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
     <img
@@ -77,7 +77,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
     <div class="ml-auto flex items-center gap-1">
       <RouterLink
         to="/setup"
-        class="press mr-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-raised px-2.5 py-1 text-xs text-slate-600 transition dark:border-white/[0.08] dark:text-slate-300"
+        class="press mr-1 flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 text-xs text-slate-600 transition dark:text-slate-300"
         :class="backend.status === 'error' && 'anim-shake'"
         :title="statusInfo.engine ? `${statusInfo.engine} ${statusInfo.text} · 后端设置` : '后端设置'"
       >

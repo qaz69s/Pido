@@ -18,7 +18,7 @@ const activeIndex = computed(() => items.findIndex((n) => n.path === route.path 
 
 <template>
   <nav
-    class="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-slate-900/[0.06] bg-surface/[0.88] backdrop-blur-xl backdrop-saturate-150 md:hidden dark:border-white/[0.06] "
+    class="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/[0.88] backdrop-blur-xl backdrop-saturate-150 md:hidden "
   >
     <div class="relative grid grid-cols-6">
       <RouterLink

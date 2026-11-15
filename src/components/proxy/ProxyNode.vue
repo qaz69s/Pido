@@ -79,7 +79,7 @@ function onSelect() {
       active
         ? 'node-active border-transparent bg-tile'
         : 'border-transparent bg-tile',
-      selectable && !active ? 'press cursor-pointer hover:border-slate-300 hover:shadow-sm dark:hover:border-slate-600' : '',
+      selectable && !active ? 'press cursor-pointer hover:border-line-strong hover:shadow-sm' : '',
       !selectable ? 'cursor-default' : '',
     ]"
     @animationend.self="bouncing = false"
@@ -90,7 +90,7 @@ function onSelect() {
       <ProxyIcon v-if="icon" :icon="icon" :size="16" />
       <span class="truncate text-sm" :class="active ? 'font-semibold text-slate-900 dark:text-slate-50' : 'font-normal'" :title="name">{{ name }}</span>
     </span>
-    <div class="flex items-center justify-between gap-2 text-[13px]">
+    <div class="flex items-center justify-between gap-2 text-sm">
       <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
       <span v-if="!testable" class="shrink-0 px-1 tabular-nums" :class="delayClass">
         <Num :value="delayText(delay)" />
@@ -98,7 +98,7 @@ function onSelect() {
       <button
         v-else
         type="button"
-        class="shrink-0 rounded px-1 tabular-nums hover:bg-slate-200/60 dark:hover:bg-white/10"
+        class="shrink-0 rounded-md px-1 tabular-nums hover:bg-slate-200/60 dark:hover:bg-white/10"
         :class="delayClass"
         :disabled="testing"
         title="测试延迟"

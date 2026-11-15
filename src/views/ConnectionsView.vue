@@ -292,7 +292,7 @@ const STATUS_TEXT = {
         <div v-if="tab === 'active'" class="relative md:hidden">
           <button
             class="btn-icon"
-            :class="sortMenu && 'bg-slate-200/70 dark:bg-slate-800'"
+            :class="sortMenu && 'bg-slate-200/70 dark:bg-white/[0.08]'"
             title="排序"
             @click="sortMenu = !sortMenu"
           >
@@ -304,7 +304,7 @@ const STATUS_TEXT = {
               <button
                 v-for="s in SORTS"
                 :key="s.key"
-                class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-slate-800"
+                class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-white/[0.06]"
                 :class="sort.key === s.key ? 'font-medium' : 'text-slate-500'"
                 @click="pickSort(s.key)"
               >
@@ -316,7 +316,7 @@ const STATUS_TEXT = {
         </div>
         <button
           class="btn-icon"
-          :class="paused && 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'"
+          :class="paused && 'bg-warn-soft text-warn'"
           :title="paused ? '继续刷新' : '暂停刷新'"
           @click="paused = !paused"
         >
@@ -349,7 +349,7 @@ const STATUS_TEXT = {
       v-if="paused"
       class="notice"
     >
-      <Icon name="pause" class="h-4 w-4 shrink-0 text-amber-500" />
+      <Icon name="pause" class="h-4 w-4 shrink-0 text-warn" />
       已暂停刷新，列表停在暂停时的状态。
     </div>
     <div
@@ -357,7 +357,7 @@ const STATUS_TEXT = {
       class="flex items-center gap-2 rounded-xl border p-2.5 text-sm"
       :class="
         status === 'error'
-          ? 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200'
+          ? 'border-danger-soft bg-danger-soft text-danger'
           : 'border-transparent bg-tile text-slate-500'
       "
     >
@@ -383,7 +383,7 @@ const STATUS_TEXT = {
       <div class="card hidden overflow-x-auto md:block">
         <table class="w-full text-sm">
           <thead>
-            <tr class="border-b border-slate-100 text-left text-xs text-slate-500 dark:border-slate-800">
+            <tr class="border-b border-line text-left text-xs text-slate-500">
               <th
                 v-for="col in COLUMNS"
                 :key="col.key"
@@ -398,7 +398,7 @@ const STATUS_TEXT = {
             </tr>
           </thead>
           <!-- 新连接滑入、关闭的淡出；切换标签时整体重建（:key），避免大量动画 -->
-          <TransitionGroup :key="tab" tag="tbody" name="conn" class="divide-y divide-slate-100 dark:divide-slate-800">
+          <TransitionGroup :key="tab" tag="tbody" name="conn" class="divide-y divide-line">
             <tr
               v-for="c in visible"
               :key="c.id"
@@ -421,7 +421,7 @@ const STATUS_TEXT = {
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.downSpeed > 0 && 'text-brand-600 dark:text-brand-400'">
                 {{ formatSpeed(c.downSpeed) }}
               </td>
-              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.upSpeed > 0 && 'text-amber-600 dark:text-amber-400'">
+              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.upSpeed > 0 && 'text-warn'">
                 {{ formatSpeed(c.upSpeed) }}
               </td>
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ bytes(c.download) }}</td>
@@ -431,7 +431,7 @@ const STATUS_TEXT = {
               <td class="px-2 py-2">
                 <button
                   v-if="tab === 'active'"
-                  class="btn-icon h-7 w-7 text-slate-400 hover:text-rose-600"
+                  class="btn-icon h-7 w-7 text-slate-400 hover:text-danger"
                   title="断开"
                   @click.stop="onClose(c)"
                 >
@@ -473,7 +473,7 @@ const STATUS_TEXT = {
               <span class="text-slate-400"> · {{ bytes(c.download) }}</span>
             </div>
             <div class="text-right">
-              <span class="text-amber-600 dark:text-amber-400">↑ {{ formatSpeed(c.upSpeed) }}</span>
+              <span class="text-warn">↑ {{ formatSpeed(c.upSpeed) }}</span>
               <span class="text-slate-400"> · {{ bytes(c.upload) }}</span>
             </div>
           </div>

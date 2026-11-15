@@ -114,7 +114,7 @@ function clearConfig() {
           >
             使用开发代理（{{ DEV_PROXY_PATH }} → vite.config.js 中的 MIHOMO_TARGET）
           </button>
-          <p v-if="hostedHint" class="mt-1.5 flex items-start gap-1 text-xs text-emerald-700 dark:text-emerald-400">
+          <p v-if="hostedHint" class="mt-1.5 flex items-start gap-1 text-xs text-ok">
             <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />{{ hostedHint }}
           </p>
         </div>
@@ -147,7 +147,7 @@ function clearConfig() {
         <!-- 错误提示 -->
         <div
           v-if="errInfo"
-          class="rounded-xl border border-rose-200 bg-rose-50 p-3 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+          class="rounded-xl border border-danger-soft bg-danger-soft p-3 text-sm text-danger"
         >
           <div class="flex items-center gap-2 font-medium">
             <Icon name="alert" class="h-4 w-4 shrink-0" />
@@ -165,7 +165,7 @@ function clearConfig() {
 
         <div v-if="backend.isConfigured" class="flex items-center justify-between pt-1 text-sm">
           <RouterLink to="/overview" class="text-slate-500 hover:underline">← 返回面板</RouterLink>
-          <button type="button" class="text-rose-600 dark:text-rose-400 hover:underline" @click="clearConfig">清除配置</button>
+          <button type="button" class="text-danger hover:underline" @click="clearConfig">清除配置</button>
         </div>
       </form>
 

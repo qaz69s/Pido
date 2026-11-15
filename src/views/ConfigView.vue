@@ -329,15 +329,15 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                   min="0"
                   max="65535"
                   class="input py-1.5 tabular-nums"
-                  :class="portErrors[p.key] && '!border-rose-500 focus:!ring-rose-500/20'"
+                  :class="portErrors[p.key] && '!border-danger focus:!ring-danger/20'"
                 />
-                <p v-if="portErrors[p.key]" class="mt-0.5 text-xs text-rose-600 dark:text-rose-400">{{ portErrors[p.key] }}</p>
+                <p v-if="portErrors[p.key]" class="mt-0.5 text-xs text-danger">{{ portErrors[p.key] }}</p>
               </div>
             </div>
           </section>
 
           <!-- 网络 -->
-          <section class="card divide-y divide-slate-100 dark:divide-slate-800">
+          <section class="card divide-y divide-line">
             <h2 class="px-4 pb-2 pt-4 font-semibold">网络</h2>
             <SettingRow title="允许局域网连接" description="其他设备可通过本机 IP 使用代理端口">
               <Switch
@@ -383,12 +383,12 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <!-- 右列 -->
         <div class="space-y-4">
           <!-- TUN -->
-          <section class="card divide-y divide-slate-100 dark:divide-slate-800">
+          <section class="card divide-y divide-line">
             <div class="flex items-center gap-2 px-4 pb-2 pt-4">
               <h2 class="flex-1 font-semibold">TUN 模式</h2>
               <span
                 class="chip"
-                :class="tun.enable && '!bg-emerald-100 !text-emerald-700 dark:!bg-emerald-900/50 dark:!text-emerald-300'"
+                :class="tun.enable && '!bg-ok-soft !text-ok'"
               >
                 {{ tun.enable ? '运行中' : '未开启' }}
               </span>
@@ -433,7 +433,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </section>
 
           <!-- 维护 -->
-          <section class="card divide-y divide-slate-100 dark:divide-slate-800">
+          <section class="card divide-y divide-line">
             <h2 class="px-4 pb-2 pt-4 font-semibold">维护</h2>
             <SettingRow v-for="a in ACTIONS" :key="a.key" :title="a.label" :description="a.desc">
               <button

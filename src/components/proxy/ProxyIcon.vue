@@ -33,7 +33,7 @@ const src = computed(() => {
     :width="size"
     :height="size"
     :style="{ width: `${size}px`, height: `${size}px` }"
-    class="shrink-0 rounded object-contain"
+    class="shrink-0 rounded-md object-contain"
     alt=""
     loading="lazy"
     referrerpolicy="no-referrer"

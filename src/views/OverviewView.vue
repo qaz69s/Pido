@@ -153,7 +153,7 @@ const infoRows = computed(() => {
       v-if="streamError && backend.status !== 'error'"
       class="notice"
     >
-      <Icon name="alert" class="h-4 w-4 shrink-0 text-amber-500" />
+      <Icon name="alert" class="h-4 w-4 shrink-0 text-warn" />
       实时数据连接不稳定，正在自动重试
     </div>
 
@@ -187,7 +187,7 @@ const infoRows = computed(() => {
       <!-- 运行信息 -->
       <section class="card p-4">
         <h2 class="mb-3 font-semibold">运行信息</h2>
-        <dl class="divide-y divide-slate-100 text-sm dark:divide-slate-800">
+        <dl class="divide-y divide-line text-sm">
           <div v-for="row in infoRows" :key="row.label" class="flex justify-between py-2.5">
             <dt class="text-slate-500">{{ row.label }}</dt>
             <dd class="font-medium tabular-nums">{{ row.value }}</dd>

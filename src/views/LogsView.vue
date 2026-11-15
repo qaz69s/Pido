@@ -32,8 +32,8 @@ const LEVELS = [
 const LEVEL_CLASS = {
   debug: 'bg-tile text-slate-500 dark:text-slate-400',
   info: 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300',
-  warning: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
-  error: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
+  warning: 'bg-warn-soft text-warn',
+  error: 'bg-danger-soft text-danger',
 }
 const LEVEL_TEXT = { debug: 'DBG', info: 'INF', warning: 'WRN', error: 'ERR' }
 
@@ -112,10 +112,10 @@ function exportLogs() {
 }
 
 const STATUS = {
-  open: { dot: 'bg-emerald-500', text: '实时' },
-  connecting: { dot: 'bg-amber-400 animate-pulse', text: '连接中' },
-  reconnecting: { dot: 'bg-amber-400 animate-pulse', text: '重连中' },
-  error: { dot: 'bg-rose-500', text: '连接失败' },
+  open: { dot: 'bg-ok', text: '实时' },
+  connecting: { dot: 'bg-warn animate-pulse', text: '连接中' },
+  reconnecting: { dot: 'bg-warn animate-pulse', text: '重连中' },
+  error: { dot: 'bg-danger', text: '连接失败' },
   unsupported: { dot: 'bg-slate-400', text: '后端未开放日志' },
 }
 const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400', text: '未连接' })
@@ -154,7 +154,7 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
       <div class="ml-auto flex items-center gap-1">
         <button
           class="btn-icon"
-          :class="paused && 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'"
+          :class="paused && 'bg-warn-soft text-warn'"
           :title="paused ? '继续' : '暂停'"
           @click="togglePause"
         >
@@ -173,13 +173,13 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
       v-if="paused"
       class="notice"
     >
-      <Icon name="pause" class="h-4 w-4 shrink-0 text-amber-500" />
+      <Icon name="pause" class="h-4 w-4 shrink-0 text-warn" />
       <span class="flex-1">已暂停，期间收到 {{ pendingCount }} 条新日志</span>
       <button class="btn-outline py-1 text-xs" @click="togglePause">继续</button>
     </div>
     <div
       v-else-if="status === 'error'"
-      class="flex items-center gap-2 rounded-xl border border-rose-200 bg-rose-50 p-2.5 text-sm text-rose-800 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200"
+      class="flex items-center gap-2 rounded-xl border border-danger-soft bg-danger-soft p-2.5 text-sm text-danger"
     >
       <Icon name="alert" class="h-4 w-4 shrink-0" />
       日志连接失败，请检查后端地址和 secret。
@@ -193,11 +193,11 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
         :description="keyword ? '' : level === 'error' || level === 'warning' ? '当前级别较高，只有出现问题时才会有日志。' : '有新连接或内核事件时会显示在这里。'"
       />
     </div>
-    <div v-else class="card divide-y divide-slate-100 overflow-hidden dark:divide-slate-800">
+    <div v-else class="card divide-y divide-line overflow-hidden">
       <div v-for="l in visible" :key="l.id" class="flex gap-2 px-3 py-2 sm:gap-3 sm:px-4">
         <div class="flex shrink-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
           <span class="text-xs tabular-nums text-slate-400 sm:w-14">{{ formatClock(l.time) }}</span>
-          <span class="rounded px-1.5 py-0.5 text-xs font-semibold" :class="LEVEL_CLASS[l.type] || LEVEL_CLASS.debug">
+          <span class="rounded-md px-1.5 py-0.5 text-xs font-semibold" :class="LEVEL_CLASS[l.type] || LEVEL_CLASS.debug">
             {{ LEVEL_TEXT[l.type] || l.type }}
           </span>
         </div>

@@ -81,7 +81,7 @@ function barHeight(d) {
         <!-- 标准 API：订阅拉取失败时保留上次的节点，并给出原因 -->
         <div
           v-if="provider._lastError || provider._status === 'stale'"
-          class="mt-1 truncate text-xs text-amber-600 dark:text-amber-400"
+          class="mt-1 truncate text-xs text-warn"
           :title="provider._lastError?.message || provider._lastError || ''"
         >
           {{ provider._lastError?.message || provider._lastError || '订阅未产出节点（stale）' }}
@@ -113,7 +113,7 @@ function barHeight(d) {
       <div class="h-1.5 overflow-hidden rounded-full bg-tile">
         <div
           class="h-full rounded-full"
-          :class="subscription.percent > 90 ? 'bg-rose-500' : 'bg-brand-500'"
+          :class="subscription.percent > 90 ? 'bg-danger' : 'bg-brand-500'"
           :style="{ width: `${subscription.percent}%` }"
         />
       </div>
@@ -135,7 +135,7 @@ function barHeight(d) {
 
     <!-- 展开：订阅中的节点 -->
     <ExpandTransition fade-only>
-      <div v-if="rendered" v-show="!collapsed" class="border-t border-slate-100 dark:border-slate-800">
+      <div v-if="rendered" v-show="!collapsed" class="border-t border-line">
         <div v-if="!nodes.length" class="p-4 text-center text-xs text-slate-500">
           这个集合还没有节点，点右上角的云图标更新一次试试
         </div>

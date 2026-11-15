@@ -75,10 +75,10 @@ async function run() {
 
 const STATUS_CLASS = (s) =>
   s === 'NOERROR'
-    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+    ? 'bg-ok-soft text-ok'
     : s === 'NXDOMAIN' || s === 'NODATA'
-      ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
-      : 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300'
+      ? 'bg-warn-soft text-warn'
+      : 'bg-danger-soft text-danger'
 </script>
 
 <template>
@@ -107,7 +107,7 @@ const STATUS_CLASS = (s) =>
             :key="t"
             type="button"
             class="rounded-md border px-2 py-0.5 font-mono text-xs transition"
-            :class="form.types.includes(t) ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'border-slate-300 text-slate-500 dark:border-slate-700'"
+            :class="form.types.includes(t) ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'border-line-strong text-slate-500'"
             @click="toggleType(t)"
           >
             {{ t }}
@@ -129,7 +129,7 @@ const STATUS_CLASS = (s) =>
       </div>
     </form>
 
-    <p v-if="error" class="mt-3 flex items-start gap-1.5 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">
+    <p v-if="error" class="mt-3 flex items-start gap-1.5 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
       <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
       {{ error }}
     </p>

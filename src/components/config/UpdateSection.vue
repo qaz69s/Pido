@@ -162,7 +162,7 @@ async function updateCore(force = false) {
 </script>
 
 <template>
-  <section class="card divide-y divide-slate-100 dark:divide-slate-800">
+  <section class="card divide-y divide-line">
     <div class="flex items-center gap-2 px-4 pb-2 pt-4">
       <h2 class="flex-1 font-semibold">更新</h2>
       <button class="btn-ghost py-1 text-xs" :disabled="checking" @click="checkLatest">
@@ -229,7 +229,7 @@ async function updateCore(force = false) {
           :class="
             channel === c.value
               ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
-              : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
+              : 'border-line hover:border-line-strong'
           "
           :disabled="upgradingCore"
           @click="channel = c.value"

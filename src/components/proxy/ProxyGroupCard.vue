@@ -117,7 +117,7 @@ const levelCounts = computed(() => {
       <!-- 延迟胶囊：显示当前节点延迟，点击整组测速（不再单独放闪电按钮，避免和工具栏「全部测速」撞脸） -->
       <span
         v-if="!testable"
-        class="flex shrink-0 items-center rounded-full px-2 py-1 text-[13px] tabular-nums"
+        class="flex shrink-0 items-center rounded-full px-2 py-1 text-sm tabular-nums"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         title="后端自动健康检查的延迟"
       >
@@ -125,7 +125,7 @@ const levelCounts = computed(() => {
       </span>
       <button
         v-else
-        class="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-[13px] tabular-nums transition hover:bg-tile disabled:opacity-100"
+        class="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-sm tabular-nums transition hover:bg-tile disabled:opacity-100"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         :disabled="testing"
         title="整组测速"
@@ -184,7 +184,7 @@ const levelCounts = computed(() => {
       <div
         v-if="rendered"
         v-show="!collapsed"
-        class="grid grid-cols-2 gap-2 border-t border-slate-100 p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3 dark:border-slate-800"
+        class="grid grid-cols-2 gap-2 border-t border-line p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3"
       >
         <ProxyNode
           v-for="n in nodes"
@@ -206,7 +206,7 @@ const levelCounts = computed(() => {
     <!-- 标准 API：组参数（展开时显示当前值；手机上标题栏放不下按钮，入口只在这里） -->
     <div
       v-if="configurable && !collapsed"
-      class="flex items-center gap-2 border-t border-slate-100 px-4 py-2 text-xs text-slate-500 dark:border-slate-800"
+      class="flex items-center gap-2 border-t border-line px-4 py-2 text-xs text-slate-500"
     >
       <span class="min-w-0 flex-1 truncate">
         间隔 {{ group._config?.check_interval != null ? `${group._config.check_interval} 秒` : '默认' }}

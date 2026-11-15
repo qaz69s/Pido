@@ -78,12 +78,12 @@ defineExpose({ jumpTo })
 
 <template>
   <div
-    class="code-editor relative flex overflow-hidden rounded-lg border border-slate-200 bg-tile font-mono dark:border-slate-700"
+    class="code-editor relative flex overflow-hidden rounded-lg border border-line bg-tile font-mono"
     :style="{ '--lh': `${LH}px`, '--pad': `${PAD}px` }"
   >
     <!-- 行号 -->
     <div
-      class="code-line relative shrink-0 select-none border-r border-slate-200 text-right text-slate-400 dark:border-slate-700 dark:text-slate-500"
+      class="code-line relative shrink-0 select-none border-r border-line text-right text-slate-400 dark:text-slate-500"
       :style="{ width: gutterWidth }"
       aria-hidden="true"
     >
@@ -97,7 +97,7 @@ defineExpose({ jumpTo })
         >
           <div
             class="h-full font-semibold"
-            :class="m.level === 'error' ? 'bg-rose-500/20 text-rose-600 dark:text-rose-400' : 'bg-amber-500/20 text-amber-600 dark:text-amber-400'"
+            :class="m.level === 'error' ? 'bg-danger-soft text-danger' : 'bg-warn-soft text-warn'"
             style="padding-right: 0.75ch"
           >
             {{ m.line }}
@@ -116,7 +116,7 @@ defineExpose({ jumpTo })
             v-for="m in markList"
             :key="'h' + m.line"
             class="absolute inset-x-0 border-l-2"
-            :class="m.level === 'error' ? 'border-rose-500 bg-rose-500/15' : 'border-amber-500 bg-amber-500/15'"
+            :class="m.level === 'error' ? 'border-danger bg-danger-soft' : 'border-warn bg-warn-soft'"
             :style="{ top: `${PAD + (m.line - 1) * LH}px`, height: `${LH}px` }"
           />
           <div

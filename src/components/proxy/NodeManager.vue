@@ -14,6 +14,7 @@ import { useToastStore } from '@/stores/toast'
 import { useConfirmStore } from '@/stores/confirm'
 import { delayLevel, delayText, DELAY_TEXT_CLASS } from '@/utils/format'
 import Modal from '@/components/common/Modal.vue'
+import EmptyState from '@/components/common/EmptyState.vue'
 import Icon from '@/components/common/Icon.vue'
 
 const props = defineProps({
@@ -181,7 +182,7 @@ const title = computed(() => {
           id="node-link"
           v-model="form.link"
           rows="3"
-          class="input resize-none break-all font-mono text-[13px] leading-5"
+          class="input resize-none break-all font-mono text-sm leading-5"
           :placeholder="editing ? '留空表示不修改链接（后端不回显原链接）' : 'vless://… 、vmess://… 、trojan://… 、ss://… 、hysteria2://…'"
           spellcheck="false"
           autocomplete="off"
@@ -196,7 +197,7 @@ const title = computed(() => {
         <input id="node-name" v-model="form.name" class="input" maxlength="64" placeholder="例如 hk-03" autocomplete="off" />
         <p class="mt-1 text-xs text-slate-500">节点名全局唯一；改名不会同步修改其他文件里按名称引用它的组过滤 / 规则。</p>
       </div>
-      <p v-if="formError" class="flex items-start gap-1.5 rounded-lg bg-rose-50 px-3 py-2 text-sm text-rose-700 dark:bg-rose-950/50 dark:text-rose-300">
+      <p v-if="formError" class="flex items-start gap-1.5 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
         <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
         {{ formError }}
       </p>
@@ -213,26 +214,26 @@ const title = computed(() => {
         <span v-if="provider && provider._kind !== 'inline'">订阅节点只读：由订阅管理，只能通过更新订阅来变更。</span>
         <span v-else>后端未开启节点管理：需要在 api 段设置 config_write: true，且配置目录为受管布局。</span>
       </p>
-      <ul v-if="nodes.length" class="divide-y divide-slate-100 dark:divide-slate-800">
+      <ul v-if="nodes.length" class="divide-y divide-line">
         <li v-for="n in nodes" :key="n._id || n.name" class="flex items-center gap-2 py-2">
           <div class="min-w-0 flex-1">
             <div class="truncate text-sm font-medium" :title="n.name">{{ n.name }}</div>
             <div class="text-xs text-slate-500">{{ n.type || '--' }}</div>
           </div>
-          <span class="shrink-0 text-[13px] font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(delays[n.name])]">
+          <span class="shrink-0 text-sm font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(delays[n.name])]">
             {{ delayText(delays[n.name]) }}
           </span>
           <template v-if="editable">
             <button class="btn-icon h-8 w-8" title="编辑" :disabled="!!busyNode" @click="startEdit(n)">
               <Icon name="pencil" class="h-4 w-4" />
             </button>
-            <button class="btn-icon h-8 w-8 hover:!text-rose-600" title="删除" :disabled="!!busyNode" @click="remove(n)">
+            <button class="btn-icon h-8 w-8 hover:!text-danger" title="删除" :disabled="!!busyNode" @click="remove(n)">
               <Icon name="trash" class="h-4 w-4" :class="busyNode === n.name && 'animate-pulse'" />
             </button>
           </template>
         </li>
       </ul>
-      <p v-else class="py-6 text-center text-sm text-slate-500">没有节点</p>
+      <EmptyState v-else icon="server" title="没有节点" />
     </div>
 
     <template #footer>

@@ -14,7 +14,7 @@ const coreLogo = useCoreLogo()
 
 <template>
   <aside
-    class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-slate-200 bg-surface md:flex dark:border-slate-800 "
+    class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-line bg-surface md:flex "
   >
     <!-- Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
     <div class="flex h-14 items-center gap-2 px-5 text-lg font-semibold">
@@ -31,7 +31,7 @@ const coreLogo = useCoreLogo()
         v-for="item in navItems"
         :key="item.path"
         :to="item.path"
-        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
+        class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/[0.06]"
         active-class="!bg-brand-50 !text-brand-700 font-medium dark:!bg-brand-500/10 dark:!text-brand-300"
       >
         <Icon :name="item.icon" class="h-5 w-5" />
@@ -42,7 +42,7 @@ const coreLogo = useCoreLogo()
     <!-- 当前后端 -->
     <RouterLink
       to="/setup"
-      class="m-3 flex items-center gap-2 rounded-lg border border-slate-200 px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 dark:border-slate-800 dark:hover:bg-slate-800"
+      class="m-3 flex items-center gap-2 rounded-lg border border-line px-3 py-2 text-xs text-slate-500 hover:bg-slate-50 dark:hover:bg-white/[0.06]"
       title="修改后端设置"
     >
       <Icon name="server" class="h-4 w-4 shrink-0" />

@@ -90,7 +90,7 @@ onBeforeUnmount(() => {
         <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]" @click="close" />
         <!-- 面板 -->
         <div
-          class="modal-panel relative flex max-h-[85svh] w-full flex-col rounded-t-2xl border border-slate-200 bg-raised shadow-xl md:rounded-2xl dark:border-white/[0.08]"
+          class="modal-panel relative flex max-h-[85svh] w-full flex-col rounded-t-2xl border border-line bg-raised shadow-xl md:rounded-2xl"
           :class="[width, dragY && '!transition-none']"
           :style="dragY ? { transform: `translateY(${dragY}px)` } : null"
           role="dialog"
@@ -111,7 +111,7 @@ onBeforeUnmount(() => {
           </div>
           <footer
             v-if="$slots.footer"
-            class="safe-bottom flex justify-end gap-2 border-t border-slate-100 px-4 py-3 dark:border-white/[0.06]"
+            class="safe-bottom flex justify-end gap-2 border-t border-line px-4 py-3"
           >
             <slot name="footer" />
           </footer>

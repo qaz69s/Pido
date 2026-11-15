@@ -300,8 +300,8 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
     </div>
 
     <div v-if="loading && !config" class="space-y-2 px-4 pb-4">
-      <div class="skeleton h-8 rounded" />
-      <div class="skeleton h-64 rounded" />
+      <div class="skeleton h-8 rounded-md" />
+      <div class="skeleton h-64 rounded-md" />
     </div>
     <EmptyState v-else-if="loadErrorInfo" icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
       <button class="btn-primary" @click="load()">重试</button>
@@ -314,13 +314,13 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
           v-for="s in sources"
           :key="s.id"
           class="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-left text-sm transition md:w-full"
-          :class="s.id === selectedId ? 'bg-brand-50 font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800'"
+          :class="s.id === selectedId ? 'bg-brand-50 font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/[0.06]'"
           :title="s.path"
           @click="select(s.id)"
         >
           <Icon :name="s.writable && !redacted[s.id] ? 'file' : 'lock'" class="h-4 w-4 shrink-0 opacity-70" />
           <span class="min-w-0 md:flex-1 md:truncate">{{ shortName(s.path) }}</span>
-          <span v-if="isDirty(s)" class="h-1.5 w-1.5 shrink-0 rounded-full bg-amber-500" title="有未保存的修改" />
+          <span v-if="isDirty(s)" class="h-1.5 w-1.5 shrink-0 rounded-full bg-warn" title="有未保存的修改" />
         </button>
         <p class="hidden px-2.5 pt-2 text-xs text-slate-400 md:block">
           <template v-if="caps?.hiddenSources?.length">{{ caps.hiddenSources.join('、') }} 由后端隐藏，只能在服务器上编辑。</template>
@@ -358,7 +358,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
         <!-- 只读说明 -->
         <div
           v-if="reasonInfo"
-          class="rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm dark:border-slate-700 dark:bg-slate-800/40"
+          class="rounded-xl border border-line bg-slate-50 p-3 text-sm dark:bg-slate-800/40"
         >
           <div class="flex items-start gap-2">
             <Icon name="lock" class="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
@@ -372,7 +372,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
             <ol class="mt-2 list-decimal space-y-1.5 pl-4 text-xs leading-relaxed">
               <li>
                 在 <code class="font-mono">api.dae</code> 的 api 段设置
-                <code class="rounded bg-tile px-1 font-mono">config_write: true</code>（必须同时设置非空 secret），然后重启 {{ backend.engine }}。
+                <code class="rounded-md bg-tile px-1 font-mono">config_write: true</code>（必须同时设置非空 secret），然后重启 {{ backend.engine }}。
               </li>
               <li>
                 按受管布局拆分配置：入口 <code class="font-mono">config.dae</code> 只保留一个 include 块，引入
@@ -397,7 +397,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
         <!-- 412 冲突 -->
         <div
           v-if="conflict"
-          class="flex flex-wrap items-center gap-2 rounded-xl border border-amber-300 bg-amber-50 p-3 text-sm text-amber-900 dark:border-amber-800 dark:bg-amber-950/50 dark:text-amber-200"
+          class="flex flex-wrap items-center gap-2 rounded-xl border border-warn-soft bg-warn-soft p-3 text-sm text-warn"
         >
           <Icon name="alert" class="h-4 w-4 shrink-0" />
           <div class="min-w-0 flex-1">
@@ -415,25 +415,25 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
           v-if="validState === 'ok' && !errorCount"
           class="notice"
         >
-          <Icon name="check" class="h-4 w-4 shrink-0 text-emerald-500" />
+          <Icon name="check" class="h-4 w-4 shrink-0 text-ok" />
           校验通过{{ dirty ? '，可以保存' : '' }}
         </div>
-        <div v-if="diagnostics.length" class="overflow-hidden rounded-xl border border-rose-200 dark:border-rose-900/70">
-          <div class="flex items-center gap-2 bg-rose-50 px-3 py-2 text-sm font-medium text-rose-800 dark:bg-rose-950/50 dark:text-rose-200">
+        <div v-if="diagnostics.length" class="overflow-hidden rounded-xl border border-danger-soft">
+          <div class="flex items-center gap-2 bg-danger-soft px-3 py-2 text-sm font-medium text-danger">
             <Icon name="alert" class="h-4 w-4 shrink-0" />
             {{ errorCount ? `${errorCount} 个错误` : '提示' }}<span v-if="diagnostics.length > errorCount" class="font-normal opacity-80">，{{ diagnostics.length - errorCount }} 条提示</span>
             <span class="ml-auto text-xs font-normal opacity-70">点击跳转到对应行</span>
           </div>
-          <ul class="max-h-40 divide-y divide-rose-100 overflow-y-auto text-sm dark:divide-rose-900/50">
+          <ul class="max-h-40 divide-y divide-danger-soft overflow-y-auto text-sm">
             <li v-for="(d, i) in diagnostics" :key="i">
               <button
-                class="flex w-full items-start gap-2 px-3 py-1.5 text-left hover:bg-rose-50/60 disabled:cursor-default dark:hover:bg-rose-950/30"
+                class="flex w-full items-start gap-2 px-3 py-1.5 text-left hover:bg-danger-soft disabled:cursor-default"
                 :disabled="!d.line"
                 @click="jumpTo(d)"
               >
                 <span
-                  class="mt-0.5 shrink-0 rounded px-1 font-mono text-xs font-semibold"
-                  :class="d.level === 'error' ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300' : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'"
+                  class="mt-0.5 shrink-0 rounded-md px-1 font-mono text-xs font-semibold"
+                  :class="d.level === 'error' ? 'bg-danger-soft text-danger' : 'bg-warn-soft text-warn'"
                 >
                   {{ d.line ? `${d.line}${d.column ? ':' + d.column : ''}` : '--' }}
                 </span>
