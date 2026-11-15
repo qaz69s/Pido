@@ -165,7 +165,7 @@ const infoRows = computed(() => {
         </span>
         <div class="min-w-0">
           <div class="text-xs text-base-content/70">{{ s.label }}</div>
-          <div class="truncate text-lg font-bold leading-7 tracking-tight tabular-nums"><Num :value="s.value" /></div>
+          <div class="truncate text-2xl font-bold tracking-tight tabular-nums sm:text-stat"><Num :value="s.value" /></div>
         </div>
       </div>
     </div>

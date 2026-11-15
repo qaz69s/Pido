@@ -87,7 +87,7 @@ function clearConfig() {
         <span class="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/30">
           <Icon name="zap" class="h-6 w-6" />
         </span>
-        <h1 class="text-xl font-semibold">Pido</h1>
+        <h1 class="text-title font-extrabold">Pido</h1>
         <p class="mt-1 text-sm text-base-content/70">连接到你的 mihomo 内核，或 dae / honk</p>
         <p class="mt-0.5 text-xs text-base-content/70">mihomo 填 external-controller 的地址和 secret；dae 填 api 段的 listen 与 secret</p>
       </div>
