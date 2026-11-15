@@ -77,9 +77,9 @@ function onSelect() {
     class="relative flex min-w-0 flex-col gap-1 overflow-hidden rounded-lg border p-2.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-200 [contain:layout_style]"
     :class="[
       active
-        ? 'node-active border-transparent bg-tile'
-        : 'border-transparent bg-tile',
-      selectable && !active ? 'press cursor-pointer hover:border-line-strong hover:shadow-sm' : '',
+        ? 'node-active border-transparent bg-base-200'
+        : 'border-transparent bg-base-200',
+      selectable && !active ? 'press cursor-pointer hover:border-base-content/20 hover:shadow-sm' : '',
       !selectable ? 'cursor-default' : '',
     ]"
     @animationend.self="bouncing = false"
@@ -88,17 +88,17 @@ function onSelect() {
   >
     <span class="flex min-w-0 items-center gap-1.5">
       <ProxyIcon v-if="icon" :icon="icon" :size="16" />
-      <span class="truncate text-sm" :class="active ? 'font-semibold text-slate-900 dark:text-slate-50' : 'font-normal'" :title="name">{{ name }}</span>
+      <span class="truncate text-sm" :class="active ? 'font-semibold text-base-content' : 'font-normal'" :title="name">{{ name }}</span>
     </span>
     <div class="flex items-center justify-between gap-2 text-sm">
-      <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
+      <span class="truncate text-base-content/70" :title="type">{{ typeLabel }}</span>
       <span v-if="!testable" class="shrink-0 px-1 tabular-nums" :class="delayClass">
         <Num :value="delayText(delay)" />
       </span>
       <button
         v-else
         type="button"
-        class="shrink-0 rounded-md px-1 tabular-nums hover:bg-slate-200/60 dark:hover:bg-white/10"
+        class="shrink-0 rounded-md px-1 tabular-nums hover:bg-base-content/10"
         :class="delayClass"
         :disabled="testing"
         title="测试延迟"

@@ -125,12 +125,12 @@ async function save() {
     </div>
     <form v-else id="group-params" class="space-y-4" @submit.prevent="save">
       <div class="flex items-center justify-between gap-3 text-sm">
-        <span class="shrink-0 whitespace-nowrap text-slate-500">策略</span>
+        <span class="shrink-0 whitespace-nowrap text-base-content/70">策略</span>
         <span class="min-w-0 break-words text-right font-medium">{{ policyText }}</span>
       </div>
 
       <div>
-        <label class="label" for="gp-interval">健康检查间隔</label>
+        <label class="label-text mb-1 block font-medium text-base-content/80" for="gp-interval">健康检查间隔</label>
         <div class="flex items-center gap-2">
           <input
             id="gp-interval"
@@ -139,20 +139,20 @@ async function save() {
             inputmode="numeric"
             min="1"
             step="1"
-            class="input tabular-nums"
-            :class="fieldErrors.check_interval && '!border-danger'"
+            class="input input-bordered input-sm w-full tabular-nums"
+            :class="fieldErrors.check_interval && 'input-error'"
             :disabled="!canInterval || saving"
             placeholder="留空则沿用 global 设置"
           />
-          <span class="shrink-0 text-sm text-slate-500">秒</span>
+          <span class="shrink-0 text-sm text-base-content/70">秒</span>
         </div>
-        <p class="mt-1 text-xs" :class="fieldErrors.check_interval ? 'text-danger' : 'text-slate-500'">
+        <p class="mt-1 text-xs" :class="fieldErrors.check_interval ? 'text-error' : 'text-base-content/70'">
           {{ fieldErrors.check_interval || (canInterval ? 'check_interval：多久探测一次组内节点' : '后端不允许修改此项') }}
         </p>
       </div>
 
       <div>
-        <label class="label" for="gp-tol">切换容差</label>
+        <label class="label-text mb-1 block font-medium text-base-content/80" for="gp-tol">切换容差</label>
         <div class="flex items-center gap-2">
           <input
             id="gp-tol"
@@ -161,14 +161,14 @@ async function save() {
             inputmode="numeric"
             min="0"
             step="1"
-            class="input tabular-nums"
-            :class="fieldErrors.tolerance && '!border-danger'"
+            class="input input-bordered input-sm w-full tabular-nums"
+            :class="fieldErrors.tolerance && 'input-error'"
             :disabled="!canTolerance || saving"
             placeholder="留空则沿用 global 设置"
           />
-          <span class="shrink-0 text-sm text-slate-500">毫秒</span>
+          <span class="shrink-0 text-sm text-base-content/70">毫秒</span>
         </div>
-        <p class="mt-1 text-xs" :class="fieldErrors.tolerance ? 'text-danger' : 'text-slate-500'">
+        <p class="mt-1 text-xs" :class="fieldErrors.tolerance ? 'text-error' : 'text-base-content/70'">
           {{
             fieldErrors.tolerance ||
             (canTolerance
@@ -180,29 +180,30 @@ async function save() {
         </p>
       </div>
 
-      <p v-if="readOnly && !error" class="flex items-start gap-1.5 rounded-lg bg-tile px-3 py-2 text-xs text-slate-500">
+      <p v-if="readOnly && !error" class="flex items-start gap-1.5 rounded-lg bg-base-200 px-3 py-2 text-xs text-base-content/70">
         <Icon name="lock" class="mt-px h-3.5 w-3.5 shrink-0" />
         后端没有开放这个组的参数修改（需要 api 段 config_write: true 且配置目录为受管布局）。
       </p>
       <div
         v-if="error"
-        class="flex items-start gap-2 rounded-lg px-3 py-2 text-sm"
-        :class="stale ? 'bg-warn-soft text-warn' : 'bg-danger-soft text-danger'"
+        role="alert"
+        class="alert flex items-start gap-2 rounded-lg border-0 px-3 py-2 text-left text-sm"
+        :class="stale ? 'bg-warning/10 text-warning' : 'bg-error/10 text-error'"
       >
         <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
         <span class="min-w-0 flex-1">{{ error }}</span>
-        <button v-if="stale" type="button" class="btn-outline shrink-0 py-0.5 text-xs" @click="load">重新读取</button>
+        <button v-if="stale" type="button" class="btn btn-xs btn-outline border-base-content/20 shrink-0" @click="load">重新读取</button>
       </div>
-      <p class="flex items-start gap-1.5 text-xs text-slate-500">
+      <p class="flex items-start gap-1.5 text-xs text-base-content/70">
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         保存会写入 config.d/group.dae 并重载 {{ backend.engine }}。
       </p>
     </form>
 
     <template #footer>
-      <button class="btn-ghost" type="button" @click="open = false">取消</button>
+      <button class="btn btn-sm btn-ghost" type="button" @click="open = false">取消</button>
       <button
-        class="btn-primary"
+        class="btn btn-sm btn-primary"
         type="submit"
         form="group-params"
         :disabled="loading || saving || readOnly || !ops.length || !!Object.keys(fieldErrors).length"

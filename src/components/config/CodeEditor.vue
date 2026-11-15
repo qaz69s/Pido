@@ -78,12 +78,12 @@ defineExpose({ jumpTo })
 
 <template>
   <div
-    class="code-editor relative flex overflow-hidden rounded-lg border border-line bg-tile font-mono"
+    class="code-editor relative flex overflow-hidden rounded-lg border border-base-content/10 bg-base-200 font-mono"
     :style="{ '--lh': `${LH}px`, '--pad': `${PAD}px` }"
   >
     <!-- 行号 -->
     <div
-      class="code-line relative shrink-0 select-none border-r border-line text-right text-slate-400 dark:text-slate-500"
+      class="code-line relative shrink-0 select-none border-r border-base-content/10 text-right text-base-content/60"
       :style="{ width: gutterWidth }"
       aria-hidden="true"
     >
@@ -92,12 +92,12 @@ defineExpose({ jumpTo })
         <div
           v-for="m in markList"
           :key="'g' + m.line"
-          class="code-line absolute inset-x-0 z-10 bg-tile"
+          class="code-line absolute inset-x-0 z-10 bg-base-200"
           :style="{ top: `${PAD + (m.line - 1) * LH}px`, height: `${LH}px` }"
         >
           <div
             class="h-full font-semibold"
-            :class="m.level === 'error' ? 'bg-danger-soft text-danger' : 'bg-warn-soft text-warn'"
+            :class="m.level === 'error' ? 'bg-error/10 text-error' : 'bg-warning/10 text-warning'"
             style="padding-right: 0.75ch"
           >
             {{ m.line }}
@@ -116,20 +116,20 @@ defineExpose({ jumpTo })
             v-for="m in markList"
             :key="'h' + m.line"
             class="absolute inset-x-0 border-l-2"
-            :class="m.level === 'error' ? 'border-danger bg-danger-soft' : 'border-warn bg-warn-soft'"
+            :class="m.level === 'error' ? 'border-error bg-error/10' : 'border-warning bg-warning/10'"
             :style="{ top: `${PAD + (m.line - 1) * LH}px`, height: `${LH}px` }"
           />
           <div
             v-if="focusLine && focusLine <= lineCount"
-            class="absolute inset-x-0 ring-1 ring-inset ring-brand-500/60"
+            class="absolute inset-x-0 ring-1 ring-inset ring-primary/60"
             :style="{ top: `${PAD + (focusLine - 1) * LH}px`, height: `${LH}px` }"
           />
         </div>
       </div>
       <textarea
         ref="ta"
-        class="code-text absolute inset-0 h-full w-full resize-none overflow-auto bg-transparent px-3 text-slate-800 outline-none dark:text-slate-200"
-        :class="readonly && 'cursor-default text-slate-600 dark:text-slate-400'"
+        class="code-text absolute inset-0 h-full w-full resize-none overflow-auto bg-transparent px-3 text-base-content outline-none"
+        :class="readonly && 'cursor-default text-base-content/80'"
         :value="modelValue"
         :readonly="readonly"
         wrap="off"

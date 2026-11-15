@@ -75,10 +75,10 @@ async function run() {
 
 const STATUS_CLASS = (s) =>
   s === 'NOERROR'
-    ? 'bg-ok-soft text-ok'
+    ? 'bg-success/10 text-success'
     : s === 'NXDOMAIN' || s === 'NODATA'
-      ? 'bg-warn-soft text-warn'
-      : 'bg-danger-soft text-danger'
+      ? 'bg-warning/10 text-warning'
+      : 'bg-error/10 text-error'
 </script>
 
 <template>
@@ -88,14 +88,14 @@ const STATUS_CLASS = (s) =>
       <div class="flex gap-2">
         <input
           v-model="form.domain"
-          class="input min-w-0 flex-1 font-mono"
+          class="input input-bordered input-sm w-full min-w-0 flex-1 font-mono"
           placeholder="example.com"
           inputmode="url"
           autocapitalize="off"
           spellcheck="false"
           aria-label="域名"
         />
-        <button class="btn-primary shrink-0" type="submit" :disabled="running">
+        <button class="btn btn-sm btn-primary shrink-0" type="submit" :disabled="running">
           <Icon name="search" class="h-4 w-4" :class="running && 'animate-pulse'" />
           {{ running ? '查询中…' : '查询' }}
         </button>
@@ -106,8 +106,8 @@ const STATUS_CLASS = (s) =>
             v-for="t in typeOptions"
             :key="t"
             type="button"
-            class="rounded-md border px-2 py-0.5 font-mono text-xs transition"
-            :class="form.types.includes(t) ? 'border-brand-500 bg-brand-50 text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'border-line-strong text-slate-500'"
+            class="btn btn-xs font-mono font-normal"
+            :class="form.types.includes(t) ? 'btn-primary' : 'btn-outline border-base-content/20 text-base-content/70'"
             @click="toggleType(t)"
           >
             {{ t }}
@@ -115,21 +115,21 @@ const STATUS_CLASS = (s) =>
         </div>
         <template v-if="backend.isStandard">
           <label v-if="upstreams.length" class="flex items-center gap-2 text-sm">
-            <span class="whitespace-nowrap text-slate-500">上游</span>
-            <select v-model="form.upstream" class="input w-auto py-1">
+            <span class="whitespace-nowrap text-base-content/70">上游</span>
+            <select v-model="form.upstream" class="select select-bordered select-sm w-auto">
               <option value="">按 DNS 规则</option>
               <option v-for="u in upstreams" :key="u" :value="u">{{ u }}</option>
             </select>
           </label>
           <label class="flex items-center gap-2 text-sm">
             <Switch v-model="form.bypass" />
-            <span class="whitespace-nowrap text-slate-500">绕过缓存</span>
+            <span class="whitespace-nowrap text-base-content/70">绕过缓存</span>
           </label>
         </template>
       </div>
     </form>
 
-    <p v-if="error" class="mt-3 flex items-start gap-1.5 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
+    <p v-if="error" role="alert" class="alert mt-3 flex items-start gap-1.5 rounded-lg border-0 bg-error/10 px-3 py-2 text-left text-sm text-error">
       <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
       {{ error }}
     </p>
@@ -137,26 +137,26 @@ const STATUS_CLASS = (s) =>
     <div v-if="result" class="mt-4 space-y-3">
       <div class="flex flex-wrap items-baseline gap-x-2 text-sm">
         <span class="font-mono font-medium">{{ result.domain }}</span>
-        <span class="text-xs text-slate-500">总耗时 {{ result.elapsed }} ms</span>
+        <span class="text-xs text-base-content/70">总耗时 {{ result.elapsed }} ms</span>
       </div>
-      <div v-for="r in result.results" :key="r.type" class="rounded-xl bg-tile p-3">
+      <div v-for="r in result.results" :key="r.type" class="rounded-xl bg-base-200 p-3">
         <div class="flex flex-wrap items-center gap-2 text-xs">
-          <span class="chip !bg-transparent font-mono !text-slate-700 ring-1 ring-slate-300 dark:!text-slate-200 dark:ring-slate-600">{{ r.type }}</span>
+          <span class="badge badge-outline badge-sm border-base-content/20 font-mono text-base-content/90">{{ r.type }}</span>
           <span class="rounded-md px-1.5 py-0.5 font-medium" :class="STATUS_CLASS(r.status)">{{ r.status }}</span>
-          <span v-if="r.cached === true" class="chip !bg-sky-100 !text-sky-700 dark:!bg-sky-900/50 dark:!text-sky-300">命中缓存</span>
-          <span v-if="r.upstream" class="truncate text-slate-500">上游 <span class="font-mono">{{ r.upstream }}</span></span>
-          <span v-if="r.route?.rule" class="truncate text-slate-500" :title="r.route.rule">规则 <span class="font-mono">{{ r.route.rule }}</span></span>
-          <span class="ml-auto shrink-0 tabular-nums text-slate-500">{{ r.elapsed_ms ?? '--' }} ms</span>
+          <span v-if="r.cached === true" class="badge badge-sm border-0 bg-info/15 text-info">命中缓存</span>
+          <span v-if="r.upstream" class="truncate text-base-content/70">上游 <span class="font-mono">{{ r.upstream }}</span></span>
+          <span v-if="r.route?.rule" class="truncate text-base-content/70" :title="r.route.rule">规则 <span class="font-mono">{{ r.route.rule }}</span></span>
+          <span class="ml-auto shrink-0 tabular-nums text-base-content/70">{{ r.elapsed_ms ?? '--' }} ms</span>
         </div>
         <ul v-if="r.answers?.length" class="mt-2 space-y-1 text-sm">
           <li v-for="(a, i) in r.answers" :key="i" class="flex items-baseline gap-2">
             <!-- 与查询类型相同时不重复显示（CNAME 链等不同类型才标出） -->
-            <span v-if="a.type !== r.type" class="shrink-0 font-mono text-xs text-slate-400">{{ a.type }}</span>
+            <span v-if="a.type !== r.type" class="shrink-0 font-mono text-xs text-base-content/60">{{ a.type }}</span>
             <span class="min-w-0 flex-1 font-mono [overflow-wrap:anywhere]">{{ a.data }}</span>
-            <span class="shrink-0 text-xs tabular-nums text-slate-400">TTL {{ a.ttl }}</span>
+            <span class="shrink-0 text-xs tabular-nums text-base-content/60">TTL {{ a.ttl }}</span>
           </li>
         </ul>
-        <p v-else class="mt-2 text-sm text-slate-500">没有记录</p>
+        <p v-else class="mt-2 text-sm text-base-content/70">没有记录</p>
       </div>
     </div>
   </section>

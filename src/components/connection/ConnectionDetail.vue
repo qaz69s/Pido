@@ -68,21 +68,21 @@ const metaRows = computed(() => {
     <template v-if="conn">
       <!-- 流量概要 -->
       <div class="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">
-        <div class="rounded-lg bg-tile p-2">
-          <div class="text-xs text-slate-500">下载</div>
+        <div class="rounded-lg bg-base-200 p-2">
+          <div class="text-xs text-base-content/70">下载</div>
           <div class="font-medium">{{ conn.download === null ? '--' : formatBytes(conn.download) }}</div>
         </div>
-        <div class="rounded-lg bg-tile p-2">
-          <div class="text-xs text-slate-500">上传</div>
+        <div class="rounded-lg bg-base-200 p-2">
+          <div class="text-xs text-base-content/70">上传</div>
           <div class="font-medium">{{ conn.upload === null ? '--' : formatBytes(conn.upload) }}</div>
         </div>
-        <div class="rounded-lg bg-tile p-2">
-          <div class="text-xs text-slate-500">速率 ↓/↑</div>
+        <div class="rounded-lg bg-base-200 p-2">
+          <div class="text-xs text-base-content/70">速率 ↓/↑</div>
           <div class="truncate font-medium">{{ formatSpeed(conn.downSpeed || 0) }}</div>
-          <div class="truncate text-xs text-slate-500">{{ formatSpeed(conn.upSpeed || 0) }}</div>
+          <div class="truncate text-xs text-base-content/70">{{ formatSpeed(conn.upSpeed || 0) }}</div>
         </div>
-        <div class="rounded-lg bg-tile p-2">
-          <div class="text-xs text-slate-500">{{ closed ? '持续时长' : '已连接' }}</div>
+        <div class="rounded-lg bg-base-200 p-2">
+          <div class="text-xs text-base-content/70">{{ closed ? '持续时长' : '已连接' }}</div>
           <div class="font-medium">{{ formatDuration(conn.start, closed ? conn.closedAt : now) }}</div>
         </div>
       </div>
@@ -90,32 +90,32 @@ const metaRows = computed(() => {
       <!-- 规则与链路 -->
       <dl class="mb-3 space-y-2 text-sm">
         <div>
-          <dt class="text-xs text-slate-500">命中规则</dt>
+          <dt class="text-xs text-base-content/70">命中规则</dt>
           <dd class="break-all font-mono">{{ connRule(conn) || '--' }}</dd>
         </div>
         <div>
-          <dt class="text-xs text-slate-500">代理链路</dt>
+          <dt class="text-xs text-base-content/70">代理链路</dt>
           <dd class="flex flex-wrap items-center gap-1">
             <template v-for="(name, i) in connChain(conn)" :key="i">
-              <span v-if="i" class="text-slate-400">→</span>
-              <span class="chip text-xs">{{ name }}</span>
+              <span v-if="i" class="text-base-content/60">→</span>
+              <span class="badge badge-ghost badge-sm text-base-content/70 text-xs">{{ name }}</span>
             </template>
           </dd>
         </div>
       </dl>
 
       <!-- 元数据 -->
-      <dl class="divide-y divide-line text-sm">
+      <dl class="divide-y divide-base-content/10 text-sm">
         <div v-for="r in metaRows" :key="r.key" class="flex gap-3 py-1.5">
-          <dt class="w-24 shrink-0 text-slate-500">{{ r.label }}</dt>
+          <dt class="w-24 shrink-0 text-base-content/70">{{ r.label }}</dt>
           <dd class="min-w-0 flex-1 break-all font-mono text-sm">{{ r.value }}</dd>
         </div>
       </dl>
     </template>
 
     <template #footer>
-      <button class="btn-outline" @click="emit('close')">关闭</button>
-      <button v-if="!closed" class="btn-danger" @click="emit('disconnect', conn)">
+      <button class="btn btn-sm btn-outline border-base-content/20" @click="emit('close')">关闭</button>
+      <button v-if="!closed" class="btn btn-sm btn-error" @click="emit('disconnect', conn)">
         <Icon name="x" class="h-4 w-4" />
         断开连接
       </button>

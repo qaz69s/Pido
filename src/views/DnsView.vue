@@ -70,10 +70,10 @@ function answersBrief(list) {
 }
 const STATUS_CLASS = (s) =>
   s === 'NOERROR'
-    ? 'text-ok'
+    ? 'text-success'
     : s === 'NXDOMAIN' || s === 'NODATA'
-      ? 'text-warn'
-      : 'text-danger'
+      ? 'text-warning'
+      : 'text-error'
 
 const recordTypes = computed(() => backend.caps?.resources?.dns_query?.record_types || ['A', 'AAAA', 'HTTPS'])
 const typeFilterOptions = computed(() => [...new Set(['A', 'AAAA', 'CNAME', 'HTTPS', ...recordTypes.value])])
@@ -270,10 +270,10 @@ async function runMihomo(a) {
     <!-- ================= mihomo ================= -->
     <div v-if="!backend.isStandard" class="grid items-start gap-3 lg:grid-cols-2">
       <DnsQueryTool />
-      <section class="card divide-y divide-line">
+      <section class="card divide-y divide-base-content/10">
         <h2 class="px-4 pb-2 pt-4 font-semibold">缓存</h2>
         <SettingRow v-for="a in MIHOMO_ACTIONS" :key="a.key" :title="a.label" :description="a.desc">
-          <button class="btn-outline py-1 text-xs" :disabled="!!mihomoBusy[a.key]" @click="runMihomo(a)">
+          <button class="btn btn-xs btn-outline border-base-content/20" :disabled="!!mihomoBusy[a.key]" @click="runMihomo(a)">
             <Icon name="trash" class="h-3.5 w-3.5" :class="mihomoBusy[a.key] && 'animate-pulse'" />
             {{ mihomoBusy[a.key] ? '执行中…' : '执行' }}
           </button>
@@ -285,19 +285,20 @@ async function runMihomo(a) {
     <template v-else>
       <!-- 标签 + 刷新：与代理页工具栏一致，固定像素，字体放大时保持一行 -->
       <div class="flex items-center gap-2">
-        <div class="tb-tabs no-scrollbar flex min-w-0 shrink overflow-x-auto rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
+        <div role="tablist" class="tb-tabs tabs tabs-boxed tabs-sm no-scrollbar min-w-0 shrink overflow-x-auto">
           <button
             v-for="t in TABS"
             :key="t.key"
-            class="whitespace-nowrap rounded-md transition"
-            :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
+            role="tab"
+            class="tab whitespace-nowrap"
+            :class="tab === t.key && 'tab-active font-medium'"
             @click="tab = t.key"
           >
             {{ t.label }}
           </button>
         </div>
         <div class="tb ml-auto flex shrink-0 items-center">
-          <button v-if="tab !== 'query'" class="btn-icon" title="刷新" @click="refresh">
+          <button v-if="tab !== 'query'" class="btn btn-sm btn-ghost btn-square size-9" title="刷新" @click="refresh">
             <Icon name="refresh" class="h-5 w-5" :class="(log.loading || cache.loading || rules.loading) && 'animate-spin'" />
           </button>
         </div>
@@ -307,48 +308,48 @@ async function runMihomo(a) {
       <template v-if="tab === 'log'">
         <div class="grid grid-cols-2 gap-2 sm:grid-cols-[minmax(0,1fr)_8rem_11rem]">
           <div class="relative col-span-2 sm:col-span-1">
-            <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input v-model="logFilter.name" class="input pl-8" placeholder="域名包含…" autocapitalize="off" spellcheck="false" />
+            <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
+            <input v-model="logFilter.name" class="input input-bordered input-sm w-full pl-8" placeholder="域名包含…" autocapitalize="off" spellcheck="false" />
           </div>
-          <select v-model="logFilter.type" class="input" aria-label="记录类型">
+          <select v-model="logFilter.type" class="select select-bordered select-sm w-full" aria-label="记录类型">
             <option value="">全部类型</option>
             <option v-for="t in typeFilterOptions" :key="t" :value="t">{{ t }}</option>
           </select>
-          <input v-model="logFilter.src" class="input font-mono" placeholder="来源 IP" inputmode="decimal" aria-label="来源 IP" />
+          <input v-model="logFilter.src" class="input input-bordered input-sm w-full font-mono" placeholder="来源 IP" inputmode="decimal" aria-label="来源 IP" />
         </div>
 
         <div v-if="log.loading && !log.records.length" class="space-y-2">
-          <div v-for="i in 6" :key="i" class="card skeleton h-14" />
+          <div v-for="i in 6" :key="i" class="skeleton h-14" />
         </div>
         <div v-else-if="log.error" class="card">
           <EmptyState icon="alert" v-bind="errorState(log.error)">
-            <button class="btn-primary" @click="loadLog()">重试</button>
+            <button class="btn btn-sm btn-primary" @click="loadLog()">重试</button>
           </EmptyState>
         </div>
         <div v-else-if="!log.records.length" class="card">
           <EmptyState icon="compass" title="没有查询记录" :description="logFilter.name || logFilter.type || logFilter.src ? '没有符合条件的记录，换个条件试试。' : '客户端发起解析后会出现在这里（诊断查询不记录）。'" />
         </div>
-        <section v-else class="card divide-y divide-line">
+        <section v-else class="card divide-y divide-base-content/10">
           <div v-for="r in log.records" :key="r.id" class="px-4 py-2.5">
             <!-- 第一行只放域名与耗时：手机上域名完整显示，过长时换行而不截断 -->
             <div class="flex items-start gap-2 text-sm">
               <span class="min-w-0 flex-1 break-all font-mono">{{ host(r.question?.name) }}</span>
-              <span class="shrink-0 text-xs tabular-nums text-slate-500">{{ r.elapsed_ms }} ms</span>
+              <span class="shrink-0 text-xs tabular-nums text-base-content/70">{{ r.elapsed_ms }} ms</span>
             </div>
-            <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-slate-500">
-              <span class="tabular-nums text-slate-400">{{ time(r.observed_at) }}</span>
-              <span class="chip font-mono">{{ r.question?.type }}</span>
+            <div class="mt-1 flex flex-wrap items-center gap-x-3 gap-y-0.5 text-xs text-base-content/70">
+              <span class="tabular-nums text-base-content/60">{{ time(r.observed_at) }}</span>
+              <span class="badge badge-ghost badge-sm text-base-content/70 font-mono">{{ r.question?.type }}</span>
               <!-- 状态放第二行：手机上不挤占域名 -->
               <span v-if="r.status !== 'NOERROR'" class="font-medium" :class="STATUS_CLASS(r.status)">{{ r.status }}</span>
               <span v-if="r.src" class="font-mono">{{ r.src }}</span>
-              <span v-if="r.cached" class="text-sky-600 dark:text-sky-400">命中缓存</span>
+              <span v-if="r.cached" class="text-info">命中缓存</span>
               <span v-else-if="r.upstream">上游 <span class="font-mono">{{ r.upstream }}</span></span>
-              <span v-if="answersBrief(r.answers)" class="min-w-0 truncate font-mono text-slate-400" :title="answersBrief(r.answers)">→ {{ answersBrief(r.answers) }}</span>
+              <span v-if="answersBrief(r.answers)" class="min-w-0 truncate font-mono text-base-content/60" :title="answersBrief(r.answers)">→ {{ answersBrief(r.answers) }}</span>
             </div>
           </div>
-          <div class="flex items-center justify-between px-4 py-2 text-xs text-slate-500">
+          <div class="flex items-center justify-between px-4 py-2 text-xs text-base-content/70">
             <span>已显示 {{ log.records.length }} 条<template v-if="log.total"> · 缓冲区共 {{ log.total }} 条</template></span>
-            <button v-if="log.cursor" class="btn-ghost py-1 text-xs" :disabled="log.more" @click="loadLog({ append: true })">
+            <button v-if="log.cursor" class="btn btn-xs btn-ghost" :disabled="log.more" @click="loadLog({ append: true })">
               {{ log.more ? '加载中…' : '加载更多' }}
             </button>
           </div>
@@ -359,53 +360,53 @@ async function runMihomo(a) {
       <template v-else-if="tab === 'cache'">
         <div class="flex flex-wrap items-center gap-2">
           <div class="relative min-w-0 flex-1 basis-48">
-            <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-            <input v-model="cacheSearch" class="input pl-8" placeholder="搜索域名或 IP" autocapitalize="off" spellcheck="false" />
+            <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
+            <input v-model="cacheSearch" class="input input-bordered input-sm w-full pl-8" placeholder="搜索域名或 IP" autocapitalize="off" spellcheck="false" />
           </div>
-          <button v-if="exactDomain" class="btn-outline" @click="removeByName">
+          <button v-if="exactDomain" class="btn btn-sm btn-outline border-base-content/20" @click="removeByName">
             <Icon name="trash" class="h-4 w-4" />
             删除该域名
           </button>
-          <button class="btn-danger" :disabled="flushing || cache.loading" @click="flushAll">
+          <button class="btn btn-sm btn-error" :disabled="flushing || cache.loading" @click="flushAll">
             <Icon name="trash" class="h-4 w-4" :class="flushing && 'animate-pulse'" />
             清空全部
           </button>
         </div>
 
         <div v-if="cache.loading && !cache.entries.length" class="space-y-2">
-          <div v-for="i in 6" :key="i" class="card skeleton h-14" />
+          <div v-for="i in 6" :key="i" class="skeleton h-14" />
         </div>
         <div v-else-if="cache.error" class="card">
           <EmptyState icon="alert" v-bind="errorState(cache.error)">
-            <button class="btn-primary" @click="loadCache()">重试</button>
+            <button class="btn btn-sm btn-primary" @click="loadCache()">重试</button>
           </EmptyState>
         </div>
         <div v-else-if="!cacheShown.length" class="card">
           <EmptyState icon="database" :title="cacheSearch ? '没有匹配的缓存' : '缓存为空'" />
         </div>
-        <section v-else class="card divide-y divide-line">
+        <section v-else class="card divide-y divide-base-content/10">
           <div v-for="e in cacheShown" :key="e.entry_id" class="flex items-center gap-2 px-4 py-2.5">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2 text-sm">
-                <span class="chip shrink-0 font-mono">{{ e.type }}</span>
+                <span class="badge badge-ghost badge-sm text-base-content/70 shrink-0 font-mono">{{ e.type }}</span>
                 <span class="min-w-0 truncate font-mono" :title="host(e.domain)">{{ host(e.domain) }}</span>
               </div>
-              <div class="mt-1 flex flex-wrap gap-x-3 text-xs text-slate-500">
+              <div class="mt-1 flex flex-wrap gap-x-3 text-xs text-base-content/70">
                 <span v-if="e.status !== 'NOERROR'" class="font-medium" :class="STATUS_CLASS(e.status)">{{ e.status }}</span>
                 <span v-if="answersBrief(e.answers)" class="min-w-0 truncate font-mono" :title="answersBrief(e.answers)">{{ answersBrief(e.answers) }}</span>
                 <span>{{ expiresText(e) }}</span>
               </div>
             </div>
-            <button class="btn-icon h-8 w-8 shrink-0 hover:!text-danger" title="删除这条缓存" :disabled="busyEntry === e.entry_id" @click="removeEntry(e)">
+            <button class="btn btn-sm btn-ghost btn-square h-8 w-8 shrink-0 hover:!text-error" title="删除这条缓存" :disabled="busyEntry === e.entry_id" @click="removeEntry(e)">
               <Icon name="trash" class="h-4 w-4" :class="busyEntry === e.entry_id && 'animate-pulse'" />
             </button>
           </div>
-          <div class="flex items-center justify-between gap-2 px-4 py-2 text-xs text-slate-500">
+          <div class="flex items-center justify-between gap-2 px-4 py-2 text-xs text-base-content/70">
             <span>
               已加载 {{ cache.entries.length }} / {{ cache.total }} 条
               <template v-if="cache.usage?.entry_capacity"> · 容量 {{ cache.usage.entries }} / {{ cache.usage.entry_capacity }}</template>
             </span>
-            <button v-if="cache.cursor" class="btn-ghost py-1 text-xs" :disabled="cache.more" @click="loadCache({ append: true })">
+            <button v-if="cache.cursor" class="btn btn-xs btn-ghost" :disabled="cache.more" @click="loadCache({ append: true })">
               {{ cache.more ? '加载中…' : '加载更多' }}
             </button>
           </div>
@@ -418,15 +419,15 @@ async function runMihomo(a) {
       <!-- ---------- 规则（只读） ---------- -->
       <template v-else>
         <div v-if="rules.loading && !rules.data" class="space-y-2">
-          <div v-for="i in 4" :key="i" class="card skeleton h-12" />
+          <div v-for="i in 4" :key="i" class="skeleton h-12" />
         </div>
         <div v-else-if="rules.error" class="card">
           <EmptyState icon="alert" v-bind="errorState(rules.error)">
-            <button class="btn-primary" @click="loadRules()">重试</button>
+            <button class="btn btn-sm btn-primary" @click="loadRules()">重试</button>
           </EmptyState>
         </div>
         <template v-else-if="rules.data">
-          <p class="flex items-start gap-1.5 text-xs text-slate-500">
+          <p class="flex items-start gap-1.5 text-xs text-base-content/70">
             <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
             只读：按顺序匹配，最后一条为 fallback。修改请在「配置」页编辑 dns.dae 后保存并重载。
           </p>
@@ -434,14 +435,14 @@ async function runMihomo(a) {
             <section v-for="part in [{ key: 'request', title: '请求规则', desc: '决定用哪个上游解析' }, { key: 'response', title: '响应规则', desc: '决定是否接受上游的答案' }]" :key="part.key" class="card">
               <div class="px-4 pb-2 pt-4">
                 <h2 class="font-semibold">{{ part.title }}</h2>
-                <p class="text-xs text-slate-500">{{ part.desc }}</p>
+                <p class="text-xs text-base-content/70">{{ part.desc }}</p>
               </div>
-              <ol class="divide-y divide-line">
+              <ol class="divide-y divide-base-content/10">
                 <li v-for="r in rules.data[part.key] || []" :key="r.rule_id" class="flex items-start gap-3 px-4 py-2 text-sm">
-                  <span class="w-6 shrink-0 text-right text-xs tabular-nums text-slate-400">{{ r.kind === 'fallback' ? '' : r.index + 1 }}</span>
+                  <span class="w-6 shrink-0 text-right text-xs tabular-nums text-base-content/60">{{ r.kind === 'fallback' ? '' : r.index + 1 }}</span>
                   <div class="min-w-0 flex-1">
-                    <div class="break-all font-mono text-sm" :class="r.kind === 'fallback' && 'text-slate-500'">{{ r.expression }}</div>
-                    <div class="mt-0.5 flex flex-wrap gap-x-2 text-xs text-slate-400">
+                    <div class="break-all font-mono text-sm" :class="r.kind === 'fallback' && 'text-base-content/70'">{{ r.expression }}</div>
+                    <div class="mt-0.5 flex flex-wrap gap-x-2 text-xs text-base-content/60">
                       <span>{{ ACTION_LABEL[r.action] || r.action }}<template v-if="r.upstream"> · {{ r.upstream }}</template></span>
                       <span v-if="r.source?.file" class="font-mono">{{ r.source.file }}<template v-if="r.source.line">:{{ r.source.line }}</template></span>
                     </div>

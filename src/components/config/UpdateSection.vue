@@ -162,10 +162,10 @@ async function updateCore(force = false) {
 </script>
 
 <template>
-  <section class="card divide-y divide-line">
+  <section class="card divide-y divide-base-content/10">
     <div class="flex items-center gap-2 px-4 pb-2 pt-4">
       <h2 class="flex-1 font-semibold">更新</h2>
-      <button class="btn-ghost py-1 text-xs" :disabled="checking" @click="checkLatest">
+      <button class="btn btn-xs btn-ghost" :disabled="checking" @click="checkLatest">
         <Icon name="refresh" class="h-3.5 w-3.5" :class="checking && 'animate-spin'" />
         检查更新
       </button>
@@ -176,24 +176,24 @@ async function updateCore(force = false) {
       <div class="min-w-0 flex-1">
         <div class="flex items-center gap-2 text-sm font-medium">
           面板
-          <span v-if="panelHasUpdate" class="rounded-full px-1.5 py-0.5 text-xs font-medium bg-brand-500/10 text-brand-600 dark:text-brand-400">有新版本</span>
+          <span v-if="panelHasUpdate" class="badge badge-sm border-0 bg-primary/10 font-medium text-primary">有新版本</span>
         </div>
-        <div class="mt-0.5 text-xs text-slate-500">
+        <div class="mt-0.5 text-xs text-base-content/70">
           当前 <span class="font-mono">{{ PANEL_VERSION }}</span>
           <template v-if="latest.panel"> · 最新 <span class="font-mono">{{ latest.panel }}</span></template>
         </div>
       </div>
-      <button v-if="!backend.isStandard" class="btn-outline py-1 text-xs" :disabled="upgradingUi" @click="updatePanel">
+      <button v-if="!backend.isStandard" class="btn btn-xs btn-outline border-base-content/20" :disabled="upgradingUi" @click="updatePanel">
         <Icon name="download" class="h-3.5 w-3.5" :class="upgradingUi && 'animate-pulse'" />
         {{ upgradingUi ? '更新中…' : '更新面板' }}
       </button>
       <!-- 标准 API：后端不提供在线更新面板，给出下载链接 -->
-      <a v-else-if="PANEL_ZIP_URL" class="btn-outline py-1 text-xs" :href="PANEL_ZIP_URL" target="_blank" rel="noopener">
+      <a v-else-if="PANEL_ZIP_URL" class="btn btn-xs btn-outline border-base-content/20" :href="PANEL_ZIP_URL" target="_blank" rel="noopener">
         <Icon name="download" class="h-3.5 w-3.5" />
         下载面板
       </a>
     </div>
-    <p v-if="backend.isStandard" class="px-4 py-3 text-xs text-slate-500">
+    <p v-if="backend.isStandard" class="px-4 py-3 text-xs text-base-content/70">
       {{ backend.engine }} 不支持在线更新面板：下载 dist.zip 解压到 api 段 ui 指向的目录（覆盖原文件），然后刷新本页即可。
     </p>
 
@@ -203,16 +203,16 @@ async function updateCore(force = false) {
         <div class="min-w-0 flex-1">
           <div class="flex items-center gap-2 text-sm font-medium">
             mihomo 内核
-            <span v-if="coreHasUpdate" class="rounded-full px-1.5 py-0.5 text-xs font-medium bg-brand-500/10 text-brand-600 dark:text-brand-400">有新版本</span>
+            <span v-if="coreHasUpdate" class="badge badge-sm border-0 bg-primary/10 font-medium text-primary">有新版本</span>
           </div>
-          <div class="mt-0.5 text-xs text-slate-500">
+          <div class="mt-0.5 text-xs text-base-content/70">
             当前 <span class="font-mono">{{ coreVersion || '--' }}</span>
             <template v-if="latestCore"> · 最新 <span class="font-mono">{{ latestCore }}</span></template>
           </div>
         </div>
         <button
-          :class="channel === 'alpha' ? 'btn-danger' : 'btn-primary'"
-          class="py-1 text-xs"
+          :class="channel === 'alpha' ? 'btn-error' : 'btn-primary'"
+          class="btn btn-xs"
           :disabled="upgradingCore"
           @click="updateCore()"
         >
@@ -228,14 +228,14 @@ async function updateCore(force = false) {
           class="rounded-xl border px-3 py-2 text-left transition"
           :class="
             channel === c.value
-              ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
-              : 'border-line hover:border-line-strong'
+              ? 'border-primary bg-primary/10 ring-1 ring-primary'
+              : 'border-base-content/10 hover:border-base-content/20'
           "
           :disabled="upgradingCore"
           @click="channel = c.value"
         >
           <div class="text-sm font-medium">{{ c.label }}</div>
-          <div class="text-xs text-slate-500">
+          <div class="text-xs text-base-content/70">
             {{ c.desc }}<template v-if="latest[c.value]"> · <span class="font-mono">{{ latest[c.value] }}</span></template>
           </div>
         </button>

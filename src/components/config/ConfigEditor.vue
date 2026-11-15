@@ -292,8 +292,8 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
   <section class="card">
     <div class="flex flex-wrap items-center gap-2 px-4 pb-2 pt-4">
       <h2 class="flex-1 whitespace-nowrap font-semibold">配置文件</h2>
-      <span v-if="config?.revision" class="chip min-w-0 max-w-full truncate font-mono" title="配置 revision">rev {{ config.revision }}</span>
-      <button class="btn-ghost py-1 text-xs" :disabled="loading" title="重新读取" @click="load({ silent: true })">
+      <span v-if="config?.revision" class="badge badge-ghost badge-sm text-base-content/70 min-w-0 max-w-full truncate font-mono" title="配置 revision">rev {{ config.revision }}</span>
+      <button class="btn btn-xs btn-ghost" :disabled="loading" title="重新读取" @click="load({ silent: true })">
         <Icon name="refresh" class="h-3.5 w-3.5" :class="loading && 'animate-spin'" />
         刷新
       </button>
@@ -304,7 +304,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
       <div class="skeleton h-64 rounded-md" />
     </div>
     <EmptyState v-else-if="loadErrorInfo" icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
-      <button class="btn-primary" @click="load()">重试</button>
+      <button class="btn btn-sm btn-primary" @click="load()">重试</button>
     </EmptyState>
 
     <div v-else-if="current" class="grid grid-cols-1 gap-3 px-4 pb-4 md:grid-cols-[13rem_minmax(0,1fr)]">
@@ -314,15 +314,15 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
           v-for="s in sources"
           :key="s.id"
           class="flex shrink-0 items-center gap-2 whitespace-nowrap rounded-lg px-2.5 py-1.5 text-left text-sm transition md:w-full"
-          :class="s.id === selectedId ? 'bg-brand-50 font-medium text-brand-700 dark:bg-brand-500/10 dark:text-brand-300' : 'text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-white/[0.06]'"
+          :class="s.id === selectedId ? 'bg-primary/10 font-medium text-primary' : 'text-base-content/80 hover:bg-base-content/5'"
           :title="s.path"
           @click="select(s.id)"
         >
           <Icon :name="s.writable && !redacted[s.id] ? 'file' : 'lock'" class="h-4 w-4 shrink-0 opacity-70" />
           <span class="min-w-0 md:flex-1 md:truncate">{{ shortName(s.path) }}</span>
-          <span v-if="isDirty(s)" class="h-1.5 w-1.5 shrink-0 rounded-full bg-warn" title="有未保存的修改" />
+          <span v-if="isDirty(s)" class="h-1.5 w-1.5 shrink-0 rounded-full bg-warning" title="有未保存的修改" />
         </button>
-        <p class="hidden px-2.5 pt-2 text-xs text-slate-400 md:block">
+        <p class="hidden px-2.5 pt-2 text-xs text-base-content/60 md:block">
           <template v-if="caps?.hiddenSources?.length">{{ caps.hiddenSources.join('、') }} 由后端隐藏，只能在服务器上编辑。</template>
         </p>
       </nav>
@@ -332,20 +332,20 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
         <div class="flex flex-wrap items-center gap-x-3 gap-y-2">
           <div class="min-w-0 flex-1">
             <div class="truncate font-mono text-sm font-medium" :title="current.path">{{ current.path }}</div>
-            <div class="text-xs text-slate-500">
+            <div class="text-xs text-base-content/70">
               {{ formatBytes(current.bytes) }} · {{ current.line_count }} 行
               <template v-if="current.loaded_at"> · 载入于 {{ formatRelativeTime(current.loaded_at) }}</template>
             </div>
           </div>
           <div class="flex shrink-0 items-center gap-2">
-            <button v-if="dirty" class="btn-ghost" :disabled="saving" @click="revert">还原</button>
-            <button class="btn-outline" :disabled="validating || saving" @click="runValidate">
+            <button v-if="dirty" class="btn btn-sm btn-ghost" :disabled="saving" @click="revert">还原</button>
+            <button class="btn btn-sm btn-outline border-base-content/20" :disabled="validating || saving" @click="runValidate">
               <Icon name="check" class="h-4 w-4" :class="validating && 'animate-pulse'" />
               {{ validating ? '校验中…' : '校验' }}
             </button>
             <button
               v-if="!readOnlyReason"
-              class="btn-primary"
+              class="btn btn-sm btn-primary"
               :disabled="!dirty || saving || validating"
               @click="save"
             >
@@ -358,21 +358,21 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
         <!-- 只读说明 -->
         <div
           v-if="reasonInfo"
-          class="rounded-xl border border-line bg-slate-50 p-3 text-sm dark:bg-slate-800/40"
+          class="alert block rounded-xl border-base-content/10 bg-base-content/5 p-3 text-left text-sm"
         >
           <div class="flex items-start gap-2">
-            <Icon name="lock" class="mt-0.5 h-4 w-4 shrink-0 text-slate-500" />
+            <Icon name="lock" class="mt-0.5 h-4 w-4 shrink-0 text-base-content/70" />
             <div class="min-w-0">
               <div class="font-medium">只读模式：{{ reasonInfo.title }}</div>
-              <div class="mt-0.5 text-slate-500">{{ reasonInfo.desc }}</div>
+              <div class="mt-0.5 text-base-content/70">{{ reasonInfo.desc }}</div>
             </div>
           </div>
-          <details v-if="globalDenied" class="mt-2 pl-6 text-slate-600 dark:text-slate-300" open>
-            <summary class="cursor-pointer select-none text-xs font-medium text-brand-600 dark:text-brand-400">如何开启配置编辑</summary>
+          <details v-if="globalDenied" class="mt-2 pl-6 text-base-content/80" open>
+            <summary class="cursor-pointer select-none text-xs font-medium text-primary">如何开启配置编辑</summary>
             <ol class="mt-2 list-decimal space-y-1.5 pl-4 text-xs leading-relaxed">
               <li>
                 在 <code class="font-mono">api.dae</code> 的 api 段设置
-                <code class="rounded-md bg-tile px-1 font-mono">config_write: true</code>（必须同时设置非空 secret），然后重启 {{ backend.engine }}。
+                <code class="rounded-md bg-base-200 px-1 font-mono">config_write: true</code>（必须同时设置非空 secret），然后重启 {{ backend.engine }}。
               </li>
               <li>
                 按受管布局拆分配置：入口 <code class="font-mono">config.dae</code> 只保留一个 include 块，引入
@@ -385,7 +385,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
                 <code class="font-mono">config.d/</code> 目录需可写（写入时会生成 .bak 与临时文件）。
               </li>
             </ol>
-            <pre class="mt-2 overflow-x-auto rounded-lg bg-tile p-2 font-mono text-xs leading-5">/etc/dae
+            <pre class="mt-2 overflow-x-auto rounded-lg bg-base-200 p-2 font-mono text-xs leading-5">/etc/dae
 ├── config.dae      # include { config.d/*.dae  api.dae }
 ├── api.dae         # api 段，API 不可见
 └── config.d
@@ -397,7 +397,8 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
         <!-- 412 冲突 -->
         <div
           v-if="conflict"
-          class="flex flex-wrap items-center gap-2 rounded-xl border border-warn-soft bg-warn-soft p-3 text-sm text-warn"
+          role="alert"
+          class="alert flex flex-wrap items-center gap-2 rounded-xl border-warning/30 bg-warning/10 p-3 text-left text-sm text-warning"
         >
           <Icon name="alert" class="h-4 w-4 shrink-0" />
           <div class="min-w-0 flex-1">
@@ -405,41 +406,41 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
             <div class="text-xs opacity-80">读取之后，{{ current.path }} 在服务器上被改动过，本次保存没有写入。</div>
           </div>
           <div class="flex shrink-0 gap-2">
-            <button class="btn-outline py-1 text-xs" @click="takeLatest">载入最新内容</button>
-            <button class="btn-ghost py-1 text-xs" @click="keepMine">保留我的修改</button>
+            <button class="btn btn-xs btn-outline border-base-content/20" @click="takeLatest">载入最新内容</button>
+            <button class="btn btn-xs btn-ghost" @click="keepMine">保留我的修改</button>
           </div>
         </div>
 
         <!-- 校验结果 -->
         <div
           v-if="validState === 'ok' && !errorCount"
-          class="notice"
+          class="alert flex items-center gap-2 px-3 py-2.5 text-left text-sm text-base-content/80"
         >
-          <Icon name="check" class="h-4 w-4 shrink-0 text-ok" />
+          <Icon name="check" class="h-4 w-4 shrink-0 text-success" />
           校验通过{{ dirty ? '，可以保存' : '' }}
         </div>
-        <div v-if="diagnostics.length" class="overflow-hidden rounded-xl border border-danger-soft">
-          <div class="flex items-center gap-2 bg-danger-soft px-3 py-2 text-sm font-medium text-danger">
+        <div v-if="diagnostics.length" class="overflow-hidden rounded-xl border border-error/30">
+          <div class="flex items-center gap-2 bg-error/10 px-3 py-2 text-sm font-medium text-error">
             <Icon name="alert" class="h-4 w-4 shrink-0" />
             {{ errorCount ? `${errorCount} 个错误` : '提示' }}<span v-if="diagnostics.length > errorCount" class="font-normal opacity-80">，{{ diagnostics.length - errorCount }} 条提示</span>
             <span class="ml-auto text-xs font-normal opacity-70">点击跳转到对应行</span>
           </div>
-          <ul class="max-h-40 divide-y divide-danger-soft overflow-y-auto text-sm">
+          <ul class="max-h-40 divide-y divide-error/20 overflow-y-auto text-sm">
             <li v-for="(d, i) in diagnostics" :key="i">
               <button
-                class="flex w-full items-start gap-2 px-3 py-1.5 text-left hover:bg-danger-soft disabled:cursor-default"
+                class="flex w-full items-start gap-2 px-3 py-1.5 text-left hover:bg-error/10 disabled:cursor-default"
                 :disabled="!d.line"
                 @click="jumpTo(d)"
               >
                 <span
                   class="mt-0.5 shrink-0 rounded-md px-1 font-mono text-xs font-semibold"
-                  :class="d.level === 'error' ? 'bg-danger-soft text-danger' : 'bg-warn-soft text-warn'"
+                  :class="d.level === 'error' ? 'bg-error/10 text-error' : 'bg-warning/10 text-warning'"
                 >
                   {{ d.line ? `${d.line}${d.column ? ':' + d.column : ''}` : '--' }}
                 </span>
                 <span class="min-w-0 flex-1 break-words">
                   {{ d.message }}
-                  <span class="text-xs text-slate-400">
+                  <span class="text-xs text-base-content/60">
                     {{ d.code }}<template v-if="d.source_id && d.source_id !== current.id"> · {{ sourceLabel(d.source_id) }}</template>
                   </span>
                 </span>
