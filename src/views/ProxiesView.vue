@@ -396,8 +396,8 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           >
             <Icon name="settings" class="h-5 w-5" />
           </button>
-          <button v-if="canTest" class="btn-primary" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
-            <Icon name="gauge" class="h-4 w-4" :class="testingAll && 'animate-pulse'" />
+          <button v-if="canTest" class="btn-ghost h-[34px] w-[34px] !px-0 sm:w-auto sm:!px-3" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
+            <Icon name="gauge" class="h-5 w-5" :class="testingAll && 'animate-pulse'" />
             <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
           </button>
         </template>

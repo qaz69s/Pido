@@ -13,6 +13,6 @@ const parts = computed(() => {
 </script>
 
 <template>
-  <span v-if="parts">{{ parts.n }}<span class="unit">{{ parts.u }}</span></span>
-  <span v-else>{{ value }}</span>
+  <span v-if="parts" class="tabular-nums">{{ parts.n }}<span class="unit">{{ parts.u }}</span></span>
+  <span v-else class="tabular-nums">{{ value }}</span>
 </template>

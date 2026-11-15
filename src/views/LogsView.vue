@@ -122,7 +122,7 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
 </script>
 
 <template>
-  <div class="space-y-3">
+  <div class="space-y-3 tabular-nums">
     <!-- 工具栏 -->
     <div class="flex flex-wrap items-center gap-2">
       <!-- 级别：桌面分段按钮，手机下拉框 -->

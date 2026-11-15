@@ -385,7 +385,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
                 <code class="font-mono">config.d/</code> 目录需可写（写入时会生成 .bak 与临时文件）。
               </li>
             </ol>
-            <pre class="mt-2 overflow-x-auto rounded-lg bg-tile p-2 font-mono text-[12px] leading-5">/etc/dae
+            <pre class="mt-2 overflow-x-auto rounded-lg bg-tile p-2 font-mono text-xs leading-5">/etc/dae
 ├── config.dae      # include { config.d/*.dae  api.dae }
 ├── api.dae         # api 段，API 不可见
 └── config.d
@@ -432,7 +432,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
                 @click="jumpTo(d)"
               >
                 <span
-                  class="mt-0.5 shrink-0 rounded px-1 font-mono text-[11px] font-semibold"
+                  class="mt-0.5 shrink-0 rounded px-1 font-mono text-xs font-semibold"
                   :class="d.level === 'error' ? 'bg-rose-500/15 text-rose-700 dark:text-rose-300' : 'bg-amber-500/15 text-amber-700 dark:text-amber-300'"
                 >
                   {{ d.line ? `${d.line}${d.column ? ':' + d.column : ''}` : '--' }}

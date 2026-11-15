@@ -235,7 +235,7 @@ const STATUS_TEXT = {
 </script>
 
 <template>
-  <div class="space-y-3">
+  <div class="space-y-3 tabular-nums">
     <!-- 顶部统计 -->
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <div class="card px-3 py-2.5">

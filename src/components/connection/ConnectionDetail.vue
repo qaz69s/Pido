@@ -64,7 +64,7 @@ const metaRows = computed(() => {
 </script>
 
 <template>
-  <Modal v-model="open" :title="conn ? connTarget(conn) : ''" width="md:max-w-xl">
+  <Modal class="tabular-nums" v-model="open" :title="conn ? connTarget(conn) : ''" width="md:max-w-xl">
     <template v-if="conn">
       <!-- 流量概要 -->
       <div class="mb-3 grid grid-cols-2 gap-2 text-sm sm:grid-cols-4">

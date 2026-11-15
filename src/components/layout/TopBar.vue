@@ -72,7 +72,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
     <span v-else class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-600 text-on-brand md:hidden">
       <Icon name="zap" class="h-4 w-4" />
     </span>
-    <h1 class="shrink-0 whitespace-nowrap text-base font-semibold">{{ route.meta.title }}</h1>
+    <h1 class="shrink-0 whitespace-nowrap text-lg font-semibold tracking-tight">{{ route.meta.title }}</h1>
 
     <div class="ml-auto flex items-center gap-1">
       <RouterLink
