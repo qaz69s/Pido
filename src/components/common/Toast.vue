@@ -12,7 +12,7 @@ const BASE = 'border-slate-200 bg-surface text-slate-700 dark:border-slate-700 d
 const STYLES = {
   info: { cls: BASE, icon: 'info', ic: 'text-slate-400' },
   success: { cls: BASE, icon: 'check', ic: 'text-brand-500' },
-  warning: { cls: BASE, icon: 'alert', ic: 'text-warn' },
+  warning: { cls: BASE, icon: 'alert', ic: 'text-amber-500' },
   error: { cls: BASE, icon: 'alert', ic: 'text-rose-500' },
 }
 </script>

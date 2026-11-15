@@ -32,7 +32,7 @@ const LEVELS = [
 const LEVEL_CLASS = {
   debug: 'bg-tile text-slate-500 dark:text-slate-400',
   info: 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300',
-  warning: 'bg-warn/15 text-warn',
+  warning: 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300',
   error: 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300',
 }
 const LEVEL_TEXT = { debug: 'DBG', info: 'INF', warning: 'WRN', error: 'ERR' }
@@ -112,10 +112,10 @@ function exportLogs() {
 }
 
 const STATUS = {
-  open: { dot: 'bg-good', text: '实时' },
-  connecting: { dot: 'bg-warn animate-pulse', text: '连接中' },
-  reconnecting: { dot: 'bg-warn animate-pulse', text: '重连中' },
-  error: { dot: 'bg-fail', text: '连接失败' },
+  open: { dot: 'bg-emerald-500', text: '实时' },
+  connecting: { dot: 'bg-amber-400 animate-pulse', text: '连接中' },
+  reconnecting: { dot: 'bg-amber-400 animate-pulse', text: '重连中' },
+  error: { dot: 'bg-rose-500', text: '连接失败' },
   unsupported: { dot: 'bg-slate-400', text: '后端未开放日志' },
 }
 const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400', text: '未连接' })
@@ -154,7 +154,7 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
       <div class="ml-auto flex items-center gap-1">
         <button
           class="btn-icon"
-          :class="paused && 'bg-warn/15 text-warn'"
+          :class="paused && 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'"
           :title="paused ? '继续' : '暂停'"
           @click="togglePause"
         >
@@ -171,7 +171,7 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
 
     <div
       v-if="paused"
-      class="flex items-center gap-2 rounded-xl border border-warn/30 bg-warn/10 p-2.5 text-sm text-warn"
+      class="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-200"
     >
       <Icon name="pause" class="h-4 w-4 shrink-0" />
       <span class="flex-1">已暂停，期间收到 {{ pendingCount }} 条新日志</span>

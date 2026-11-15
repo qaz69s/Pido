@@ -48,22 +48,22 @@ export function delayLevel(delay) {
   return 'bad'
 }
 
-/** 延迟分级对应的文字颜色（颜色由主题定义，见 themes.css 的 --st-* / --stt-*） */
+/** 延迟分级对应的文字颜色 */
 export const DELAY_TEXT_CLASS = {
   none: 'text-slate-400 dark:text-slate-500',
-  timeout: 'text-fail',
-  good: 'text-good',
-  ok: 'text-ok',
-  bad: 'text-slow',
+  timeout: 'text-rose-600 dark:text-rose-400',
+  good: 'text-emerald-700 dark:text-emerald-400',
+  ok: 'text-amber-700 dark:text-amber-400',
+  bad: 'text-orange-600 dark:text-orange-400',
 }
 
 /** 延迟分级对应的背景色（折叠时的小圆点） */
 export const DELAY_BG_CLASS = {
   none: 'bg-slate-300 dark:bg-slate-600',
-  timeout: 'bg-fail',
-  good: 'bg-good',
-  ok: 'bg-ok',
-  bad: 'bg-slow',
+  timeout: 'bg-rose-500',
+  good: 'bg-emerald-500',
+  ok: 'bg-amber-400',
+  bad: 'bg-orange-500',
 }
 
 export function delayText(delay) {

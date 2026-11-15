@@ -20,10 +20,6 @@ function textPalette(prefix, fallback) {
   )
 }
 
-/** 状态色：填充用 --st-*，文字用 --stt-*（深浅色各自保证对比度） */
-const st = (k) => `rgb(var(--st-${k}) / <alpha-value>)`
-const stText = (k) => `rgb(var(--stt-${k}, var(--st-${k})) / <alpha-value>)`
-
 const r = (rem) => `calc(${rem}rem * var(--radius-scale, 1))`
 
 /** @type {import('tailwindcss').Config} */
@@ -43,32 +39,11 @@ export default {
         tile: 'rgb(var(--s-tile) / <alpha-value>)',
         // 主色背景上的文字色（大多数主题为白色，素墨深色下为深灰）
         'on-brand': 'rgb(var(--on-b, 255 255 255) / <alpha-value>)',
-        // 状态色（见 themes.css 末尾 --st-*）：延迟 好 / 中 / 慢 / 失败，以及警告横幅
-        good: st('good'),
-        ok: st('ok'),
-        slow: st('slow'),
-        fail: st('fail'),
-        warn: st('warn'),
       },
       // 文字颜色单独走对比度修正后的变量（见 src/themes.css 末尾）
       textColor: {
         slate: textPalette('tx', 'n'),
         brand: textPalette('txb', 'b'),
-        good: stText('good'),
-        ok: stText('ok'),
-        slow: stText('slow'),
-        fail: stText('fail'),
-        warn: stText('warn'),
-      },
-      // 字号阶梯：12 / 13 / 15 / 20 / 32（辅助 / 正文 / 卡片标题 / 次要数值 / 主数值）
-      fontSize: {
-        xs: ['12px', '16px'],
-        sm: ['13px', '20px'],
-        base: ['15px', '22px'],
-        lg: ['20px', '28px'],
-        xl: ['20px', '28px'],
-        '2xl': ['32px', '38px'],
-        display: ['32px', '38px'],
       },
       borderRadius: {
         md: r(0.375),

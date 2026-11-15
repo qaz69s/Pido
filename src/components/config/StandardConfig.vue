@@ -129,7 +129,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <dl v-else class="divide-y divide-slate-100 px-4 pb-2 text-sm dark:divide-slate-800">
             <div v-for="row in rows" :key="row.label" class="flex justify-between gap-3 py-2.5">
               <dt class="shrink-0 text-slate-500">{{ row.label }}</dt>
-              <dd class="min-w-0 truncate text-right font-medium tabular-nums" :class="row.mono && 'font-mono text-sm'" :title="String(row.value)">
+              <dd class="min-w-0 truncate text-right font-medium tabular-nums" :class="row.mono && 'font-mono text-[13px]'" :title="String(row.value)">
                 {{ row.value }}
               </dd>
             </div>
@@ -141,7 +141,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <h2 class="mb-2 font-semibold">运行提示</h2>
           <ul class="space-y-2 text-sm">
             <li v-for="d in degradations" :key="d.code" class="flex items-start gap-2">
-              <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0 text-warn" />
+              <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0 text-amber-500" />
               <div class="min-w-0">
                 <div class="break-words">{{ d.message || d.code }}</div>
                 <div class="text-xs text-slate-500">

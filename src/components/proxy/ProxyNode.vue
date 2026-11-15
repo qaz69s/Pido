@@ -90,7 +90,7 @@ function onSelect() {
       <ProxyIcon v-if="icon" :icon="icon" :size="16" />
       <span class="truncate text-sm font-medium" :title="name">{{ name }}</span>
     </span>
-    <div class="flex items-center justify-between gap-2 text-sm">
+    <div class="flex items-center justify-between gap-2 text-[13px]">
       <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
       <span v-if="!testable" class="shrink-0 px-1 font-semibold tabular-nums" :class="delayClass">
         <span :key="popKey" :class="popping && 'anim-pop'">{{ delayText(delay) }}</span>

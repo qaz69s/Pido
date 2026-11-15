@@ -70,10 +70,10 @@ function answersBrief(list) {
 }
 const STATUS_CLASS = (s) =>
   s === 'NOERROR'
-    ? 'text-good'
+    ? 'text-emerald-600 dark:text-emerald-400'
     : s === 'NXDOMAIN' || s === 'NODATA'
-      ? 'text-ok'
-      : 'text-fail'
+      ? 'text-amber-600 dark:text-amber-400'
+      : 'text-rose-600 dark:text-rose-400'
 
 const recordTypes = computed(() => backend.caps?.resources?.dns_query?.record_types || ['A', 'AAAA', 'HTTPS'])
 const typeFilterOptions = computed(() => [...new Set(['A', 'AAAA', 'CNAME', 'HTTPS', ...recordTypes.value])])
@@ -440,7 +440,7 @@ async function runMihomo(a) {
                 <li v-for="r in rules.data[part.key] || []" :key="r.rule_id" class="flex items-start gap-3 px-4 py-2 text-sm">
                   <span class="w-6 shrink-0 text-right text-xs tabular-nums text-slate-400">{{ r.kind === 'fallback' ? '' : r.index + 1 }}</span>
                   <div class="min-w-0 flex-1">
-                    <div class="break-all font-mono text-sm" :class="r.kind === 'fallback' && 'text-slate-500'">{{ r.expression }}</div>
+                    <div class="break-all font-mono text-[13px]" :class="r.kind === 'fallback' && 'text-slate-500'">{{ r.expression }}</div>
                     <div class="mt-0.5 flex flex-wrap gap-x-2 text-xs text-slate-400">
                       <span>{{ ACTION_LABEL[r.action] || r.action }}<template v-if="r.upstream"> · {{ r.upstream }}</template></span>
                       <span v-if="r.source?.file" class="font-mono">{{ r.source.file }}<template v-if="r.source.line">:{{ r.source.line }}</template></span>

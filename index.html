@@ -27,17 +27,6 @@
           // 配色方案
           document.documentElement.dataset.theme =
             (localStorage.getItem('mihomo-dashboard:preset') || 'default').replace(/^(matcha|jade)$/, 'neutral')
-          // 纯黑（OLED）
-          document.documentElement.dataset.oled = localStorage.getItem('mihomo-dashboard:oled') === 'on' ? 'on' : 'off'
-          // 自定义主色：直接套用上次生成的变量
-          if (document.documentElement.dataset.theme === 'custom') {
-            var cv = JSON.parse(localStorage.getItem('mihomo-dashboard:custom-vars') || 'null')
-            var set = cv && cv[dark ? 'dark' : 'light']
-            if (set) for (var k in set) document.documentElement.style.setProperty(k, set[k])
-          }
-          // 状态栏颜色跟随页面底色
-          var pg = getComputedStyle(document.documentElement).getPropertyValue('--s-page').trim()
-          if (pg) document.querySelector('meta[name="theme-color"]').setAttribute('content', 'rgb(' + pg.split(/\s+/).join(', ') + ')')
           // 动画开关：没设置过时跟随系统「减少动画」
           var motion = localStorage.getItem('mihomo-dashboard:motion')
           document.documentElement.dataset.motion =

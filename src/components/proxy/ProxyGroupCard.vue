@@ -116,7 +116,7 @@ const levelCounts = computed(() => {
       <!-- 延迟胶囊：显示当前节点延迟，点击整组测速（不再单独放闪电按钮，避免和工具栏「全部测速」撞脸） -->
       <span
         v-if="!testable"
-        class="flex shrink-0 items-center rounded-full bg-tile px-2.5 py-1 text-sm font-semibold tabular-nums"
+        class="flex shrink-0 items-center rounded-full bg-tile px-2.5 py-1 text-[13px] font-semibold tabular-nums"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         title="后端自动健康检查的延迟"
       >
@@ -124,7 +124,7 @@ const levelCounts = computed(() => {
       </span>
       <button
         v-else
-        class="flex shrink-0 items-center gap-1 rounded-full bg-tile px-2.5 py-1 text-sm font-semibold tabular-nums transition hover:brightness-110 disabled:opacity-100"
+        class="flex shrink-0 items-center gap-1 rounded-full bg-tile px-2.5 py-1 text-[13px] font-semibold tabular-nums transition hover:brightness-110 disabled:opacity-100"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         :disabled="testing"
         title="整组测速"
@@ -170,7 +170,7 @@ const levelCounts = computed(() => {
         <div class="flex h-1.5 min-w-0 flex-1 gap-[2px] overflow-hidden rounded-full" :class="testing && 'animate-pulse'">
           <span v-for="l in levelCounts" :key="l.key" class="h-full" :class="DELAY_BG_CLASS[l.key]" :style="{ flexGrow: l.count }" />
         </div>
-        <span class="flex shrink-0 gap-2 text-xs text-slate-500">
+        <span class="flex shrink-0 gap-2 text-[11px] text-slate-500">
           <span v-for="l in levelCounts" :key="l.key" class="flex items-center gap-1">
             <span class="h-1.5 w-1.5 rounded-full" :class="DELAY_BG_CLASS[l.key]" />{{ l.count }}
           </span>

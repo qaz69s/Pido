@@ -316,7 +316,7 @@ const STATUS_TEXT = {
         </div>
         <button
           class="btn-icon"
-          :class="paused && 'bg-warn/15 text-warn'"
+          :class="paused && 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-300'"
           :title="paused ? '继续刷新' : '暂停刷新'"
           @click="paused = !paused"
         >
@@ -347,7 +347,7 @@ const STATUS_TEXT = {
     <!-- 状态提示 -->
     <div
       v-if="paused"
-      class="flex items-center gap-2 rounded-xl border border-warn/30 bg-warn/10 p-2.5 text-sm text-warn"
+      class="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-200"
     >
       <Icon name="pause" class="h-4 w-4 shrink-0" />
       已暂停刷新，列表停在暂停时的状态。
@@ -421,7 +421,7 @@ const STATUS_TEXT = {
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.downSpeed > 0 && 'text-brand-600 dark:text-brand-400'">
                 {{ formatSpeed(c.downSpeed) }}
               </td>
-              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.upSpeed > 0 && 'text-accent-600 dark:text-accent-400'">
+              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.upSpeed > 0 && 'text-amber-600 dark:text-amber-400'">
                 {{ formatSpeed(c.upSpeed) }}
               </td>
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ bytes(c.download) }}</td>
@@ -473,7 +473,7 @@ const STATUS_TEXT = {
               <span class="text-slate-400"> · {{ bytes(c.download) }}</span>
             </div>
             <div class="text-right">
-              <span class="text-accent-600 dark:text-accent-400">↑ {{ formatSpeed(c.upSpeed) }}</span>
+              <span class="text-amber-600 dark:text-amber-400">↑ {{ formatSpeed(c.upSpeed) }}</span>
               <span class="text-slate-400"> · {{ bytes(c.upload) }}</span>
             </div>
           </div>

@@ -251,7 +251,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <span class="w-8 shrink-0 text-right text-xs tabular-nums text-slate-400">{{ r.index }}</span>
           <div class="min-w-0 flex-1">
             <div class="flex min-w-0 items-center gap-2">
-              <span class="truncate font-mono text-sm" :title="r.payload">{{ r.payload || '（全部流量）' }}</span>
+              <span class="truncate font-mono text-[13px]" :title="r.payload">{{ r.payload || '（全部流量）' }}</span>
               <span v-if="ruleSize(r) != null" class="shrink-0 text-xs text-slate-400">{{ ruleSize(r) }} 条</span>
             </div>
             <div class="mt-0.5 flex items-center gap-2 sm:hidden">
