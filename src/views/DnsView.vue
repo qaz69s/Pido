@@ -291,7 +291,7 @@ async function runMihomo(a) {
             :key="t.key"
             role="tab"
             class="tab whitespace-nowrap"
-            :class="tab === t.key && 'tab-active font-medium'"
+            :class="tab === t.key && 'tab-active'"
             @click="tab = t.key"
           >
             {{ t.label }}

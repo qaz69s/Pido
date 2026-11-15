@@ -184,11 +184,11 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
               ]"
           :key="t.key"
           role="tab"
-          class="tab min-w-0 shrink truncate whitespace-nowrap"
-          :class="tab === t.key && 'tab-active font-medium'"
+          class="tab min-w-0 shrink whitespace-nowrap"
+          :class="tab === t.key && 'tab-active'"
           @click="tab = t.key"
         >
-          {{ t.label }} <span class="tab-count w4 text-xs opacity-60">{{ t.count }}</span>
+          <span class="min-w-0 truncate">{{ t.label }}</span><span class="tab-count w4 shrink-0 text-xs opacity-70">{{ t.count }}</span>
         </button>
       </div>
 

@@ -68,7 +68,7 @@
     @apply border border-line bg-base-200;
   }
   .tabs-boxed .tab {
-    @apply font-semibold text-muted;
+    @apply flex-nowrap whitespace-nowrap font-semibold text-muted;
   }
   .tabs-boxed .tab-active:not(.tab-disabled):not([disabled]),
   .tabs-boxed :is(input:checked) {
@@ -127,6 +127,8 @@
 }
 .tb-tabs > .tab {
   padding: 0 10px;
+  /* daisyUI 的 .tab 默认 flex-wrap: wrap，空间紧时数量会掉到第二行、被截掉；这里强制单行 */
+  flex-wrap: nowrap;
 }
 /* 标签上的数量：预留固定宽度，数字从 0 变成多位数时按钮不变宽、相邻标签不跳动 */
 .tab-count {
