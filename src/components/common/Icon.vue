@@ -5,6 +5,8 @@
  */
 const props = defineProps({
   name: { type: String, required: true },
+  // 实心态：线条加粗 + 闭合区域填充淡色（底部导航选中项用）
+  solid: { type: Boolean, default: false },
 })
 
 const PATHS = {
@@ -67,9 +69,10 @@ const PATHS = {
 <template>
   <svg
     viewBox="0 0 24 24"
-    fill="none"
+    :fill="props.solid ? 'currentColor' : 'none'"
+    :fill-opacity="props.solid ? 0.22 : undefined"
     stroke="currentColor"
-    stroke-width="2"
+    :stroke-width="props.solid ? 2.25 : 2"
     stroke-linecap="round"
     stroke-linejoin="round"
     aria-hidden="true"

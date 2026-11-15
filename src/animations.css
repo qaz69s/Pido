@@ -114,9 +114,9 @@
 
 /* ---------- 连接状态：绿点呼吸，异常时抖一下 ---------- */
 @keyframes breathe {
-  0% { box-shadow: 0 0 0 0 rgb(16 185 129 / 0.55); }
-  70% { box-shadow: 0 0 0 5px rgb(16 185 129 / 0); }
-  100% { box-shadow: 0 0 0 0 rgb(16 185 129 / 0); }
+  0% { box-shadow: 0 0 0 0 rgb(var(--st-good, 16 185 129) / 0.55); }
+  70% { box-shadow: 0 0 0 5px rgb(var(--st-good, 16 185 129) / 0); }
+  100% { box-shadow: 0 0 0 0 rgb(var(--st-good, 16 185 129) / 0); }
 }
 .anim-breathe {
   animation: breathe 2.4s ease-out infinite;
@@ -142,6 +142,10 @@
 .skeleton {
   position: relative;
   overflow: hidden;
+  background-color: rgb(var(--s-tile) / 0.7);
+}
+.card.skeleton {
+  background-color: rgb(var(--s-card));
 }
 .skeleton::after {
   content: '';

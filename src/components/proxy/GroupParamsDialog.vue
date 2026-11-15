@@ -187,7 +187,7 @@ async function save() {
       <div
         v-if="error"
         class="flex items-start gap-2 rounded-lg px-3 py-2 text-sm"
-        :class="stale ? 'bg-amber-50 text-amber-900 dark:bg-amber-950/50 dark:text-amber-200' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'"
+        :class="stale ? 'bg-warn/10 text-warn' : 'bg-rose-50 text-rose-700 dark:bg-rose-950/50 dark:text-rose-300'"
       >
         <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
         <span class="min-w-0 flex-1">{{ error }}</span>

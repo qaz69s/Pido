@@ -18,10 +18,12 @@ import { useThemeStore } from '@/stores/theme'
 const props = defineProps({
   up: { type: Array, required: true }, // 上传速率序列（字节/秒），旧 → 新；null = 还没有数据
   down: { type: Array, required: true }, // 下载速率序列
-  height: { type: Number, default: 220 },
+  height: { type: Number, default: 220 }, // 0 = 由外部 CSS 决定高度
   // 不传时取主题变量：上传 = accent-500，下载 = brand-500（见 src/themes.css）
   upColor: { type: String, default: '' },
   downColor: { type: String, default: '' },
+  // 背景模式：不画坐标轴、刻度和网格，曲线铺满容器（概览页大卡片的背景）
+  bare: { type: Boolean, default: false },
 })
 
 const wrap = ref(null)
@@ -39,7 +41,9 @@ let shiftStart = 0 // 最近一次新数据到来的时间
 const SHIFT_MS = 1000 // 平移时长，与 /traffic 推送间隔一致
 let lead = [null, null] // 上一帧最左边被挤出去的点（上传、下载），平移时补在左侧，避免左边露出空隙
 
-const PAD = { right: 8, top: 10, bottom: 22 }
+const FULL_PAD = { right: 8, top: 10, bottom: 22 }
+const BARE_PAD = { right: 0, top: 8, bottom: 0 }
+let PAD = FULL_PAD
 let padLeft = 64 // 左边距按 Y 轴刻度文字宽度动态计算，防止长刻度被裁切
 const GRID_LINES = 2
 let hoverX = -1 // 悬停 / 按住的位置（CSS 像素），-1 表示不显示提示
@@ -186,6 +190,9 @@ function draw() {
   const valid = [...props.up, ...props.down].filter((v) => v != null)
   const max = niceMax(Math.max(0, ...valid) * 1.1)
 
+  PAD = props.bare ? BARE_PAD : FULL_PAD
+  if (props.bare) return drawBare(max)
+
   // 先算出所有刻度文字，按最宽的那个确定左边距
   ctx.font = '11px ui-sans-serif, system-ui, sans-serif'
   const labels = Array.from({ length: GRID_LINES + 1 }, (_, i) =>
@@ -239,6 +246,26 @@ function draw() {
   ctx.restore()
 
   drawTooltip({ max, plotW, plotH, upColor, downColor, textColor })
+}
+
+/** 背景模式：只画两条曲线，不画坐标轴与提示 */
+function drawBare(max) {
+  padLeft = 0
+  const plotW = cw
+  const plotH = ch - PAD.top
+  const downColor = props.downColor || themeColor('--b-500', '#6366f1')
+  const upColor = props.upColor || themeColor('--a-500', '#f59e0b')
+  const animate = motionEnabled()
+  const now = performance.now()
+  const offset = animate ? Math.max(0, 1 - (now - shiftStart) / SHIFT_MS) : 0
+  const pulse = animate ? (now % 1600) / 1600 : -1
+  ctx.save()
+  ctx.beginPath()
+  ctx.rect(0, 0, cw, ch)
+  ctx.clip()
+  drawSeries(props.down, downColor, max, plotW, plotH, offset, pulse >= 0 ? pulse : -1, lead[1])
+  drawSeries(props.up, upColor, max, plotW, plotH, offset, pulse >= 0 ? pulse : -1, lead[0])
+  ctx.restore()
 }
 
 /** 悬停 / 按住时：竖线 + 两个圆点 + 数值气泡 */
@@ -339,7 +366,7 @@ watch(
   },
 )
 // 深浅色或主题配色变化时重绘
-watch(() => [theme.isDark, theme.preset], () => nextTick(scheduleDraw))
+watch(() => [theme.isDark, theme.preset, theme.oled, theme.customColor], () => nextTick(scheduleDraw))
 
 onMounted(() => {
   ctx = canvas.value.getContext('2d')
@@ -367,12 +394,12 @@ onBeforeUnmount(() => {
   <div
     ref="wrap"
     class="relative w-full touch-pan-y select-none text-slate-500 dark:text-slate-400"
-    :style="{ height: `${props.height}px` }"
-    @pointerdown="onPointer"
-    @pointermove="onPointer"
-    @pointerup="onPointerEnd"
-    @pointercancel="onPointerEnd"
-    @pointerleave="onPointerEnd"
+    :style="props.height ? { height: `${props.height}px` } : null"
+    @pointerdown="!props.bare && onPointer($event)"
+    @pointermove="!props.bare && onPointer($event)"
+    @pointerup="!props.bare && onPointerEnd($event)"
+    @pointercancel="!props.bare && onPointerEnd($event)"
+    @pointerleave="!props.bare && onPointerEnd($event)"
   >
     <canvas ref="canvas" class="absolute inset-0 h-full w-full" />
   </div>

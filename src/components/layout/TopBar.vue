@@ -31,16 +31,16 @@ const statusInfo = computed(() => {
   switch (backend.status) {
     case 'ok':
       return {
-        dot: 'bg-emerald-500 anim-breathe',
+        dot: 'bg-good anim-breathe',
         text: backend.version?.version || '已连接',
         logo: CORE_LOGOS[backend.engine] || '',
         engine: CORE_NAMES[backend.engine] || backend.engine,
       }
     case 'checking':
     case 'unknown':
-      return { dot: 'bg-amber-400 animate-pulse', text: '检测中' }
+      return { dot: 'bg-warn animate-pulse', text: '检测中' }
     case 'error':
-      return { dot: 'bg-rose-500', text: '连接异常' }
+      return { dot: 'bg-fail', text: '连接异常' }
     default:
       return { dot: 'bg-slate-400', text: '未配置' }
   }

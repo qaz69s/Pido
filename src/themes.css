@@ -329,9 +329,9 @@ body {
   --txb-500: 133 144 248;
   --txb-600: 110 115 243;
   --txb-700: 67 56 202;
-  --s-page: 2 6 23;
-  --s-card: 21 30 49;
-  --s-tile: 36 48 67;
+  --s-page: 13 19 33;
+  --s-card: 22 30 46;
+  --s-tile: 34 45 64;
 }
 [data-theme='nord'] {
   --tx-400: 99 111 133;
@@ -463,3 +463,136 @@ body {
   --s-card: 34 31 30;
   --s-tile: 52 48 46;
 }
+
+/* ===== 状态色（延迟好/中/慢/失败、警告）：每套主题各自定义，和配色协调 =====
+ * --st-*：填充色（圆点、分段条、横幅底色）  --stt-*：文字色（浅/深色分别保证可读） */
+:root, [data-theme='default'], [data-theme='custom'] {
+  --st-good: 16 185 129;
+  --stt-good: 4 120 87;
+  --st-ok: 245 158 11;
+  --stt-ok: 180 83 9;
+  --st-slow: 249 115 22;
+  --stt-slow: 194 65 12;
+  --st-fail: 244 63 94;
+  --stt-fail: 225 29 72;
+  --st-warn: 245 158 11;
+  --stt-warn: 146 64 14;
+}
+.dark, .dark[data-theme='default'], .dark[data-theme='custom'] {
+  --stt-good: 52 211 153;
+  --stt-ok: 251 191 36;
+  --stt-slow: 251 146 60;
+  --stt-fail: 251 113 133;
+  --stt-warn: 252 211 77;
+}
+[data-theme='nord'] {
+  --st-good: 163 190 140;
+  --stt-good: 82 116 62;
+  --st-ok: 235 203 139;
+  --stt-ok: 140 102 30;
+  --st-slow: 208 135 112;
+  --stt-slow: 160 82 58;
+  --st-fail: 191 97 106;
+  --stt-fail: 160 60 70;
+  --st-warn: 235 203 139;
+  --stt-warn: 122 88 26;
+}
+.dark[data-theme='nord'] {
+  --stt-good: 180 205 160;
+  --stt-ok: 235 203 139;
+  --stt-slow: 222 160 140;
+  --stt-fail: 220 132 140;
+  --stt-warn: 235 203 139;
+}
+[data-theme='neutral'] {
+  --st-good: 34 197 94;
+  --stt-good: 21 128 61;
+  --st-ok: 234 179 8;
+  --stt-ok: 161 98 7;
+  --st-slow: 249 115 22;
+  --stt-slow: 194 65 12;
+  --st-fail: 239 68 68;
+  --stt-fail: 185 28 28;
+  --st-warn: 234 179 8;
+  --stt-warn: 133 77 14;
+}
+.dark[data-theme='neutral'] {
+  --stt-good: 74 222 128;
+  --stt-ok: 250 204 21;
+  --stt-slow: 251 146 60;
+  --stt-fail: 248 113 113;
+  --stt-warn: 250 204 21;
+}
+[data-theme='sakura'] {
+  --st-good: 94 196 150;
+  --stt-good: 28 120 84;
+  --st-ok: 240 182 80;
+  --stt-ok: 156 96 18;
+  --st-slow: 240 132 104;
+  --stt-slow: 180 76 52;
+  --st-fail: 225 70 110;
+  --stt-fail: 185 28 72;
+  --st-warn: 240 182 80;
+  --stt-warn: 140 84 14;
+}
+.dark[data-theme='sakura'] {
+  --stt-good: 134 220 180;
+  --stt-ok: 248 205 130;
+  --stt-slow: 250 165 140;
+  --stt-fail: 245 130 160;
+  --stt-warn: 248 205 130;
+}
+[data-theme='cyber'] {
+  --st-good: 34 211 238;
+  --stt-good: 14 116 144;
+  --st-ok: 250 204 21;
+  --stt-ok: 133 100 4;
+  --st-slow: 251 146 60;
+  --stt-slow: 194 65 12;
+  --st-fail: 255 46 151;
+  --stt-fail: 190 18 100;
+  --st-warn: 250 204 21;
+  --stt-warn: 113 85 4;
+}
+.dark[data-theme='cyber'] {
+  --stt-good: 103 232 249;
+  --stt-ok: 253 224 71;
+  --stt-slow: 253 186 116;
+  --stt-fail: 255 120 190;
+  --stt-warn: 253 224 71;
+}
+[data-theme='sunset'] {
+  --st-good: 132 170 90;
+  --stt-good: 70 104 36;
+  --st-ok: 234 179 8;
+  --stt-ok: 150 92 6;
+  --st-slow: 217 119 6;
+  --stt-slow: 170 75 8;
+  --st-fail: 220 38 38;
+  --stt-fail: 185 28 28;
+  --st-warn: 234 179 8;
+  --stt-warn: 133 77 14;
+}
+.dark[data-theme='sunset'] {
+  --stt-good: 164 204 116;
+  --stt-ok: 250 204 21;
+  --stt-slow: 251 158 70;
+  --stt-fail: 248 113 113;
+  --stt-warn: 250 204 21;
+}
+
+/* ===== 深色卡片：细边 + 顶部微光区分层次（不靠亮色底） ===== */
+.dark .card {
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.045);
+}
+
+/* ===== 纯黑（OLED 省电）：仅深色下生效，放在最后以覆盖各主题的深色底 ===== */
+.dark[data-oled='on'] {
+  --s-page: 0 0 0;
+  --s-card: 14 14 16;
+  --s-tile: 28 28 31;
+}
+.dark[data-oled='on'] body {
+  background-image: none;
+}
+

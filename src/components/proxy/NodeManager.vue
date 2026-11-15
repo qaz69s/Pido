@@ -181,7 +181,7 @@ const title = computed(() => {
           id="node-link"
           v-model="form.link"
           rows="3"
-          class="input resize-none break-all font-mono text-[13px] leading-5"
+          class="input resize-none break-all font-mono text-sm leading-5"
           :placeholder="editing ? '留空表示不修改链接（后端不回显原链接）' : 'vless://… 、vmess://… 、trojan://… 、ss://… 、hysteria2://…'"
           spellcheck="false"
           autocomplete="off"
@@ -219,7 +219,7 @@ const title = computed(() => {
             <div class="truncate text-sm font-medium" :title="n.name">{{ n.name }}</div>
             <div class="text-xs text-slate-500">{{ n.type || '--' }}</div>
           </div>
-          <span class="shrink-0 text-[13px] font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(delays[n.name])]">
+          <span class="shrink-0 text-sm font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(delays[n.name])]">
             {{ delayText(delays[n.name]) }}
           </span>
           <template v-if="editable">

@@ -21,8 +21,9 @@
 
 /* ---------- 可复用组件类 ---------- */
 @layer components {
+  /* 卡片只用一种分隔方式：浅色靠细边框，深色靠细边 + 顶部微光（themes.css），都不加投影 */
   .card {
-    @apply rounded-2xl border border-slate-200/80 bg-surface shadow-[0_1px_3px_rgb(0_0_0/0.06),0_1px_2px_rgb(0_0_0/0.04)] dark:border-white/[0.06] dark:shadow-none;
+    @apply rounded-2xl border border-slate-200/80 bg-surface dark:border-white/[0.06];
   }
   .btn {
     @apply inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;

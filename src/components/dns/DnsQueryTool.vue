@@ -75,10 +75,10 @@ async function run() {
 
 const STATUS_CLASS = (s) =>
   s === 'NOERROR'
-    ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/50 dark:text-emerald-300'
+    ? 'bg-good/15 text-good'
     : s === 'NXDOMAIN' || s === 'NODATA'
-      ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/50 dark:text-amber-300'
-      : 'bg-rose-100 text-rose-700 dark:bg-rose-900/50 dark:text-rose-300'
+      ? 'bg-ok/15 text-ok'
+      : 'bg-fail/15 text-fail'
 </script>
 
 <template>

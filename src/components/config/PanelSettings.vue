@@ -11,7 +11,9 @@ import { useConfirmStore } from '@/stores/confirm'
 import Icon from '@/components/common/Icon.vue'
 import Switch from '@/components/common/Switch.vue'
 import SettingRow from '@/components/common/SettingRow.vue'
+import { computed } from 'vue'
 import { THEME_PRESETS } from '@/utils/themes'
+import { buildCustomVars } from '@/utils/oklch'
 
 const router = useRouter()
 const backend = useBackendStore()
@@ -24,6 +26,12 @@ const THEMES = [
   { value: 'light', label: '浅色', icon: 'sun' },
   { value: 'dark', label: '深色', icon: 'moon' },
 ]
+
+/** 自定义配色的色块预览：取生成色阶中的 200 / 400 / 600 / 800 */
+const customPreview = computed(() => {
+  const v = buildCustomVars(theme.customColor)?.light
+  return v ? [200, 400, 600, 800].map((k) => `rgb(${v[`--b-${k}`]})`) : [theme.customColor]
+})
 
 async function disconnect() {
   const ok = await confirm.ask({
@@ -59,7 +67,7 @@ async function disconnect() {
     <!-- 配色方案：色块预览 + 名称，点击立即生效 -->
     <div class="px-4 py-3">
       <div class="mb-2 text-sm font-medium">配色</div>
-      <div class="grid grid-cols-3 gap-2 sm:grid-cols-6">
+      <div class="grid grid-cols-4 gap-2 sm:grid-cols-7">
         <button
           v-for="p in THEME_PRESETS"
           :key="p.id"
@@ -79,8 +87,37 @@ async function disconnect() {
           </div>
           <div class="mt-1.5 text-xs font-medium">{{ p.name }}</div>
         </button>
+        <!-- 自定义主色：取色器选一个颜色，OKLCH 自动生成整套色阶 -->
+        <label
+          class="group relative cursor-pointer rounded-xl border p-2 text-left transition"
+          :class="
+            theme.preset === 'custom'
+              ? 'border-brand-500 ring-2 ring-brand-500/25'
+              : 'border-slate-200 hover:border-slate-300 dark:border-slate-800 dark:hover:border-slate-700'
+          "
+          title="选一个颜色，自动生成整套主色色阶"
+          @click="theme.preset !== 'custom' && theme.setPreset('custom', $event)"
+        >
+          <div class="flex h-7 overflow-hidden rounded-md">
+            <span v-for="(c, i) in customPreview" :key="i" class="flex-1" :style="{ background: c }" />
+          </div>
+          <div class="mt-1.5 flex items-center gap-1 text-xs font-medium">
+            自定义
+            <span class="h-2.5 w-2.5 rounded-full border border-slate-300 dark:border-slate-600" :style="{ background: theme.customColor }" />
+          </div>
+          <input
+            type="color"
+            class="absolute inset-0 h-full w-full cursor-pointer opacity-0"
+            :value="theme.customColor"
+            aria-label="自定义主色"
+            @input="theme.setCustomColor($event.target.value)"
+          />
+        </label>
       </div>
     </div>
+    <SettingRow title="纯黑深色" description="深色模式下使用纯黑底色，OLED 屏幕更省电">
+      <Switch :model-value="theme.oled" @update:model-value="theme.setOled" />
+    </SettingRow>
     <SettingRow title="动画效果" description="页面切换、展开、数字滚动等动画；系统开了「减少动画」时默认关闭">
       <Switch :model-value="motion.enabled" @update:model-value="motion.setEnabled" />
     </SettingRow>

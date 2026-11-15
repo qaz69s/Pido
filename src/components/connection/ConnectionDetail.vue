@@ -108,7 +108,7 @@ const metaRows = computed(() => {
       <dl class="divide-y divide-slate-100 text-sm dark:divide-slate-800">
         <div v-for="r in metaRows" :key="r.key" class="flex gap-3 py-1.5">
           <dt class="w-24 shrink-0 text-slate-500">{{ r.label }}</dt>
-          <dd class="min-w-0 flex-1 break-all font-mono text-[13px]">{{ r.value }}</dd>
+          <dd class="min-w-0 flex-1 break-all font-mono text-sm">{{ r.value }}</dd>
         </div>
       </dl>
     </template>

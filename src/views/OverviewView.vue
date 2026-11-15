@@ -8,7 +8,8 @@
  * dae / honk（标准 API）：数据流由 ws.js 转为轮询 /runtime、/runtime/memory、/connections，
  *   运行信息改读 GET /api/v1/runtime（运行时长、数据面、配置代次、上次重载）
  * 本页在 App.vue 中被 KeepAlive 缓存，切走再回来曲线不会清空
- * 指标数字用 useTween 平滑滚动到新值，卡片首次进入依次浮现
+ * 顶部主卡片：上传 / 下载速率用大号数字，流量曲线作为卡片背景；连接、内存、总流量缩成一行小标签
+ * 指标数字用 useTween 平滑滚动到新值；首次加载显示骨架屏
  */
 import { computed, reactive, ref, onMounted, onActivated } from 'vue'
 import { useStream } from '@/composables/useStream'
@@ -23,6 +24,10 @@ import { useTween } from '@/composables/useTween'
 const MAX_POINTS = 60
 const backend = useBackendStore()
 
+/* ---------- 首次加载：还没收到任何实时数据时显示骨架屏 ---------- */
+const gotTraffic = ref(false)
+const gotConn = ref(false)
+
 /* ---------- 实时流量 ---------- */
 const speed = reactive({ up: 0, down: 0 })
 // 还没收到数据的位置用 null 占位，曲线不画这一段（打开页面时从右侧“长”出来，而不是一长段 0）
@@ -31,6 +36,7 @@ const downHistory = ref(Array(MAX_POINTS).fill(null))
 
 const traffic = useStream('/traffic', {
   onMessage(d) {
+    gotTraffic.value = true
     speed.up = d.up ?? 0
     speed.down = d.down ?? 0
     // 每次生成新数组，触发图表重绘
@@ -53,6 +59,7 @@ const connStream = useStream('/connections', {
   query: { interval: 2000 }, // 每 2 秒推送一次快照，概览页不需要更频繁
   onMessage(d) {
     // 标准 API 的快照带 total（列表可能被 limit 截断）；mihomo 没有 total，按列表长度
+    gotConn.value = true
     conn.count = d.total ?? d.connections?.length ?? 0
     conn.uploadTotal = d.uploadTotal ?? 0
     conn.downloadTotal = d.downloadTotal ?? 0
@@ -68,11 +75,13 @@ const streamError = computed(() =>
 const configs = ref(null)
 /** 标准 API 的运行时汇总 */
 const runtime = ref(null)
+const infoFailed = ref(false)
 async function loadConfigs() {
   try {
     if (backend.isStandard) runtime.value = await getRuntime()
     else configs.value = await getConfigs()
   } catch {
+    infoFailed.value = true
     /* 连接异常由顶部 ErrorBanner 统一提示 */
   }
 }
@@ -94,21 +103,26 @@ const showMemory = computed(
   () => !backend.isStandard || (memoryStream.status.value !== 'unsupported' && backend.supports('runtime_memory')),
 )
 
-/** 指标图标的圆形淡底配色（主题变量驱动） */
-const UP_COLOR = 'text-accent-600 dark:text-accent-400 bg-accent-500/[0.14]'
-const DOWN_COLOR = 'text-brand-600 dark:text-brand-400 bg-brand-500/[0.14]'
-const NEUTRAL_COLOR = 'text-slate-600 dark:text-slate-300 bg-slate-500/[0.14]'
-
-const allStats = computed(() => [
-  // 配色跟随主题：上传 = accent（强调色），下载 = brand（主色），内存 / 连接 = 中性色；与下方流量曲线一致
-  { label: '上传速率', value: formatSpeed(tUp.value), icon: 'circleUp', color: UP_COLOR },
-  { label: '下载速率', value: formatSpeed(tDown.value), icon: 'circleDown', color: DOWN_COLOR },
-  { label: '上传总量', value: formatBytes(tUpTotal.value), icon: 'cloudUp', color: UP_COLOR },
-  { label: '下载总量', value: formatBytes(tDownTotal.value), icon: 'cloudDown', color: DOWN_COLOR },
-  { label: '内存占用', value: formatBytes(tMemory.value), icon: 'cpu', color: NEUTRAL_COLOR },
-  { label: '活动连接', value: String(Math.round(tCount.value)), icon: 'network', color: NEUTRAL_COLOR },
+/** 主卡片的两个大数字：上传 = accent（强调色），下载 = brand（主色），与背景曲线一致 */
+const rates = computed(() => [
+  { label: '下载', value: formatSpeed(tDown.value), icon: 'arrowDown', dot: 'bg-brand-500', text: 'text-slate-900 dark:text-white' },
+  { label: '上传', value: formatSpeed(tUp.value), icon: 'arrowUp', dot: 'bg-accent-500', text: 'text-slate-900 dark:text-white' },
 ])
-const stats = computed(() => (showMemory.value ? allStats.value : allStats.value.filter((s) => s.icon !== 'cpu')))
+
+/** 次要指标：缩成一行小标签 */
+const tags = computed(() => {
+  const list = [
+    { label: '连接', value: String(Math.round(tCount.value)), icon: 'network' },
+    { label: '内存', value: formatBytes(tMemory.value), icon: 'cpu', hide: !showMemory.value },
+    { label: '↓ 总量', value: formatBytes(tDownTotal.value), icon: 'cloudDown' },
+    { label: '↑ 总量', value: formatBytes(tUpTotal.value), icon: 'cloudUp' },
+  ]
+  return list.filter((t) => !t.hide)
+})
+
+const trafficReady = computed(() => gotTraffic.value || ['error', 'unsupported'].includes(traffic.status.value))
+const connReady = computed(() => gotConn.value || ['error', 'unsupported'].includes(connStream.status.value))
+const infoReady = computed(() => !!(backend.isStandard ? runtime.value : configs.value) || infoFailed.value)
 
 const DATAPATH_STATE = { active: '运行中', degraded: '降级', inactive: '未启用', starting: '启动中', stopped: '已停止', failed: '失败' }
 const RELOAD_STATUS = { succeeded: '成功', failed: '失败', running: '进行中', queued: '排队中' }
@@ -150,48 +164,74 @@ const infoRows = computed(() => {
   <div class="space-y-3">
     <div
       v-if="streamError && backend.status !== 'error'"
-      class="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-200"
+      class="flex items-center gap-2 rounded-xl border border-warn/30 bg-warn/10 p-3 text-sm text-warn"
     >
       <Icon name="alert" class="h-4 w-4 shrink-0" />
       实时数据连接失败，正在自动重试。若持续出现，请检查 secret 或网络。
     </div>
 
-    <!-- 指标卡片（排版同 v0.3；桌面 1280 左右用 3 列，超宽屏 2xl 才排成一行，避免数值被截断） -->
-    <div class="stagger grid grid-cols-2 gap-3 sm:grid-cols-3" :class="stats.length === 5 ? '2xl:grid-cols-5' : '2xl:grid-cols-6'">
-      <div v-for="s in stats" :key="s.label" class="card flex items-center gap-3 p-3">
-        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full" :class="s.color">
-          <Icon :name="s.icon" class="h-5 w-5" />
-        </span>
-        <div class="min-w-0">
-          <div class="text-xs text-slate-500">{{ s.label }}</div>
-          <div class="truncate text-[17px] font-semibold tabular-nums">{{ s.value }}</div>
-        </div>
-      </div>
-    </div>
-
     <div class="stagger grid gap-3 lg:grid-cols-3">
-      <!-- 流量曲线 -->
-      <section class="card p-4 lg:col-span-2">
-        <div class="mb-3 flex items-center justify-between">
-          <h2 class="font-semibold">实时流量</h2>
-          <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-accent-500" />上传</span>
-            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-brand-500" />下载</span>
+      <!-- 主卡片：上下行速率是页面主角，流量曲线铺在卡片背景里 -->
+      <section class="card relative isolate overflow-hidden lg:col-span-2">
+        <TrafficChart
+          :up="upHistory"
+          :down="downHistory"
+          :height="0"
+          bare
+          class="!absolute inset-x-0 bottom-0 -z-10 h-[62%] opacity-80"
+        />
+        <div class="flex min-h-[220px] flex-col p-4 sm:min-h-[260px] sm:p-5">
+          <div class="flex items-center justify-between">
+            <h2 class="font-semibold">实时流量</h2>
+          </div>
+
+          <div class="mt-3 grid grid-cols-2 gap-3 sm:gap-6">
+            <div v-for="r in rates" :key="r.label" class="min-w-0">
+              <div class="flex items-center gap-1.5 text-xs text-slate-500">
+                <i class="h-2 w-2 rounded-full" :class="r.dot" />{{ r.label }}
+              </div>
+              <div v-if="trafficReady" class="mt-1 truncate text-[28px] font-semibold leading-tight tracking-tight tabular-nums sm:text-display" :class="r.text">
+                {{ r.value }}
+              </div>
+              <div v-else class="skeleton mt-2 h-8 w-32 rounded-lg" />
+            </div>
+          </div>
+
+          <!-- 次要指标：一行小标签 -->
+          <div class="mt-auto flex flex-wrap gap-1.5 pt-6">
+            <template v-if="connReady">
+              <span
+                v-for="t in tags"
+                :key="t.label"
+                class="inline-flex items-center gap-1.5 rounded-full border border-slate-200/70 bg-surface/80 px-2.5 py-1 text-xs backdrop-blur dark:border-white/[0.08]"
+              >
+                <Icon :name="t.icon" class="h-3.5 w-3.5 text-slate-400" />
+                <span class="text-slate-500">{{ t.label }}</span>
+                <span class="font-semibold tabular-nums">{{ t.value }}</span>
+              </span>
+            </template>
+            <template v-else>
+              <span v-for="i in 4" :key="i" class="skeleton h-6 w-24 rounded-full" />
+            </template>
           </div>
         </div>
-        <!-- 上传 = 主题强调色，下载 = 主题主色，与上方卡片一致 -->
-        <TrafficChart :up="upHistory" :down="downHistory" :height="240" />
       </section>
 
       <!-- 运行信息 -->
       <section class="card p-4">
         <h2 class="mb-3 font-semibold">运行信息</h2>
-        <dl class="divide-y divide-slate-100 text-sm dark:divide-slate-800">
+        <dl v-if="infoReady" class="divide-y divide-slate-100 text-sm dark:divide-slate-800">
           <div v-for="row in infoRows" :key="row.label" class="flex justify-between py-2.5">
             <dt class="text-slate-500">{{ row.label }}</dt>
             <dd class="font-medium tabular-nums">{{ row.value }}</dd>
           </div>
         </dl>
+        <div v-else class="space-y-3 py-1">
+          <div v-for="i in 5" :key="i" class="flex justify-between">
+            <span class="skeleton h-4 w-16 rounded" />
+            <span class="skeleton h-4 w-24 rounded" />
+          </div>
+        </div>
       </section>
     </div>
   </div>
