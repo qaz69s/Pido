@@ -1,16 +1,278 @@
 /**
- * 主题配色列表
- * - id 对应 src/themes.css 中的 [data-theme='id']
- * - swatch：设置页色块预览用（中性色、主色、强调色）
+ * 主题配色（daisyUI）
+ * - 每套配色各有浅色、深色两个 daisyUI 主题：`${id}-light` / `${id}-dark`，由 tailwind.config.js 注册
+ * - stores/theme.js 把 <html data-theme> 设为当前配色 + 外观，例如 data-theme="nord-dark"
+ * - 颜色语义：primary 主色（按钮、选中、下载曲线）、accent 强调色（上传曲线）、
+ *   base-100 卡片 / base-200 卡片内小块 / base-300 页面底色、base-content 正文，
+ *   info / success / warning / error 状态色
+ * - 每套主题还带圆角（--rounded-box 卡片与弹窗、--rounded-btn 按钮、--rounded-badge 徽标）与字体（--font-body，可选）
+ * - 本文件只用纯 ESM、不依赖其他模块：tailwind.config.js（Node）与页面代码共用
+ *
+ * 深色主题对比度（相对卡片 base-100）：主色文字 ≥ 6:1、主按钮文字 ≥ 8:1、正文 ≥ 10:1，卡片 / 背景 ≈ 1.32:1
+ * 新增配色：在 DAISY_THEMES 里加 `<id>-light` 与 `<id>-dark` 两项，再在 THEME_PRESETS 里登记 id、名称与地址栏颜色
+ */
+
+/* 状态色：浅色 / 深色各一套，所有配色共用 */
+const STATE_LIGHT = { info: '#0284c7', success: '#059669', warning: '#d97706', error: '#e11d48' }
+const STATE_DARK = { info: '#38bdf8', success: '#34d399', warning: '#fbbf24', error: '#fb7185' }
+/* 按下回弹、输入框聚焦动画与面板动效节奏一致 */
+const MOTION = { '--btn-focus-scale': '0.96', '--animation-btn': '0.18s', '--animation-input': '0.18s' }
+
+/** 各配色的 daisyUI 主题（颜色为 hex，构建时由 daisyUI 转成 oklch 变量） */
+export const DAISY_THEMES = {
+  'default-light': {
+    'color-scheme': 'light',
+    primary: '#4f46e5',
+    'primary-content': '#ffffff',
+    secondary: '#818cf8',
+    accent: '#f59e0b',
+    neutral: '#1e293b',
+    'neutral-content': '#f8fafc',
+    'base-100': '#ffffff',
+    'base-200': '#f4f7fa',
+    'base-300': '#ecf1f6',
+    'base-content': '#1e293b',
+    ...STATE_LIGHT,
+    '--rounded-box': '1rem',
+    '--rounded-btn': '0.5rem',
+    '--rounded-badge': '0.375rem',
+    '--tab-radius': '0.375rem',
+    ...MOTION,
+  },
+  'default-dark': {
+    'color-scheme': 'dark',
+    primary: '#95a2fa',
+    'primary-content': '#080e1f',
+    secondary: '#a5b4fc',
+    accent: '#fbbf24',
+    neutral: '#303748',
+    'neutral-content': '#f8fafc',
+    'base-100': '#21293b',
+    'base-200': '#131a2c',
+    'base-300': '#080e1f',
+    'base-content': '#f8fafc',
+    ...STATE_DARK,
+    '--rounded-box': '1rem',
+    '--rounded-btn': '0.5rem',
+    '--rounded-badge': '0.375rem',
+    '--tab-radius': '0.375rem',
+    ...MOTION,
+  },
+  'nord-light': {
+    'color-scheme': 'light',
+    primary: '#47668d',
+    'primary-content': '#ffffff',
+    secondary: '#6fafc4',
+    accent: '#d9a44a',
+    neutral: '#3b4252',
+    'neutral-content': '#f6f8fb',
+    'base-100': '#ffffff',
+    'base-200': '#f5f7fa',
+    'base-300': '#eef1f6',
+    'base-content': '#3b4252',
+    ...STATE_LIGHT,
+    '--rounded-box': '0.75rem',
+    '--rounded-btn': '0.375rem',
+    '--rounded-badge': '0.2812rem',
+    '--tab-radius': '0.2812rem',
+    ...MOTION,
+  },
+  'nord-dark': {
+    'color-scheme': 'dark',
+    primary: '#9eccda',
+    'primary-content': '#242933',
+    secondary: '#88c0d0',
+    accent: '#e2b866',
+    neutral: '#444955',
+    'neutral-content': '#f6f8fb',
+    'base-100': '#373c49',
+    'base-200': '#2d323d',
+    'base-300': '#242933',
+    'base-content': '#f6f8fb',
+    ...STATE_DARK,
+    '--rounded-box': '0.75rem',
+    '--rounded-btn': '0.375rem',
+    '--rounded-badge': '0.2812rem',
+    '--tab-radius': '0.2812rem',
+    ...MOTION,
+  },
+  'neutral-light': {
+    'color-scheme': 'light',
+    primary: '#262626',
+    'primary-content': '#ffffff',
+    secondary: '#737373',
+    accent: '#737373',
+    neutral: '#333333',
+    'neutral-content': '#fafafa',
+    'base-100': '#ffffff',
+    'base-200': '#f7f7f7',
+    'base-300': '#f0f0f0',
+    'base-content': '#333333',
+    ...STATE_LIGHT,
+    '--rounded-box': '1rem',
+    '--rounded-btn': '0.5rem',
+    '--rounded-badge': '0.375rem',
+    '--tab-radius': '0.375rem',
+    ...MOTION,
+  },
+  'neutral-dark': {
+    'color-scheme': 'dark',
+    primary: '#e5e5e5',
+    'primary-content': '#1a1a1a',
+    secondary: '#d4d4d4',
+    accent: '#a3a3a3',
+    neutral: '#3f3f3f',
+    'neutral-content': '#fafafa',
+    'base-100': '#313131',
+    'base-200': '#242424',
+    'base-300': '#1a1a1a',
+    'base-content': '#fafafa',
+    ...STATE_DARK,
+    '--rounded-box': '1rem',
+    '--rounded-btn': '0.5rem',
+    '--rounded-badge': '0.375rem',
+    '--tab-radius': '0.375rem',
+    ...MOTION,
+  },
+  'sakura-light': {
+    'color-scheme': 'light',
+    primary: '#db2777',
+    'primary-content': '#ffffff',
+    secondary: '#f472b6',
+    accent: '#8b5cf6',
+    neutral: '#3b2c33',
+    'neutral-content': '#fdf8f9',
+    'base-100': '#ffffff',
+    'base-200': '#fcf5f7',
+    'base-300': '#f8eef1',
+    'base-content': '#3b2c33',
+    ...STATE_LIGHT,
+    '--rounded-box': '1.5rem',
+    '--rounded-btn': '0.75rem',
+    '--rounded-badge': '0.5625rem',
+    '--tab-radius': '0.5625rem',
+    ...MOTION,
+  },
+  'sakura-dark': {
+    'color-scheme': 'dark',
+    primary: '#f790c6',
+    'primary-content': '#1a1317',
+    secondary: '#f9a8d4',
+    accent: '#a78bfa',
+    neutral: '#42383c',
+    'neutral-content': '#fdf8f9',
+    'base-100': '#352a2f',
+    'base-200': '#261d22',
+    'base-300': '#1a1317',
+    'base-content': '#fdf8f9',
+    ...STATE_DARK,
+    '--rounded-box': '1.5rem',
+    '--rounded-btn': '0.75rem',
+    '--rounded-badge': '0.5625rem',
+    '--tab-radius': '0.5625rem',
+    ...MOTION,
+  },
+  'cyber-light': {
+    'color-scheme': 'light',
+    primary: '#c026d3',
+    'primary-content': '#ffffff',
+    secondary: '#e879f9',
+    accent: '#06b6d4',
+    neutral: '#27272a',
+    'neutral-content': '#fafafa',
+    'base-100': '#ffffff',
+    'base-200': '#f7f7f8',
+    'base-300': '#f0f0f2',
+    'base-content': '#27272a',
+    ...STATE_LIGHT,
+    '--rounded-box': '0.3rem',
+    '--rounded-btn': '0.15rem',
+    '--rounded-badge': '0.1125rem',
+    '--tab-radius': '0.1125rem',
+    ...MOTION,
+    '--font-body': 'ui-monospace, \'JetBrains Mono\', \'SF Mono\', Menlo, Consolas, \'Roboto Mono\', \'Droid Sans Mono\', \'DejaVu Sans Mono\', var(--font-sans)',
+  },
+  'cyber-dark': {
+    'color-scheme': 'dark',
+    primary: '#e980f9',
+    'primary-content': '#0f0f11',
+    secondary: '#f0abfc',
+    accent: '#22d3ee',
+    neutral: '#373739',
+    'neutral-content': '#fafafa',
+    'base-100': '#29292c',
+    'base-200': '#1b1b1d',
+    'base-300': '#0f0f11',
+    'base-content': '#fafafa',
+    ...STATE_DARK,
+    '--rounded-box': '0.3rem',
+    '--rounded-btn': '0.15rem',
+    '--rounded-badge': '0.1125rem',
+    '--tab-radius': '0.1125rem',
+    ...MOTION,
+    '--font-body': 'ui-monospace, \'JetBrains Mono\', \'SF Mono\', Menlo, Consolas, \'Roboto Mono\', \'Droid Sans Mono\', \'DejaVu Sans Mono\', var(--font-sans)',
+  },
+  'sunset-light': {
+    'color-scheme': 'light',
+    primary: '#b23c0e',
+    'primary-content': '#ffffff',
+    secondary: '#fb923c',
+    accent: '#f43f5e',
+    neutral: '#292524',
+    'neutral-content': '#fafaf9',
+    'base-100': '#ffffff',
+    'base-200': '#f7f7f6',
+    'base-300': '#f1f0ef',
+    'base-content': '#292524',
+    ...STATE_LIGHT,
+    '--rounded-box': '1rem',
+    '--rounded-btn': '0.5rem',
+    '--rounded-badge': '0.375rem',
+    '--tab-radius': '0.375rem',
+    ...MOTION,
+  },
+  'sunset-dark': {
+    'color-scheme': 'dark',
+    primary: '#fb923c',
+    'primary-content': '#100e0d',
+    secondary: '#fdba74',
+    accent: '#fb7185',
+    neutral: '#393736',
+    'neutral-content': '#fafaf9',
+    'base-100': '#2b2928',
+    'base-200': '#1c1a19',
+    'base-300': '#100e0d',
+    'base-content': '#fafaf9',
+    ...STATE_DARK,
+    '--rounded-box': '1rem',
+    '--rounded-btn': '0.5rem',
+    '--rounded-badge': '0.375rem',
+    '--tab-radius': '0.375rem',
+    ...MOTION,
+  },
+}
+
+/**
+ * 配色列表（设置页「配色」）
+ * - swatch：色块预览（深色底、主色、强调色），从对应的 daisyUI 主题取色
  * - meta：浏览器地址栏颜色（浅色 / 深色）
  */
-export const THEME_PRESETS = [
-  { id: 'default', name: '靛夜', desc: '沉稳的靛蓝，默认配色', swatch: ['#0f172a', '#6366f1', '#f59e0b'], meta: ['#f8fafc', '#020617'] },
-  { id: 'nord', name: '北境', desc: 'Nord 冷色调，低饱和护眼', swatch: ['#2e3440', '#5e81ac', '#ebcb8b'], meta: ['#f6f8fb', '#242933'] },
-  { id: 'neutral', name: '素墨', desc: '纯中性灰，黑白极简', swatch: ['#1a1a1a', '#262626', '#e5e5e5'], meta: ['#fafafa', '#1a1a1a'] },
-  { id: 'sakura', name: '樱花', desc: '粉紫渐变，大圆角', swatch: ['#2a1f25', '#ec4899', '#8b5cf6'], meta: ['#fdf8f9', '#1a1317'] },
-  { id: 'cyber', name: '赛博', desc: '霓虹 + 等宽字体，硬朗直角', swatch: ['#18181b', '#d946ef', '#06b6d4'], meta: ['#fafafa', '#09090b'] },
-  { id: 'sunset', name: '暖阳', desc: '温暖的橙与米色', swatch: ['#1c1917', '#f97316', '#f43f5e'], meta: ['#fafaf9', '#0c0a09'] },
+const PRESETS = [
+  { id: 'default', name: '靛夜', desc: '沉稳的靛蓝，默认配色', meta: ['#f8fafc', '#020617'] },
+  { id: 'nord', name: '北境', desc: 'Nord 冷色调，低饱和护眼', meta: ['#f6f8fb', '#242933'] },
+  { id: 'neutral', name: '素墨', desc: '纯中性灰，黑白极简', meta: ['#fafafa', '#1a1a1a'] },
+  { id: 'sakura', name: '樱花', desc: '粉紫渐变，大圆角', meta: ['#fdf8f9', '#1a1317'] },
+  { id: 'cyber', name: '赛博', desc: '霓虹 + 等宽字体，硬朗直角', meta: ['#fafafa', '#09090b'] },
+  { id: 'sunset', name: '暖阳', desc: '温暖的橙与米色', meta: ['#fafaf9', '#0c0a09'] },
 ]
 
+export const THEME_PRESETS = PRESETS.map((p) => {
+  const light = DAISY_THEMES[`${p.id}-light`]
+  const dark = DAISY_THEMES[`${p.id}-dark`]
+  return { ...p, swatch: [dark['base-300'], light.primary, light.accent] }
+})
+
 export const PRESET_IDS = THEME_PRESETS.map((t) => t.id)
+
+/** daisyUI 主题名：配色 + 外观，例如 themeName('nord', true) === 'nord-dark' */
+export const themeName = (preset, dark) => `${preset}-${dark ? 'dark' : 'light'}`

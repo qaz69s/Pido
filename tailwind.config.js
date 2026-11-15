@@ -1,67 +1,19 @@
 /**
- * Tailwind 配置
- * - 颜色全部指向 CSS 变量（定义在 src/themes.css），切换 <html data-theme="..."> 即可换主题
- * - slate 被替换为主题的中性色，这样现有组件无需改动类名
- * - brand：主色；accent：强调色（上传曲线等）
- * - 圆角乘以 --radius-scale，不同主题可以更圆或更方
+ * Tailwind + daisyUI 配置
+ * - 颜色、组件全部使用 daisyUI：主题定义在 src/utils/themes.js（每套配色浅色 / 深色各一个主题，共 12 个）
+ * - 切换 <html data-theme="nord-dark"> 即可换主题（见 stores/theme.js）；dark: 变体跟随以 -dark 结尾的主题
+ * - 圆角跟随主题变量：rounded-lg = 按钮圆角（--rounded-btn），rounded-2xl = 卡片圆角（--rounded-box），其余按比例
  */
-
-/** 生成 50~950 的变量色板，支持 bg-brand-500/20 这类透明度写法 */
-function palette(prefix) {
-  const keys = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
-  return Object.fromEntries(keys.map((k) => [k, `rgb(var(--${prefix}-${k}) / <alpha-value>)`]))
-}
-
-/** 文字专用色板：优先用 --tx-* / --txb-*（对比度修正过），未定义时回退到背景色板 */
-function textPalette(prefix, fallback) {
-  const keys = [50, 100, 200, 300, 400, 500, 600, 700, 800, 900, 950]
-  return Object.fromEntries(
-    keys.map((k) => [k, `rgb(var(--${prefix}-${k}, var(--${fallback}-${k})) / <alpha-value>)`]),
-  )
-}
-
-const r = (rem) => `calc(${rem}rem * var(--radius-scale, 1))`
+import daisyui from 'daisyui'
+import { DAISY_THEMES } from './src/utils/themes.js'
 
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./index.html', './src/**/*.{vue,js}'],
-  // 使用 class 策略：由 stores/theme.js 给 <html> 加/去 .dark
-  darkMode: 'class',
+  // dark: 变体：<html data-theme="*-dark"> 时生效（少量非语义色仍用到，如延迟偏高的橙色）
+  darkMode: ['variant', '&:where([data-theme$="-dark"], [data-theme$="-dark"] *)'],
   theme: {
     extend: {
-      colors: {
-        slate: palette('n'),
-        brand: palette('b'),
-        // 语义状态色（见 style.css 的 --danger / --warn / --ok）：实色、浅底；文字与描边见 textColor / borderColor
-        danger: { DEFAULT: 'rgb(var(--danger) / <alpha-value>)', soft: 'var(--danger-soft)' },
-        warn: { DEFAULT: 'rgb(var(--warn) / <alpha-value>)', soft: 'var(--warn-soft)' },
-        ok: { DEFAULT: 'rgb(var(--ok) / <alpha-value>)', soft: 'var(--ok-soft)' },
-        accent: palette('a'),
-        // 表面层级（见 themes.css 末尾 --s-*）：页面底色 / 卡片 / 卡片内的小块
-        page: 'rgb(var(--s-page) / <alpha-value>)',
-        surface: 'rgb(var(--s-card) / <alpha-value>)',
-        tile: 'rgb(var(--s-tile) / <alpha-value>)',
-        // 浮层：弹窗、选中的分段标签；浅色为白，深色比卡片再亮一级
-        raised: 'rgb(var(--s-raised, 255 255 255) / <alpha-value>)',
-        // 主色背景上的文字色（大多数主题为白色，素墨深色下为深灰）
-        'on-brand': 'rgb(var(--on-b, 255 255 255) / <alpha-value>)',
-      },
-      // 文字颜色单独走对比度修正后的变量（见 src/themes.css 末尾）
-      textColor: {
-        slate: textPalette('tx', 'n'),
-        brand: textPalette('txb', 'b'),
-        danger: 'rgb(var(--danger-tx) / <alpha-value>)',
-        warn: 'rgb(var(--warn-tx) / <alpha-value>)',
-        ok: 'rgb(var(--ok-tx) / <alpha-value>)',
-      },
-      // 线条只有两档：line（分隔、卡片、弹窗）、line-strong（输入框、描边按钮）
-      borderColor: {
-        line: 'var(--line)',
-        'line-strong': 'var(--line-strong)',
-        danger: { DEFAULT: 'rgb(var(--danger) / <alpha-value>)', soft: 'var(--danger-line)' },
-        warn: { DEFAULT: 'rgb(var(--warn) / <alpha-value>)', soft: 'var(--warn-line)' },
-        ok: { DEFAULT: 'rgb(var(--ok) / <alpha-value>)', soft: 'var(--ok-line)' },
-      },
       // 三档浮起：sm 贴面（分段选中块）、DEFAULT/md 浮动（菜单、Toast）、lg/xl 弹层（弹窗）；均为近实 + 远虚两层
       boxShadow: {
         sm: '0 1px 2px rgb(15 23 42 / 0.06), 0 1px 1px rgb(15 23 42 / 0.04)',
@@ -80,14 +32,21 @@ export default {
       // 统一动效：所有 transition 类默认同一条缓动曲线和时长（与 style.css 的 --ease / --dur-* 一致）
       transitionTimingFunction: { DEFAULT: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
       transitionDuration: { DEFAULT: '180ms' },
+      // 圆角跟随 daisyUI 主题变量（各配色更圆或更方）
       borderRadius: {
-        md: r(0.375),
-        lg: r(0.5),
-        xl: r(0.75),
-        '2xl': r(1),
-        '3xl': r(1.5),
+        md: 'calc(var(--rounded-btn, 0.5rem) * 0.75)',
+        lg: 'var(--rounded-btn, 0.5rem)',
+        xl: 'calc(var(--rounded-box, 1rem) * 0.75)',
+        '2xl': 'var(--rounded-box, 1rem)',
+        '3xl': 'calc(var(--rounded-box, 1rem) * 1.5)',
       },
     },
   },
-  plugins: [],
+  plugins: [daisyui],
+  daisyui: {
+    // 第一个主题是 :root 的默认主题；系统深色且尚未写入 data-theme 时用 darkTheme
+    themes: [DAISY_THEMES],
+    darkTheme: 'default-dark',
+    logs: false,
+  },
 }
