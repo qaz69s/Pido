@@ -13,6 +13,7 @@ BEGIN, END = '/* ===== 深色层次（scripts/dark-contrast.py 生成，勿手�
 THEMES = ['default', 'nord', 'neutral', 'sakura', 'cyber', 'sunset']
 PAGE_MIN_L = 0.0045      # 背景最低相对亮度：避免纯黑带来的光晕
 CARD_ON_PAGE = 1.32      # 卡片 / 背景
+RAISED_ON_CARD = 1.22    # 浮层（弹窗、选中的分段标签）/ 卡片：越靠前越亮
 TILE_POS = 0.55          # tile 在 卡片→背景 之间的位置（0 = 卡片，1 = 背景）
 PRIMARY = 15.0           # 主文字 / 卡片（受主题最亮色限制）
 SECONDARY = 7.0          # 说明文字（400）/ 卡片
@@ -48,6 +49,7 @@ for t in THEMES:
     if lum(page) < PAGE_MIN_L: page = scale_to(page, PAGE_MIN_L, toward=card)
     card = scale_to(card, CARD_ON_PAGE * (lum(page) + 0.05) - 0.05, toward=mix(card, (255, 255, 255), 0.5))
     tile = mix(card, page, TILE_POS)
+    raised = scale_to(card, RAISED_ON_CARD * (lum(card) + 0.05) - 0.05, toward=mix(card, (255, 255, 255), 0.5))
     light = d['n-50']
     primary = scale_to(d['n-200'], PRIMARY * (lum(card) + 0.05) - 0.05, toward=light) if cr(light, card) > PRIMARY else light
     def text_at(ratio):  # 在卡片色与最亮色之间取对比度恰为 ratio 的颜色
@@ -57,7 +59,7 @@ for t in THEMES:
     third = text_at(SECONDARY)         # 400：说明文字
     sel = ".dark, .dark[data-theme='default']" if t == 'default' else f".dark[data-theme='{t}']"
     rgb = lambda c: ' '.join(map(str, c))
-    out.append(f"{sel} {{\n  --s-page: {rgb(page)};\n  --s-card: {rgb(card)};\n  --s-tile: {rgb(tile)};\n"
+    out.append(f"{sel} {{\n  --s-page: {rgb(page)};\n  --s-card: {rgb(card)};\n  --s-tile: {rgb(tile)};\n  --s-raised: {rgb(raised)};\n"
                f"  --tx-50: {rgb(light)};\n  --tx-100: {rgb(light)};\n  --tx-200: {rgb(primary)};\n"
                f"  --tx-300: {rgb(second)};\n  --tx-400: {rgb(third)};\n}}"
                f"  /* 主文字 {cr(primary, card):.1f}:1，300 {cr(second, card):.1f}:1，400 {cr(third, card):.1f}:1，"

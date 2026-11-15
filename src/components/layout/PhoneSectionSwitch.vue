@@ -13,13 +13,13 @@ const ITEMS = [
 </script>
 
 <template>
-  <nav class="grid grid-cols-2 gap-0.5 rounded-lg bg-slate-200/70 p-0.5 text-sm md:hidden dark:bg-slate-800" aria-label="规则与 DNS">
+  <nav class="grid grid-cols-2 gap-0.5 rounded-lg bg-slate-200/70 p-0.5 text-sm md:hidden dark:bg-tile" aria-label="规则与 DNS">
     <RouterLink
       v-for="it in ITEMS"
       :key="it.to"
       :to="it.to"
       class="flex items-center justify-center gap-1.5 whitespace-nowrap rounded-md py-1 text-slate-500 transition"
-      active-class="bg-white font-medium !text-slate-800 shadow-sm dark:bg-slate-900 dark:!text-slate-100"
+      active-class="bg-raised font-medium !text-slate-800 shadow-sm dark:!text-slate-100"
     >
       <Icon :name="it.icon" class="h-4 w-4" />
       {{ it.label }}

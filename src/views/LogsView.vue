@@ -126,12 +126,12 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
     <!-- 工具栏 -->
     <div class="flex flex-wrap items-center gap-2">
       <!-- 级别：桌面分段按钮，手机下拉框 -->
-      <div class="hidden rounded-lg bg-slate-200/70 p-0.5 text-sm sm:flex dark:bg-slate-800">
+      <div class="hidden rounded-lg bg-slate-200/70 p-0.5 text-sm sm:flex dark:bg-tile">
         <button
           v-for="l in LEVELS"
           :key="l.value"
           class="rounded-md px-3 py-1 transition"
-          :class="level === l.value ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
+          :class="level === l.value ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
           @click="level = l.value"
         >
           {{ l.label }}

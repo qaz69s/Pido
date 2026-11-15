@@ -39,7 +39,7 @@
     @apply btn bg-brand-600 text-on-brand hover:bg-brand-700 active:bg-brand-800;
   }
   .btn-outline {
-    @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:text-slate-400 disabled:opacity-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:disabled:text-slate-600;
+    @apply btn border border-slate-300 bg-raised text-slate-700 hover:bg-slate-100 disabled:text-slate-400 disabled:opacity-100 dark:border-white/10 dark:text-slate-200 dark:hover:bg-tile dark:disabled:text-slate-600;
   }
   .btn-ghost {
     @apply btn text-slate-600 hover:bg-slate-200/70 disabled:text-slate-400 disabled:opacity-100 disabled:hover:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800 dark:disabled:text-slate-600;
@@ -133,4 +133,50 @@
 .dark[data-theme='nord'] .btn-primary,
 .dark[data-theme='sunset'] .btn-primary {
   background-color: rgb(var(--b-700));
+}
+
+/* ---------- 动效节奏：进入 220ms、退出 160ms，共用一条缓动曲线 ---------- */
+:root {
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --dur-in: 220ms;
+  --dur-out: 160ms;
+}
+
+/* ---------- 键盘焦点：只在键盘操作时出现，点击不显示 ---------- */
+:where(button, a, [role='button'], [tabindex], summary, input, select, textarea):focus-visible {
+  outline: 2px solid rgb(var(--b-500) / 0.7);
+  outline-offset: 2px;
+  border-radius: 0.5rem;
+}
+.input:focus-visible {
+  outline: none; /* 输入框已有自己的聚焦环 */
+}
+
+/* ---------- 桌面端细滚动条，跟随主题色 ---------- */
+@media (hover: hover) and (pointer: fine) {
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: rgb(var(--n-400) / 0.45) transparent;
+  }
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: rgb(var(--n-400) / 0.4);
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background-clip: padding-box;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background-color: rgb(var(--n-400) / 0.7);
+  }
+}
+
+/* ---------- 选中文字跟随主题色 ---------- */
+::selection {
+  background: rgb(var(--b-500) / 0.25);
 }

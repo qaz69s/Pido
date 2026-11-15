@@ -39,7 +39,7 @@ const STYLES = {
 <style scoped>
 .toast-enter-active,
 .toast-leave-active {
-  transition: all 0.2s ease;
+  transition: all var(--dur-in) var(--ease);
 }
 .toast-enter-from,
 .toast-leave-to {

@@ -262,7 +262,7 @@ const STATUS_TEXT = {
 
     <!-- 工具栏：标签与按钮一行不换行；手机上搜索框单独放在下一行 -->
     <div class="flex items-center gap-2">
-      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
+      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
         <button
           v-for="t in [
             { key: 'active', label: '活动', count: active.length },
@@ -270,7 +270,7 @@ const STATUS_TEXT = {
           ]"
           :key="t.key"
           class="truncate whitespace-nowrap rounded-md transition"
-          :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
+          :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
           @click="tab = t.key"
         >
           {{ t.label }} <span class="tab-count text-xs text-slate-400">{{ t.count }}</span>

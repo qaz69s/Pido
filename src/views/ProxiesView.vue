@@ -368,7 +368,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
   <div class="space-y-3">
     <!-- 工具栏：不换行，空间不够时标签先收缩（手机系统字体放大时也保持一行） -->
     <div class="flex items-center gap-2">
-      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
+      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
         <button
           v-for="t in [
             { key: 'groups', label: '代理组', count: groups.length },
@@ -376,7 +376,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           ]"
           :key="t.key"
           class="truncate whitespace-nowrap rounded-md transition"
-          :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
+          :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
           @click="tab = t.key"
         >
           {{ t.label }} <span class="tab-count text-xs text-slate-400">{{ t.count }}</span>

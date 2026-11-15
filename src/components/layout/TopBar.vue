@@ -77,7 +77,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
     <div class="ml-auto flex items-center gap-1">
       <RouterLink
         to="/setup"
-        class="press mr-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-white px-2.5 py-1 text-xs text-slate-600 transition dark:border-slate-700 dark:bg-slate-900 dark:text-slate-300"
+        class="press mr-1 flex items-center gap-1.5 rounded-full border border-slate-200 bg-raised px-2.5 py-1 text-xs text-slate-600 transition dark:border-white/[0.08] dark:text-slate-300"
         :class="backend.status === 'error' && 'anim-shake'"
         :title="statusInfo.engine ? `${statusInfo.engine} ${statusInfo.text} · 后端设置` : '后端设置'"
       >

@@ -5,10 +5,10 @@
 
 /* ---------- 页面切换：淡入 + 轻微上移 ---------- */
 .page-enter-active {
-  transition: opacity 0.22s ease-out, transform 0.22s ease-out;
+  transition: opacity var(--dur-in) var(--ease), transform var(--dur-in) var(--ease);
 }
 .page-leave-active {
-  transition: opacity 0.12s ease-in;
+  transition: opacity var(--dur-out) var(--ease);
 }
 .page-enter-from {
   opacity: 0;
@@ -159,14 +159,14 @@
 
 /* ---------- 连接列表：新连接滑入，关闭的淡出并收起 ---------- */
 .conn-enter-active {
-  transition: opacity 0.25s ease-out, transform 0.25s ease-out;
+  transition: opacity var(--dur-in) var(--ease), transform var(--dur-in) var(--ease);
 }
 .conn-enter-from {
   opacity: 0;
   transform: translateY(-6px);
 }
 .conn-leave-active {
-  transition: opacity 0.22s ease-in, max-height 0.25s ease-in, padding 0.25s ease-in, margin 0.25s ease-in;
+  transition: opacity var(--dur-out) var(--ease), max-height var(--dur-in) var(--ease), padding var(--dur-in) var(--ease), margin var(--dur-in) var(--ease);
   overflow: hidden;
 }
 .conn-leave-from {
@@ -184,7 +184,7 @@ div.conn-leave-to {
   border-width: 0;
 }
 .conn-move {
-  transition: transform 0.3s ease;
+  transition: transform var(--dur-in) var(--ease);
 }
 
 /* ---------- 主题切换：从按钮处圆形扩散（View Transitions API） ---------- */

@@ -285,12 +285,12 @@ async function runMihomo(a) {
     <template v-else>
       <!-- 标签 + 刷新：与代理页工具栏一致，固定像素，字体放大时保持一行 -->
       <div class="flex items-center gap-2">
-        <div class="tb-tabs no-scrollbar flex min-w-0 shrink overflow-x-auto rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
+        <div class="tb-tabs no-scrollbar flex min-w-0 shrink overflow-x-auto rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
           <button
             v-for="t in TABS"
             :key="t.key"
             class="whitespace-nowrap rounded-md transition"
-            :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
+            :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
             @click="tab = t.key"
           >
             {{ t.label }}

@@ -174,7 +174,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
     <!-- 工具栏：固定一行不换行（系统字体放大时标签先截断）；手机端搜索框单独一行 -->
     <div class="flex flex-nowrap items-center gap-2">
-      <div class="tb-tabs flex min-w-0 shrink-0 overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
+      <div class="tb-tabs flex min-w-0 shrink-0 overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
         <button
           v-for="t in backend.isStandard
             ? [{ key: 'rules', label: '规则', count: rules.length }]
@@ -184,7 +184,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
               ]"
           :key="t.key"
           class="min-w-0 shrink truncate whitespace-nowrap rounded-md transition"
-          :class="tab === t.key ? 'bg-white font-medium shadow-sm dark:bg-slate-900' : 'text-slate-500'"
+          :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
           @click="tab = t.key"
         >
           {{ t.label }} <span class="tab-count w4 text-xs text-slate-400">{{ t.count }}</span>

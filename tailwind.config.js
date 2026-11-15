@@ -37,6 +37,8 @@ export default {
         page: 'rgb(var(--s-page) / <alpha-value>)',
         surface: 'rgb(var(--s-card) / <alpha-value>)',
         tile: 'rgb(var(--s-tile) / <alpha-value>)',
+        // 浮层：弹窗、选中的分段标签；浅色为白，深色比卡片再亮一级
+        raised: 'rgb(var(--s-raised, 255 255 255) / <alpha-value>)',
         // 主色背景上的文字色（大多数主题为白色，素墨深色下为深灰）
         'on-brand': 'rgb(var(--on-b, 255 255 255) / <alpha-value>)',
       },
@@ -45,6 +47,9 @@ export default {
         slate: textPalette('tx', 'n'),
         brand: textPalette('txb', 'b'),
       },
+      // 统一动效：所有 transition 类默认同一条缓动曲线和时长（与 style.css 的 --ease / --dur-* 一致）
+      transitionTimingFunction: { DEFAULT: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },
+      transitionDuration: { DEFAULT: '180ms' },
       borderRadius: {
         md: r(0.375),
         lg: r(0.5),

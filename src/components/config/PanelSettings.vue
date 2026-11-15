@@ -48,7 +48,7 @@ async function disconnect() {
           v-for="t in THEMES"
           :key="t.value"
           class="flex items-center gap-1 rounded-md px-2 py-1 transition"
-          :class="theme.mode === t.value ? 'bg-white font-medium shadow-sm dark:bg-tile' : 'text-slate-500'"
+          :class="theme.mode === t.value ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
           @click="theme.setMode(t.value, $event)"
         >
           <Icon :name="t.icon" class="h-3.5 w-3.5" />
