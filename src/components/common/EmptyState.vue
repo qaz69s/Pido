@@ -14,12 +14,12 @@ defineProps({
 
 <template>
   <div class="flex flex-col items-center px-4 py-12 text-center">
-    <div class="mb-3 grid h-12 w-12 place-items-center rounded-full bg-tile text-slate-400">
+    <div class="mb-3 grid h-12 w-12 place-items-center rounded-full bg-base-200 text-base-content/60">
       <Icon :name="icon" class="h-6 w-6" />
     </div>
     <h3 class="font-semibold">{{ title }}</h3>
-    <p v-if="description" class="mt-1 max-w-md text-sm text-slate-500">{{ description }}</p>
-    <ul v-if="tips.length" class="mt-3 max-w-lg list-disc space-y-1 pl-5 text-left text-sm text-slate-500">
+    <p v-if="description" class="mt-1 max-w-md text-sm text-base-content/70">{{ description }}</p>
+    <ul v-if="tips.length" class="mt-3 max-w-lg list-disc space-y-1 pl-5 text-left text-sm text-base-content/70">
       <li v-for="tip in tips" :key="tip">{{ tip }}</li>
     </ul>
     <div class="mt-4 flex gap-2"><slot /></div>

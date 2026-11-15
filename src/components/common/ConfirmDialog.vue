@@ -17,12 +17,12 @@ const open = computed({
 
 <template>
   <Modal v-model="open" :title="confirm.options.title" width="md:max-w-sm" z="z-[60]">
-    <p v-if="confirm.options.message" class="whitespace-pre-line break-all text-sm text-slate-600 dark:text-slate-300">
+    <p v-if="confirm.options.message" class="whitespace-pre-line break-all text-sm text-base-content/80">
       {{ confirm.options.message }}
     </p>
     <template #footer>
-      <button class="btn-outline" @click="confirm.settle(false)">取消</button>
-      <button :class="confirm.options.danger ? 'btn-danger' : 'btn-primary'" @click="confirm.settle(true)">
+      <button class="btn btn-sm btn-outline border-base-content/20" @click="confirm.settle(false)">取消</button>
+      <button :class="confirm.options.danger ? 'btn-error' : 'btn-primary'" @click="confirm.settle(true)" class="btn btn-sm">
         {{ confirm.options.confirmText }}
       </button>
     </template>

@@ -1,6 +1,6 @@
 <script setup>
 /**
- * 开关组件
+ * 开关组件（daisyUI toggle）
  * 用法：<Switch v-model="enabled" :loading="saving" />
  */
 defineProps({
@@ -13,21 +13,15 @@ const emit = defineEmits(['update:modelValue'])
 </script>
 
 <template>
-  <button
-    type="button"
+  <!-- daisyUI toggle：保留 role="switch" 与 v-model 接口；保存中半透明并禁止点击 -->
+  <input
+    type="checkbox"
     role="switch"
+    class="toggle toggle-primary shrink-0 rounded-full"
+    :class="loading && 'animate-pulse'"
+    :checked="modelValue"
     :aria-checked="modelValue"
     :disabled="disabled || loading"
-    class="relative inline-flex h-6 w-11 shrink-0 items-center rounded-full transition disabled:cursor-not-allowed"
-    :class="[
-      modelValue ? 'bg-brand-600' : 'bg-slate-300 dark:bg-slate-700',
-      (disabled || loading) && 'opacity-60',
-    ]"
-    @click="emit('update:modelValue', !modelValue)"
-  >
-    <span
-      class="inline-block h-5 w-5 rounded-full shadow transition-transform"
-      :class="[modelValue ? 'translate-x-[22px] bg-on-brand' : 'translate-x-0.5 bg-white', loading && 'animate-pulse']"
-    />
-  </button>
+    @change="(e) => { emit('update:modelValue', e.target.checked); e.target.checked = modelValue }"
+  />
 </template>

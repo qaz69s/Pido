@@ -21,7 +21,8 @@ async function retry() {
 <template>
   <div
     v-if="backend.status === 'error' && info"
-    class="flex flex-col gap-2 rounded-xl border border-danger-soft bg-danger-soft p-3 text-sm text-danger sm:flex-row sm:items-center"
+    role="alert"
+    class="alert flex flex-col items-stretch gap-2 rounded-xl border-error/30 bg-error/10 p-3 text-left text-sm text-error sm:flex-row sm:items-center"
   >
     <div class="flex flex-1 items-start gap-2">
       <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
@@ -31,10 +32,10 @@ async function retry() {
       </div>
     </div>
     <div class="flex gap-2 self-end sm:self-auto">
-      <button class="btn-outline py-1 text-xs" :disabled="retrying" @click="retry">
+      <button class="btn btn-xs btn-outline border-base-content/20" :disabled="retrying" @click="retry">
         {{ retrying ? '检测中…' : '重试' }}
       </button>
-      <RouterLink to="/setup" class="btn-primary py-1 text-xs">修改设置</RouterLink>
+      <RouterLink to="/setup" class="btn btn-xs btn-primary">修改设置</RouterLink>
     </div>
   </div>
 </template>
