@@ -1,0 +1,1 @@
+import{R as n,S as o,an as e,ao as t,ap as c}from"./index-DAJKVA8G.js";const i=()=>o()?c():n.get("/connections"),l=()=>o()?e():n.del("/connections"),C=s=>o()?t(s):n.del(`/connections/${encodeURIComponent(s)}`);export{l as a,C as c,i as g};
