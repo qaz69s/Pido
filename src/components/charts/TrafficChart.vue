@@ -1,13 +1,13 @@
 <script setup>
 /**
  * 实时流量曲线（手写 Canvas，零依赖）
- * - 两条平滑曲线 + 渐变填充（上传 / 下载），颜色取主题变量（上传 accent、下载 brand）
+ * - 两条平滑曲线 + 渐变填充（上传 / 下载），颜色取 daisyUI 主题色（上传 accent、下载 primary）
  * - 单调三次插值（Fritsch–Carlson）：曲线不会在尖峰处冲到 0 以下或来回晃
  * - 数据里的 null 表示“还没有数据”，这一段不画（打开页面时曲线从右侧长出来）
  * - Y 轴按 1024 进制自动取“整”刻度，3 条淡实线
  * - 手指按住 / 鼠标悬停显示该时刻的上传、下载
  * - 适配高分屏（devicePixelRatio）和容器尺寸变化（ResizeObserver）
- * - 网格/文字颜色取自容器的 CSS color，因此会跟随深浅主题
+ * - 网格/文字颜色取自容器的 CSS color（text-base-content/70），因此会跟随深浅主题
  * - 动画：新数据到来时曲线在 1 秒内平滑左移；右端有呼吸光点（动画关闭时静态绘制）
  */
 import { ref, watch, onMounted, onBeforeUnmount, onActivated, onDeactivated, nextTick } from 'vue'
@@ -19,7 +19,7 @@ const props = defineProps({
   up: { type: Array, required: true }, // 上传速率序列（字节/秒），旧 → 新；null = 还没有数据
   down: { type: Array, required: true }, // 下载速率序列
   height: { type: Number, default: 220 },
-  // 不传时取主题变量：上传 = accent-500，下载 = brand-500（见 src/themes.css）
+  // 不传时取 daisyUI 主题色：上传 = accent，下载 = primary（见 src/utils/themes.js）
   upColor: { type: String, default: '' },
   downColor: { type: String, default: '' },
 })
@@ -45,25 +45,41 @@ const GRID_LINES = 2
 let hoverX = -1 // 悬停 / 按住的位置（CSS 像素），-1 表示不显示提示
 let hoverTimer = 0
 
-/** 颜色转 [r, g, b]：支持 #rrggbb 和 CSS 变量里的 "r g b" 写法 */
-function toRgb(color) {
-  if (color.startsWith('#')) {
-    const n = parseInt(color.slice(1), 16)
-    return [(n >> 16) & 255, (n >> 8) & 255, n & 255]
-  }
-  return color.trim().split(/\s+/).map(Number)
+/* ---------- 颜色：daisyUI 主题变量是 oklch，统一解析成 [r, g, b, a] 再交给 Canvas ---------- */
+let probe = null // 1×1 画布：把任意 CSS 颜色（oklch / rgb / hex）画出来再读回像素
+const colorCache = new Map()
+/** CSS 颜色 → [r, g, b, a]（a 为 0~1） */
+function toRgba(color) {
+  if (colorCache.has(color)) return colorCache.get(color)
+  probe ||= document.createElement('canvas').getContext('2d', { willReadFrequently: true })
+  probe.canvas.width = probe.canvas.height = 1
+  probe.clearRect(0, 0, 1, 1)
+  probe.fillStyle = '#000'
+  probe.fillStyle = color
+  probe.fillRect(0, 0, 1, 1)
+  const [r, g, b, a] = probe.getImageData(0, 0, 1, 1).data
+  const rgba = [r, g, b, a / 255]
+  if (colorCache.size > 64) colorCache.clear()
+  colorCache.set(color, rgba)
+  return rgba
 }
 
-/** 读取主题变量（如 --a-500），读不到时用兜底色 */
+/**
+ * 读取 daisyUI 主题色（--p 主色、--a 强调色、--b2 等，值为 "L% C H"），读不到时用兜底色
+ * 不支持 oklch 的旧浏览器上 daisyUI 会提供 --fallback-* 变量（hex），优先用它
+ */
 function themeColor(varName, fallback) {
-  const v = getComputedStyle(document.documentElement).getPropertyValue(varName).trim()
-  return v || fallback
+  const style = getComputedStyle(document.documentElement)
+  const legacy = style.getPropertyValue(`--fallback-${varName.slice(2)}`).trim()
+  if (legacy) return legacy
+  const v = style.getPropertyValue(varName).trim()
+  return v ? `oklch(${v})` : fallback
 }
 
-/** 颜色 → rgba(r,g,b,a) */
+/** 颜色 → rgba(r,g,b,a)；alpha 会再乘上颜色自带的透明度 */
 function withAlpha(color, alpha) {
-  const [r, g, b] = toRgb(color)
-  return `rgba(${r}, ${g}, ${b}, ${alpha})`
+  const [r, g, b, a] = toRgba(color)
+  return `rgba(${r}, ${g}, ${b}, ${alpha * a})`
 }
 
 /** 取一个“好看”的最大值：1 / 2 / 5 / 10 × 1024^n */
@@ -182,7 +198,7 @@ function draw() {
   if (!ctx || cw <= 0) return
   ctx.clearRect(0, 0, cw, ch)
 
-  const textColor = getComputedStyle(wrap.value).color
+  const textColor = withAlpha(getComputedStyle(wrap.value).color, 1) // 计算值可能是 oklch(... / 0.7)，统一转成 rgba
   const valid = [...props.up, ...props.down].filter((v) => v != null)
   const max = niceMax(Math.max(0, ...valid) * 1.1)
 
@@ -221,8 +237,8 @@ function draw() {
   ctx.textAlign = 'right'
   ctx.fillText('现在', cw - PAD.right, ch - 4)
 
-  const downColor = props.downColor || themeColor('--b-500', '#6366f1')
-  const upColor = props.upColor || themeColor('--a-500', '#f59e0b')
+  const downColor = props.downColor || themeColor('--p', '#6366f1')
+  const upColor = props.upColor || themeColor('--a', '#f59e0b')
 
   // 动画：offset 从 1 平滑降到 0（新点从右边缘滑入），pulse 0~1 循环
   const animate = motionEnabled()
@@ -277,14 +293,15 @@ function drawTooltip({ max, plotW, plotH, upColor, downColor, textColor }) {
   let bx = x - bw - 10
   if (bx < padLeft) bx = x + 10
   const by = PAD.top + 2
-  const tile = themeColor('--s-tile', '241 245 249')
+  const tile = themeColor('--b2', '#f1f5f9')
+  const [tr, tg, tb] = toRgba(textColor)
   ctx.fillStyle = withAlpha(tile, 0.96)
-  ctx.strokeStyle = withAlpha(textColor.match(/\d+/g)?.slice(0, 3).join(' ') || '100 116 139', 0.25)
+  ctx.strokeStyle = `rgba(${tr}, ${tg}, ${tb}, 0.25)`
   ctx.beginPath()
   ctx.roundRect ? ctx.roundRect(bx, by, bw, bh, 8) : ctx.rect(bx, by, bw, bh)
   ctx.fill()
   ctx.stroke()
-  ctx.fillStyle = getComputedStyle(document.body).color
+  ctx.fillStyle = withAlpha(getComputedStyle(document.body).color, 1)
   ctx.textAlign = 'left'
   ctx.textBaseline = 'middle'
   ctx.fillText(lines[0], bx + 10, by + 14)
@@ -366,7 +383,7 @@ onBeforeUnmount(() => {
 <template>
   <div
     ref="wrap"
-    class="relative w-full touch-pan-y select-none text-slate-500 dark:text-slate-400"
+    class="relative w-full touch-pan-y select-none text-base-content/70"
     :style="{ height: `${props.height}px` }"
     @pointerdown="onPointer"
     @pointermove="onPointer"

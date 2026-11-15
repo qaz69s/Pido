@@ -84,22 +84,22 @@ function clearConfig() {
   <div class="flex min-h-screen items-center justify-center p-4">
     <div class="w-full max-w-md">
       <div class="mb-6 flex flex-col items-center text-center">
-        <span class="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-brand-600 text-on-brand shadow-lg shadow-brand-600/30">
+        <span class="mb-3 grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-content shadow-lg shadow-primary/30">
           <Icon name="zap" class="h-6 w-6" />
         </span>
         <h1 class="text-xl font-semibold">Pido</h1>
-        <p class="mt-1 text-sm text-slate-500">连接到你的 mihomo 内核，或 dae / honk</p>
-        <p class="mt-0.5 text-xs text-slate-500">mihomo 填 external-controller 的地址和 secret；dae 填 api 段的 listen 与 secret</p>
+        <p class="mt-1 text-sm text-base-content/70">连接到你的 mihomo 内核，或 dae / honk</p>
+        <p class="mt-0.5 text-xs text-base-content/70">mihomo 填 external-controller 的地址和 secret；dae 填 api 段的 listen 与 secret</p>
       </div>
 
       <form class="card space-y-4 p-5" @submit.prevent="submit">
         <!-- 地址 -->
         <div>
-          <label class="label" for="url">后端地址</label>
+          <label class="label-text mb-1 block font-medium text-base-content/80" for="url">后端地址</label>
           <input
             id="url"
             v-model="form.url"
-            class="input font-mono"
+            class="input input-bordered input-sm w-full font-mono"
             placeholder="http://127.0.0.1:9090"
             autocomplete="url"
             autocapitalize="off"
@@ -109,25 +109,25 @@ function clearConfig() {
           <button
             v-if="isDev"
             type="button"
-            class="mt-1.5 text-xs text-brand-600 hover:underline dark:text-brand-400"
+            class="mt-1.5 text-xs text-primary hover:underline"
             @click="useDevProxy"
           >
             使用开发代理（{{ DEV_PROXY_PATH }} → vite.config.js 中的 MIHOMO_TARGET）
           </button>
-          <p v-if="hostedHint" class="mt-1.5 flex items-start gap-1 text-xs text-ok">
+          <p v-if="hostedHint" class="mt-1.5 flex items-start gap-1 text-xs text-success">
             <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />{{ hostedHint }}
           </p>
         </div>
 
         <!-- Secret -->
         <div>
-          <label class="label" for="secret">Secret</label>
+          <label class="label-text mb-1 block font-medium text-base-content/80" for="secret">Secret</label>
           <div class="relative">
             <input
               id="secret"
               v-model="form.secret"
               :type="showSecret ? 'text' : 'password'"
-              class="input pr-10 font-mono"
+              class="input input-bordered input-sm w-full pr-10 font-mono"
               placeholder="未设置可留空"
               autocomplete="current-password"
               autocapitalize="off"
@@ -135,7 +135,7 @@ function clearConfig() {
             />
             <button
               type="button"
-              class="absolute inset-y-0 right-0 grid w-10 place-items-center text-slate-400 hover:text-slate-600"
+              class="absolute inset-y-0 right-0 grid w-10 place-items-center text-base-content/60 hover:text-base-content/80"
               :title="showSecret ? '隐藏' : '显示'"
               @click="showSecret = !showSecret"
             >
@@ -147,7 +147,8 @@ function clearConfig() {
         <!-- 错误提示 -->
         <div
           v-if="errInfo"
-          class="rounded-xl border border-danger-soft bg-danger-soft p-3 text-sm text-danger"
+          role="alert"
+          class="alert block rounded-xl border-error/30 bg-error/10 p-3 text-left text-sm text-error"
         >
           <div class="flex items-center gap-2 font-medium">
             <Icon name="alert" class="h-4 w-4 shrink-0" />
@@ -158,18 +159,18 @@ function clearConfig() {
           </ul>
         </div>
 
-        <button type="submit" class="btn-primary w-full py-2.5" :disabled="loading">
-          <Icon v-if="loading" name="refresh" class="h-4 w-4 animate-spin" />
+        <button type="submit" class="btn btn-primary w-full" :disabled="loading">
+          <span v-if="loading" class="loading loading-spinner loading-sm" />
           {{ loading ? '正在连接…' : '连接' }}
         </button>
 
         <div v-if="backend.isConfigured" class="flex items-center justify-between pt-1 text-sm">
-          <RouterLink to="/overview" class="text-slate-500 hover:underline">← 返回面板</RouterLink>
-          <button type="button" class="text-danger hover:underline" @click="clearConfig">清除配置</button>
+          <RouterLink to="/overview" class="text-base-content/70 hover:underline">← 返回面板</RouterLink>
+          <button type="button" class="text-error hover:underline" @click="clearConfig">清除配置</button>
         </div>
       </form>
 
-      <p class="mt-4 text-center text-xs text-slate-400">配置仅保存在本机浏览器（localStorage）</p>
+      <p class="mt-4 text-center text-xs text-base-content/60">配置仅保存在本机浏览器（localStorage）</p>
     </div>
   </div>
 </template>

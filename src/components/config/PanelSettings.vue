@@ -40,15 +40,16 @@ async function disconnect() {
 
 <template>
   <!-- 面板 -->
-  <section class="card divide-y divide-line">
+  <section class="card divide-y divide-base-content/10">
     <h2 class="px-4 pb-2 pt-4 font-semibold">面板</h2>
     <SettingRow title="外观">
-      <div class="flex rounded-lg bg-tile p-0.5 text-xs dark:bg-page">
+      <div role="tablist" class="tabs tabs-boxed tabs-xs">
         <button
           v-for="t in THEMES"
           :key="t.value"
-          class="flex items-center gap-1 rounded-md px-2 py-1 transition"
-          :class="theme.mode === t.value ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
+          role="tab"
+          class="tab gap-1 px-2"
+          :class="theme.mode === t.value && 'tab-active font-medium'"
           @click="theme.setMode(t.value, $event)"
         >
           <Icon :name="t.icon" class="h-3.5 w-3.5" />
@@ -66,8 +67,8 @@ async function disconnect() {
           class="group rounded-xl border p-2 text-left transition"
           :class="
             theme.preset === p.id
-              ? 'border-brand-500 ring-2 ring-brand-500/25'
-              : 'border-line hover:border-line-strong'
+              ? 'border-primary ring-2 ring-primary/25'
+              : 'border-base-content/10 hover:border-base-content/20'
           "
           :title="p.desc"
           @click="theme.setPreset(p.id, $event)"
@@ -87,16 +88,16 @@ async function disconnect() {
     <div class="flex items-center gap-3 px-4 py-3">
       <div class="min-w-0 flex-1">
         <div class="text-sm font-medium">当前后端</div>
-        <div class="mt-0.5 truncate font-mono text-xs text-slate-500">{{ backend.url }}</div>
-        <div v-if="backend.isStandard" class="text-xs text-slate-500">
+        <div class="mt-0.5 truncate font-mono text-xs text-base-content/70">{{ backend.url }}</div>
+        <div v-if="backend.isStandard" class="text-xs text-base-content/70">
           后端 {{ backend.label || '--' }} · 原生 API
         </div>
-        <div v-else class="text-xs text-slate-500">
+        <div v-else class="text-xs text-base-content/70">
           内核 {{ backend.version?.version || '--' }}{{ backend.version?.meta ? '（Meta）' : '' }}
         </div>
       </div>
-      <RouterLink to="/setup" class="btn-outline py-1 text-xs">更换</RouterLink>
-      <button class="btn-ghost py-1 text-xs text-danger" @click="disconnect">断开</button>
+      <RouterLink to="/setup" class="btn btn-xs btn-outline border-base-content/20">更换</RouterLink>
+      <button class="btn btn-xs btn-ghost text-error" @click="disconnect">断开</button>
     </div>
   </section>
 </template>

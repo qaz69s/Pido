@@ -7,26 +7,24 @@ import Icon from './Icon.vue'
 
 const toast = useToastStore()
 
-// 底色跟随主题（卡片表面色 + 中性边框），只用图标颜色区分类型；成功用主题主色
-const BASE = 'border-line bg-surface text-slate-700 dark:text-slate-200'
+// daisyUI alert：底色跟随主题（base-100 + 细描边），只用图标颜色区分类型；成功用主题主色
 const STYLES = {
-  info: { cls: BASE, icon: 'info', ic: 'text-slate-400' },
-  success: { cls: BASE, icon: 'check', ic: 'text-brand-500' },
-  warning: { cls: BASE, icon: 'alert', ic: 'text-warn' },
-  error: { cls: BASE, icon: 'alert', ic: 'text-danger' },
+  info: { icon: 'info', ic: 'text-base-content/60' },
+  success: { icon: 'check', ic: 'text-primary' },
+  warning: { icon: 'alert', ic: 'text-warning' },
+  error: { icon: 'alert', ic: 'text-error' },
 }
 </script>
 
 <template>
-  <div
-    class="pointer-events-none fixed inset-x-0 top-3 z-[70] flex flex-col items-center gap-2 px-3 md:inset-x-auto md:right-4 md:items-end"
-  >
+  <!-- daisyUI toast：手机端顶部居中，桌面端右上角 -->
+  <div class="toast toast-center toast-top pointer-events-none z-[70] w-full max-w-sm items-stretch gap-2 p-3 md:left-auto md:right-0 md:translate-x-0 md:p-4">
     <TransitionGroup name="toast">
       <div
         v-for="t in toast.items"
         :key="t.id"
-        class="pointer-events-auto flex w-full max-w-sm cursor-pointer items-start gap-2 rounded-xl border px-3 py-2.5 text-sm shadow-lg"
-        :class="STYLES[t.type]?.cls"
+        role="alert"
+        class="alert pointer-events-auto flex cursor-pointer items-start gap-2 whitespace-normal rounded-xl border-base-content/10 bg-base-100 px-3 py-2.5 text-left text-sm text-base-content/90 shadow-lg"
         @click="toast.remove(t.id)"
       >
         <Icon :name="STYLES[t.type]?.icon" class="mt-0.5 h-4 w-4 shrink-0" :class="STYLES[t.type]?.ic" />

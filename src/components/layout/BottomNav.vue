@@ -18,17 +18,17 @@ const activeIndex = computed(() => items.findIndex((n) => n.path === route.path 
 
 <template>
   <nav
-    class="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-line bg-surface/[0.88] backdrop-blur-xl backdrop-saturate-150 md:hidden "
+    class="safe-bottom fixed inset-x-0 bottom-0 z-40 border-t border-base-content/10 bg-base-100/90 backdrop-blur-xl backdrop-saturate-150 md:hidden "
   >
     <div class="relative grid grid-cols-6">
       <RouterLink
         v-for="(item, i) in items"
         :key="item.path"
         :to="item.path"
-        class="press flex flex-col items-center gap-0.5 whitespace-nowrap py-2 text-xs text-slate-500 transition dark:text-slate-400"
-        :class="i === activeIndex && 'nav-active !text-brand-600 dark:!text-brand-400'"
+        class="press flex flex-col items-center gap-0.5 whitespace-nowrap py-2 text-xs text-base-content/70 transition"
+        :class="i === activeIndex && 'nav-active !text-primary'"
       >
-        <Icon :name="item.icon" class="h-5 w-5" :class="i !== activeIndex && 'text-slate-400 dark:text-slate-500'" />
+        <Icon :name="item.icon" class="h-5 w-5" :class="i !== activeIndex && 'text-base-content/60'" />
         {{ item.title }}
       </RouterLink>
     </div>

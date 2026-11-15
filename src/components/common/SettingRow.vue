@@ -12,7 +12,7 @@ defineProps({
   <div class="flex items-center gap-4 px-4 py-3">
     <div class="min-w-0 flex-1">
       <div class="text-sm font-medium">{{ title }}</div>
-      <div v-if="description" class="mt-0.5 text-xs text-slate-500">{{ description }}</div>
+      <div v-if="description" class="mt-0.5 text-xs text-base-content/70">{{ description }}</div>
     </div>
     <div class="shrink-0">
       <slot />

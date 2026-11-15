@@ -2,6 +2,13 @@
 @tailwind components;
 @tailwind utilities;
 
+/*
+ * 颜色与组件来自 daisyUI（主题见 src/utils/themes.js），这里只放：
+ * - 字体、页面底色、各配色的背景质感
+ * - 对 daisyUI 组件的少量项目级默认（卡片描边、工具栏固定尺寸、深色浮层提亮）
+ * - 与颜色无关的工具类（安全区、滚动条、单位、图标线宽、动效节奏）
+ */
+
 /* ---------- 基础样式 ---------- */
 @layer base {
   html {
@@ -11,53 +18,34 @@
     /* 始终为滚动条预留位置：展开/收起策略组使页面在“有/无滚动条”之间切换时，整页不再左右跳动（桌面浏览器） */
     scrollbar-gutter: stable;
   }
+  /* 页面底色用 base-300（卡片 base-100 浮在上面）；daisyUI 默认给根元素 base-100，这里覆盖 */
+  :root,
+  [data-theme] {
+    background-color: var(--fallback-b3, oklch(var(--b3) / 1));
+  }
   body {
-    @apply bg-page text-slate-800 antialiased dark:text-slate-200;
-    /* 中文字体按平台补齐：苹果 PingFang、华为 HarmonyOS、小米 MiSans、OPPO/realme OPPO Sans、其余 Noto */
-    font-family: var(--font-sans);
+    @apply bg-base-300 text-base-content antialiased;
+    /* 中文字体按平台补齐：苹果 PingFang、华为 HarmonyOS、小米 MiSans、OPPO/realme OPPO Sans、其余 Noto
+     * 主题可通过 --font-body 换字体（赛博：英文和数字走等宽，中文回落到无衬线） */
+    font-family: var(--font-body, var(--font-sans));
+    background-attachment: fixed;
     /* 数字等宽只加在会跳动的数值上（Num 组件、连接 / 日志列表），名字里的数字保持比例宽度 */
   }
 }
 
-/* ---------- 可复用组件类 ---------- */
+/* ---------- daisyUI 组件的项目级默认 ---------- */
 @layer components {
+  /* 卡片：daisyUI card + 卡片底色 + 发丝描边 */
   .card {
-    @apply rounded-2xl border border-line bg-surface;
-  }
-  /* 中性提示条：浅底 + 彩色小图标，只有报错才用满色横幅 */
-  .notice {
-    @apply flex items-center gap-2 rounded-xl bg-tile px-3 py-2.5 text-sm text-slate-600 dark:text-slate-300;
+    @apply border border-base-content/10 bg-base-100;
   }
   /* 数值后的单位：小一号、灰一级 */
   .unit {
-    @apply ml-[0.15em] text-[0.75em] font-normal text-slate-400 dark:text-slate-500;
+    @apply ml-[0.15em] text-[0.75em] font-normal text-base-content/60;
   }
+  /* 按钮：字重与面板其余文字一致，图标与文字间距 4px */
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
-  }
-  .btn-primary {
-    @apply btn bg-brand-600 text-on-brand hover:bg-brand-700 active:bg-brand-800;
-  }
-  .btn-outline {
-    @apply btn border border-line-strong bg-raised text-slate-700 hover:bg-slate-100 disabled:text-slate-400 disabled:opacity-100 dark:text-slate-200 dark:hover:bg-tile dark:disabled:text-slate-600;
-  }
-  .btn-ghost {
-    @apply btn text-slate-600 hover:bg-slate-200/70 disabled:text-slate-400 disabled:opacity-100 disabled:hover:bg-transparent dark:text-slate-300 dark:hover:bg-white/[0.06] dark:disabled:text-slate-600;
-  }
-  .btn-danger {
-    @apply btn bg-danger text-white hover:bg-danger/90;
-  }
-  .btn-icon {
-    @apply btn-ghost h-9 w-9 p-0;
-  }
-  .input {
-    @apply w-full rounded-lg border border-line-strong bg-white px-3 py-2 text-sm outline-none transition placeholder:text-slate-400 focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 dark:bg-page dark:placeholder:text-slate-500;
-  }
-  .label {
-    @apply mb-1 block text-sm font-medium text-slate-600 dark:text-slate-300;
-  }
-  .chip {
-    @apply inline-flex items-center rounded-md bg-tile px-1.5 py-0.5 text-xs font-normal text-slate-500 dark:text-slate-400;
+    @apply gap-1 font-medium;
   }
 }
 
@@ -82,31 +70,30 @@
   gap: 4px;
 }
 /* 工具栏放不下 36px，手机上保持 34px，避免分段标签被截断 */
-.tb .btn-icon {
+.tb .btn-square {
   width: 34px;
   height: 34px;
+  min-height: 34px;
 }
-.tb .btn-primary,
-.tb .btn-danger,
-.tb .btn-outline {
+.tb .btn:not(.btn-square):not(.btn-ghost) {
   height: 34px;
+  min-height: 34px;
   padding: 0 10px;
 }
-.tb-tabs > button {
-  padding: 4px 10px;
+.tb-tabs > .tab {
+  padding: 0 10px;
 }
 /* 标签上的数量：预留固定宽度，数字从 0 变成多位数时按钮不变宽、相邻标签不跳动 */
 .tab-count {
   display: inline-block;
   min-width: 3ch;
+  margin-left: 0.25em;
   text-align: left;
   font-variant-numeric: tabular-nums;
 }
 .tab-count.w4 {
   min-width: 4ch;
 }
-
-
 
 /* ---------- 图标线宽按尺寸补偿：大小图标看起来一样重 ---------- */
 .ic.h-3,
@@ -124,14 +111,48 @@
   stroke-width: 2.25;
 }
 
-/* ---------- 深色：卡片发丝描边 + 顶部内高光，靠光线而不是粗边框分层 ---------- */
-.dark .card {
+/* ---------- 深色：卡片顶部内高光；弹窗 / 下拉菜单比卡片再亮一级（靠光线而不是粗边框分层） ---------- */
+[data-theme$='-dark'] .card {
   box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
 }
-/* 北境 / 暖阳的主色偏浅，白字对比不足 4.5:1，深色下主按钮改用深一级主色 */
-.dark[data-theme='nord'] .btn-primary,
-.dark[data-theme='sunset'] .btn-primary {
-  background-color: rgb(var(--b-700));
+[data-theme$='-dark'] .modal-box,
+[data-theme$='-dark'] .dropdown-content {
+  background-image: linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.05));
+}
+
+/* ---------- 各配色的背景质感 ---------- */
+/* 北境：冷色雾面背景 */
+[data-theme^='nord-'] body {
+  background-image: linear-gradient(180deg, oklch(var(--p) / 0.08), transparent 320px);
+}
+/* 素墨：纯中性灰的极简风格；深色卡片不描边 */
+[data-theme='neutral-dark'] .card {
+  border-color: transparent;
+}
+/* 樱花：粉紫双光晕 */
+[data-theme^='sakura-'] body {
+  background-image:
+    radial-gradient(700px 380px at 0% -10%, oklch(var(--p) / 0.14), transparent 70%),
+    radial-gradient(700px 380px at 100% 0%, oklch(var(--a) / 0.12), transparent 70%);
+}
+[data-theme='sakura-dark'] body {
+  background-image:
+    radial-gradient(700px 380px at 0% -10%, oklch(var(--p) / 0.1), transparent 70%),
+    radial-gradient(700px 380px at 100% 0%, oklch(var(--a) / 0.08), transparent 70%);
+}
+/* 赛博：网格底纹 + 霓虹描边（等宽字体见主题的 --font-body） */
+[data-theme^='cyber-'] body {
+  background-image:
+    linear-gradient(oklch(var(--p) / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, oklch(var(--p) / 0.05) 1px, transparent 1px);
+  background-size: 28px 28px;
+}
+[data-theme='cyber-dark'] .card {
+  box-shadow: 0 0 0 1px oklch(var(--p) / 0.18), 0 0 24px -12px oklch(var(--p) / 0.6);
+}
+/* 暖阳：纸张般的暖色顶部渐变 */
+[data-theme^='sunset-'] body {
+  background-image: linear-gradient(180deg, oklch(var(--p) / 0.1), transparent 360px);
 }
 
 /* ---------- 动效节奏：进入 220ms、退出 160ms，共用一条缓动曲线 ---------- */
@@ -142,20 +163,17 @@
 }
 
 /* ---------- 键盘焦点：只在键盘操作时出现，点击不显示 ---------- */
-:where(button, a, [role='button'], [tabindex], summary, input, select, textarea):focus-visible {
-  outline: 2px solid rgb(var(--b-500) / 0.7);
+:where(button, a, [role='button'], [tabindex], summary):focus-visible {
+  outline: 2px solid oklch(var(--p) / 0.7);
   outline-offset: 2px;
-  border-radius: 0.5rem;
-}
-.input:focus-visible {
-  outline: none; /* 输入框已有自己的聚焦环 */
+  border-radius: var(--rounded-btn, 0.5rem);
 }
 
 /* ---------- 桌面端细滚动条，跟随主题色 ---------- */
 @media (hover: hover) and (pointer: fine) {
   * {
     scrollbar-width: thin;
-    scrollbar-color: rgb(var(--n-400) / 0.45) transparent;
+    scrollbar-color: oklch(var(--bc) / 0.3) transparent;
   }
   ::-webkit-scrollbar {
     width: 10px;
@@ -165,48 +183,17 @@
     background: transparent;
   }
   ::-webkit-scrollbar-thumb {
-    background: rgb(var(--n-400) / 0.4);
+    background: oklch(var(--bc) / 0.25);
     border: 3px solid transparent;
     border-radius: 999px;
     background-clip: padding-box;
   }
   ::-webkit-scrollbar-thumb:hover {
-    background-color: rgb(var(--n-400) / 0.7);
+    background-color: oklch(var(--bc) / 0.45);
   }
 }
 
 /* ---------- 选中文字跟随主题色 ---------- */
 ::selection {
-  background: rgb(var(--b-500) / 0.25);
-}
-
-/* ---------- 线条与语义状态色（浅色 / 深色各一套，主题无关） ---------- */
-:root {
-  --line: rgb(var(--n-900) / 0.09);
-  --line-strong: rgb(var(--n-900) / 0.2);
-  --danger: 225 29 72;
-  --danger-tx: 225 29 72;
-  --danger-soft: rgb(255 236 238);
-  --danger-line: rgb(254 205 211);
-  --warn: 245 158 11;
-  --warn-tx: 180 83 9;
-  --warn-soft: rgb(254 246 220);
-  --warn-line: rgb(253 230 138);
-  --ok: 16 185 129;
-  --ok-tx: 4 120 87;
-  --ok-soft: rgb(220 250 235);
-  --ok-line: rgb(167 243 208);
-}
-.dark {
-  --line: rgb(255 255 255 / 0.08);
-  --line-strong: rgb(255 255 255 / 0.15);
-  --danger-tx: 251 113 133;
-  --danger-soft: rgb(244 63 94 / 0.14);
-  --danger-line: rgb(244 63 94 / 0.3);
-  --warn-tx: 251 191 36;
-  --warn-soft: rgb(245 158 11 / 0.14);
-  --warn-line: rgb(245 158 11 / 0.3);
-  --ok-tx: 52 211 153;
-  --ok-soft: rgb(16 185 129 / 0.14);
-  --ok-line: rgb(16 185 129 / 0.3);
+  background: oklch(var(--p) / 0.25);
 }

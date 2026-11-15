@@ -100,7 +100,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
 <template>
   <div class="min-w-0 space-y-4">
-    <p class="flex items-start gap-1.5 text-xs text-slate-500">
+    <p class="flex items-start gap-1.5 text-xs text-base-content/70">
       <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
       已连接 {{ backend.engine }} 的原生 API。运行模式、TUN、端口等 mihomo 专属设置不适用；配置在下方按文件编辑，保存后自动重载。
     </p>
@@ -115,7 +115,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <section class="card">
           <div class="flex items-center gap-2 px-4 pb-2 pt-4">
             <h2 class="flex-1 font-semibold">后端信息</h2>
-            <button class="btn-ghost py-1 text-xs" :disabled="loading" @click="load({ silent: true })">
+            <button class="btn btn-xs btn-ghost" :disabled="loading" @click="load({ silent: true })">
               <Icon name="refresh" class="h-3.5 w-3.5" :class="loading && 'animate-spin'" />
               刷新
             </button>
@@ -124,11 +124,11 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             <div v-for="i in 5" :key="i" class="skeleton h-6 rounded-md" />
           </div>
           <EmptyState v-else-if="loadErrorInfo" icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
-            <button class="btn-primary" @click="load()">重试</button>
+            <button class="btn btn-sm btn-primary" @click="load()">重试</button>
           </EmptyState>
-          <dl v-else class="divide-y divide-line px-4 pb-2 text-sm">
+          <dl v-else class="divide-y divide-base-content/10 px-4 pb-2 text-sm">
             <div v-for="row in rows" :key="row.label" class="flex justify-between gap-3 py-2.5">
-              <dt class="shrink-0 text-slate-500">{{ row.label }}</dt>
+              <dt class="shrink-0 text-base-content/70">{{ row.label }}</dt>
               <dd class="min-w-0 truncate text-right font-medium tabular-nums" :class="row.mono && 'font-mono text-sm'" :title="String(row.value)">
                 {{ row.value }}
               </dd>
@@ -141,10 +141,10 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <h2 class="mb-2 font-semibold">运行提示</h2>
           <ul class="space-y-2 text-sm">
             <li v-for="d in degradations" :key="d.code" class="flex items-start gap-2">
-              <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0 text-warn" />
+              <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0 text-warning" />
               <div class="min-w-0">
                 <div class="break-words">{{ d.message || d.code }}</div>
-                <div class="text-xs text-slate-500">
+                <div class="text-xs text-base-content/70">
                   <span class="font-mono">{{ d.code }}</span>
                   <template v-if="d.since"> · {{ formatRelativeTime(d.since) }}</template>
                 </div>
@@ -157,21 +157,21 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       <!-- 右列 -->
       <div class="min-w-0 space-y-4">
         <!-- 维护 -->
-        <section class="card divide-y divide-line">
+        <section class="card divide-y divide-base-content/10">
           <h2 class="px-4 pb-2 pt-4 font-semibold">维护</h2>
           <SettingRow title="重载配置" description="重新读取磁盘上的配置文件，生成新的路由代次">
-            <button class="btn-outline py-1 text-xs" :disabled="reloading" @click="reload">
+            <button class="btn btn-xs btn-outline border-base-content/20" :disabled="reloading" @click="reload">
               <Icon name="file" class="h-3.5 w-3.5" :class="reloading && 'animate-pulse'" />
               {{ reloading ? '重载中…' : '执行' }}
             </button>
           </SettingRow>
-          <div v-if="lastReload" class="px-4 py-3 text-xs text-slate-500">
+          <div v-if="lastReload" class="px-4 py-3 text-xs text-base-content/70">
             上次重载：
-            <span :class="lastReload.status === 'failed' ? 'text-danger' : 'text-slate-700 dark:text-slate-300'">
+            <span :class="lastReload.status === 'failed' ? 'text-error' : 'text-base-content/90'">
               {{ RELOAD_STATUS[lastReload.status] || lastReload.status }}
             </span>
             <template v-if="lastReload.finished_at"> · {{ formatRelativeTime(lastReload.finished_at) }}</template>
-            <div v-if="lastReload.error" class="mt-1 break-words text-danger">
+            <div v-if="lastReload.error" class="mt-1 break-words text-error">
               {{ lastReload.error.message || lastReload.error.code || lastReload.error }}
             </div>
           </div>

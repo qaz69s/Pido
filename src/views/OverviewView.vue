@@ -96,9 +96,9 @@ const showMemory = computed(
 )
 
 /** 指标图标的圆形淡底配色（主题变量驱动） */
-const UP_COLOR = 'text-accent-600 dark:text-accent-400 bg-accent-500/[0.14]'
-const DOWN_COLOR = 'text-brand-600 dark:text-brand-400 bg-brand-500/[0.14]'
-const NEUTRAL_COLOR = 'text-slate-600 dark:text-slate-300 bg-slate-500/[0.14]'
+const UP_COLOR = 'text-accent bg-accent/[0.14]'
+const DOWN_COLOR = 'text-primary bg-primary/[0.14]'
+const NEUTRAL_COLOR = 'text-base-content/80 bg-base-content/[0.14]'
 
 const allStats = computed(() => [
   // 配色跟随主题：上传 = accent（强调色），下载 = brand（主色），内存 / 连接 = 中性色；与下方流量曲线一致
@@ -151,20 +151,20 @@ const infoRows = computed(() => {
   <div class="space-y-3">
     <div
       v-if="streamError && backend.status !== 'error'"
-      class="notice"
+      class="alert flex items-center gap-2 px-3 py-2.5 text-left text-sm text-base-content/80"
     >
-      <Icon name="alert" class="h-4 w-4 shrink-0 text-warn" />
+      <Icon name="alert" class="h-4 w-4 shrink-0 text-warning" />
       实时数据连接不稳定，正在自动重试
     </div>
 
     <!-- 指标卡片（排版同 v0.3；桌面 1280 左右用 3 列，超宽屏 2xl 才排成一行，避免数值被截断） -->
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" :class="stats.length === 5 ? '2xl:grid-cols-5' : '2xl:grid-cols-6'">
-      <div v-for="s in stats" :key="s.label" class="card flex items-center gap-3 p-4">
+      <div v-for="s in stats" :key="s.label" class="card flex flex-row items-center gap-3 p-4">
         <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl" :class="s.color">
           <Icon :name="s.icon" class="h-5 w-5" />
         </span>
         <div class="min-w-0">
-          <div class="text-xs text-slate-500">{{ s.label }}</div>
+          <div class="text-xs text-base-content/70">{{ s.label }}</div>
           <div class="truncate text-lg font-semibold leading-7 tracking-tight tabular-nums"><Num :value="s.value" /></div>
         </div>
       </div>
@@ -175,9 +175,9 @@ const infoRows = computed(() => {
       <section class="card p-4 lg:col-span-2">
         <div class="mb-3 flex items-center justify-between">
           <h2 class="font-semibold">实时流量</h2>
-          <div class="flex items-center gap-3 text-xs text-slate-500">
-            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-accent-500" />上传</span>
-            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-brand-500" />下载</span>
+          <div class="flex items-center gap-3 text-xs text-base-content/70">
+            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-accent" />上传</span>
+            <span class="flex items-center gap-1"><i class="h-2 w-2 rounded-full bg-primary" />下载</span>
           </div>
         </div>
         <!-- 上传 = 主题强调色，下载 = 主题主色，与上方卡片一致 -->
@@ -187,9 +187,9 @@ const infoRows = computed(() => {
       <!-- 运行信息 -->
       <section class="card p-4">
         <h2 class="mb-3 font-semibold">运行信息</h2>
-        <dl class="divide-y divide-line text-sm">
+        <dl class="divide-y divide-base-content/10 text-sm">
           <div v-for="row in infoRows" :key="row.label" class="flex justify-between py-2.5">
-            <dt class="text-slate-500">{{ row.label }}</dt>
+            <dt class="text-base-content/70">{{ row.label }}</dt>
             <dd class="font-medium tabular-nums">{{ row.value }}</dd>
           </div>
         </dl>

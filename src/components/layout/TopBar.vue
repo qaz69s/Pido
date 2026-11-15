@@ -31,18 +31,18 @@ const statusInfo = computed(() => {
   switch (backend.status) {
     case 'ok':
       return {
-        dot: 'bg-ok',
+        dot: 'bg-success',
         text: backend.version?.version || '已连接',
         logo: CORE_LOGOS[backend.engine] || '',
         engine: CORE_NAMES[backend.engine] || backend.engine,
       }
     case 'checking':
     case 'unknown':
-      return { dot: 'bg-warn animate-pulse', text: '检测中' }
+      return { dot: 'bg-warning animate-pulse', text: '检测中' }
     case 'error':
-      return { dot: 'bg-danger', text: '连接异常' }
+      return { dot: 'bg-error', text: '连接异常' }
     default:
-      return { dot: 'bg-slate-400', text: '未配置' }
+      return { dot: 'bg-base-content/40', text: '未配置' }
   }
 })
 
@@ -59,7 +59,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 <template>
   <header
     class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 transition-[background-color,border-color] duration-200"
-    :class="scrolled ? 'border-line bg-page/80 backdrop-blur' : 'border-transparent bg-page'"
+    :class="scrolled ? 'border-base-content/10 bg-base-300/80 backdrop-blur' : 'border-transparent bg-base-300'"
   >
     <!-- 手机端显示 Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
     <img
@@ -69,7 +69,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
       :title="statusInfo.engine"
       class="h-7 w-7 shrink-0 rounded-lg object-contain md:hidden"
     />
-    <span v-else class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-brand-600 text-on-brand md:hidden">
+    <span v-else class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary text-primary-content md:hidden">
       <Icon name="zap" class="h-4 w-4" />
     </span>
     <h1 class="shrink-0 whitespace-nowrap text-lg font-semibold tracking-tight">{{ route.meta.title }}</h1>
@@ -77,7 +77,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
     <div class="ml-auto flex items-center gap-1">
       <RouterLink
         to="/setup"
-        class="press mr-1 flex items-center gap-1.5 rounded-full border border-line bg-raised px-2.5 py-1 text-xs text-slate-600 transition dark:text-slate-300"
+        class="press mr-1 flex items-center gap-1.5 rounded-full border border-base-content/10 bg-base-100 px-2.5 py-1 text-xs text-base-content/80 transition"
         :class="backend.status === 'error' && 'anim-shake'"
         :title="statusInfo.engine ? `${statusInfo.engine} ${statusInfo.text} · 后端设置` : '后端设置'"
       >
@@ -85,7 +85,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
         <span class="max-w-[9rem] truncate">{{ statusInfo.text }}</span>
       </RouterLink>
       <button
-        class="btn-icon"
+        class="btn btn-sm btn-ghost btn-square size-9"
         :title="`主题：${THEME_META[theme.mode].label}（点击切换）`"
         @click="theme.cycle($event)"
       >

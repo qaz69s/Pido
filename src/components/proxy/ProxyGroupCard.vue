@@ -104,14 +104,14 @@ const levelCounts = computed(() => {
           <!-- 组图标：小尺寸贴在组名前，与组名同一行居中 -->
           <ProxyIcon v-if="group.icon" :icon="group.icon" :size="20" class="self-center" />
           <h3 class="max-w-full shrink-0 truncate font-semibold">{{ group.name }}</h3>
-          <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ group.type }} · {{ group.all?.length || 0 }}</span>
+          <span class="min-w-0 truncate text-xs text-base-content/60">{{ group.type }} · {{ group.all?.length || 0 }}</span>
         </div>
         <!-- 第二行：当前节点 -->
         <div class="mt-0.5 flex items-center gap-2 text-sm">
-          <span class="min-w-0 truncate text-slate-600 dark:text-slate-300" :title="group.now">{{ group.now || '--' }}</span>
+          <span class="min-w-0 truncate text-base-content/80" :title="group.now">{{ group.now || '--' }}</span>
         </div>
       </div>
-      <button v-if="configurable" class="btn-icon hidden sm:inline-flex" title="组参数（检查间隔 / 容差）" @click.stop="emit('settings')">
+      <button v-if="configurable" class="btn btn-sm btn-ghost btn-square size-9 hidden sm:inline-flex" title="组参数（检查间隔 / 容差）" @click.stop="emit('settings')">
         <Icon name="sliders" class="h-5 w-5" />
       </button>
       <!-- 延迟胶囊：显示当前节点延迟，点击整组测速（不再单独放闪电按钮，避免和工具栏「全部测速」撞脸） -->
@@ -125,7 +125,7 @@ const levelCounts = computed(() => {
       </span>
       <button
         v-else
-        class="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-sm tabular-nums transition hover:bg-tile disabled:opacity-100"
+        class="flex shrink-0 items-center gap-1 rounded-full px-2 py-1 text-sm tabular-nums transition hover:bg-base-200 disabled:opacity-100"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         :disabled="testing"
         title="整组测速"
@@ -137,7 +137,7 @@ const levelCounts = computed(() => {
       </button>
       <Icon
         name="chevronDown"
-        class="h-5 w-5 text-slate-400 transition-transform duration-300"
+        class="h-5 w-5 text-base-content/60 transition-transform duration-300"
         :class="collapsed ? '' : 'rotate-180'"
       />
     </header>
@@ -150,7 +150,7 @@ const levelCounts = computed(() => {
           v-for="(n, i) in nodes"
           :key="n.name"
           class="min-w-[2px] max-w-[5px] flex-1 rounded-sm transition-[height,background-color] duration-300"
-          :class="[n.name === group.now ? 'bg-brand-500' : [DELAY_BG_CLASS[delayLevel(n.delay)], 'opacity-80'], testing && 'anim-sweep']"
+          :class="[n.name === group.now ? 'bg-primary' : [DELAY_BG_CLASS[delayLevel(n.delay)], 'opacity-80'], testing && 'anim-sweep']"
           :style="{ height: barHeight(n.delay) + '%', animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
           :title="`${n.name} · ${delayText(n.delay)}`"
         />
@@ -161,7 +161,7 @@ const levelCounts = computed(() => {
           v-for="(n, i) in nodes"
           :key="n.name"
           class="h-2 w-2 rounded-full transition-colors duration-300"
-          :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-brand-400 ring-offset-1 ring-offset-transparent', testing && 'anim-sweep']"
+          :class="[DELAY_BG_CLASS[delayLevel(n.delay)], n.name === group.now && 'ring-2 ring-primary ring-offset-1 ring-offset-transparent', testing && 'anim-sweep']"
           :style="{ animationDelay: testing ? `${(i % 30) * 45}ms` : null }"
           :title="`${n.name} · ${delayText(n.delay)}`"
         />
@@ -171,7 +171,7 @@ const levelCounts = computed(() => {
         <div class="flex h-1.5 min-w-0 flex-1 gap-[2px] overflow-hidden rounded-full" :class="testing && 'animate-pulse'">
           <span v-for="l in levelCounts" :key="l.key" class="h-full" :class="DELAY_BG_CLASS[l.key]" :style="{ flexGrow: l.count }" />
         </div>
-        <span class="flex shrink-0 gap-2 text-xs text-slate-500">
+        <span class="flex shrink-0 gap-2 text-xs text-base-content/70">
           <span v-for="l in levelCounts" :key="l.key" class="flex items-center gap-1">
             <span class="h-1.5 w-1.5 rounded-full" :class="DELAY_BG_CLASS[l.key]" />{{ l.count }}
           </span>
@@ -184,7 +184,7 @@ const levelCounts = computed(() => {
       <div
         v-if="rendered"
         v-show="!collapsed"
-        class="grid grid-cols-2 gap-2 border-t border-line p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3"
+        class="grid grid-cols-2 gap-2 border-t border-base-content/10 p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3"
       >
         <ProxyNode
           v-for="n in nodes"
@@ -206,13 +206,13 @@ const levelCounts = computed(() => {
     <!-- 标准 API：组参数（展开时显示当前值；手机上标题栏放不下按钮，入口只在这里） -->
     <div
       v-if="configurable && !collapsed"
-      class="flex items-center gap-2 border-t border-line px-4 py-2 text-xs text-slate-500"
+      class="flex items-center gap-2 border-t border-base-content/10 px-4 py-2 text-xs text-base-content/70"
     >
       <span class="min-w-0 flex-1 truncate">
         间隔 {{ group._config?.check_interval != null ? `${group._config.check_interval} 秒` : '默认' }}
         <template v-if="group._policy === 'urltest'"> · 容差 {{ group._config?.tolerance != null ? `${group._config.tolerance} ms` : '默认' }}</template>
       </span>
-      <button class="btn-ghost shrink-0 px-2 py-0.5 text-xs" @click="emit('settings')">
+      <button class="btn btn-xs btn-ghost shrink-0 px-2" @click="emit('settings')">
         <Icon name="sliders" class="h-3.5 w-3.5" />
         调整
       </button>

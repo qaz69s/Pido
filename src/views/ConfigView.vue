@@ -262,19 +262,19 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
   <div v-else class="space-y-4">
     <!-- 加载中 -->
     <div v-if="loading" class="space-y-3">
-      <div v-for="i in 3" :key="i" class="card h-32 animate-pulse" />
+      <div v-for="i in 3" :key="i" class="skeleton h-32" />
     </div>
 
     <!-- 加载失败 -->
     <div v-else-if="loadErrorInfo" class="card">
       <EmptyState icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
-        <button class="btn-primary" @click="load()">重试</button>
-        <RouterLink to="/setup" class="btn-outline">修改设置</RouterLink>
+        <button class="btn btn-sm btn-primary" @click="load()">重试</button>
+        <RouterLink to="/setup" class="btn btn-sm btn-outline border-base-content/20">修改设置</RouterLink>
       </EmptyState>
     </div>
 
     <template v-else-if="cfg">
-      <p class="flex items-start gap-1.5 text-xs text-slate-500">
+      <p class="flex items-start gap-1.5 text-xs text-base-content/70">
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         这里的修改立即生效，但只作用于当前运行的内核；重启或重载配置后会恢复为配置文件中的值。
       </p>
@@ -283,18 +283,15 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <!-- 左列 -->
         <div class="space-y-4">
           <!-- 运行模式：紧凑分段按钮，说明放在 title 里 -->
-          <section class="card flex items-center gap-3 px-4 py-3">
+          <section class="card flex flex-row items-center gap-3 px-4 py-3">
             <h2 class="shrink-0 font-semibold">运行模式</h2>
-            <div class="ml-auto grid flex-1 grid-cols-3 gap-1 rounded-xl bg-tile p-1 sm:max-w-xs">
+            <div role="tablist" class="tabs tabs-boxed ml-auto flex-1 grid-cols-3 sm:max-w-xs">
               <button
                 v-for="m in MODES"
                 :key="m.value"
-                class="flex items-center justify-center gap-1 rounded-lg px-2 py-1.5 text-sm transition"
-                :class="
-                  mode === m.value
-                    ? 'bg-brand-600 font-medium text-on-brand shadow-sm'
-                    : 'text-slate-600 hover:bg-surface dark:text-slate-300'
-                "
+                role="tab"
+                class="tab gap-1 px-2 text-sm"
+                :class="mode === m.value && 'tab-active font-medium'"
                 :title="m.desc"
                 :disabled="saving.mode"
                 @click="setMode(m.value)"
@@ -309,35 +306,35 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <section class="card">
             <div class="flex items-center gap-2 px-4 pt-4">
               <h2 class="flex-1 font-semibold">入站端口</h2>
-              <button v-if="portsDirty" class="btn-ghost py-1 text-xs" @click="resetPorts">还原</button>
+              <button v-if="portsDirty" class="btn btn-xs btn-ghost" @click="resetPorts">还原</button>
               <button
-                class="btn-primary py-1 text-xs"
+                class="btn btn-xs btn-primary"
                 :disabled="!portsDirty || !!Object.keys(portErrors).length || saving.ports"
                 @click="savePorts"
               >
                 {{ saving.ports ? '保存中…' : '保存' }}
               </button>
             </div>
-            <p class="px-4 pt-1 text-xs text-slate-500">填 0 表示关闭该端口</p>
+            <p class="px-4 pt-1 text-xs text-base-content/70">填 0 表示关闭该端口</p>
             <div class="grid grid-cols-2 gap-3 p-4 sm:grid-cols-3">
               <div v-for="p in PORTS" :key="p.key">
-                <label class="label text-xs" :title="p.desc">{{ p.label }}</label>
+                <label class="label-text mb-1 block font-medium text-base-content/80 text-xs" :title="p.desc">{{ p.label }}</label>
                 <input
                   v-model.number="ports[p.key]"
                   type="number"
                   inputmode="numeric"
                   min="0"
                   max="65535"
-                  class="input py-1.5 tabular-nums"
-                  :class="portErrors[p.key] && '!border-danger focus:!ring-danger/20'"
+                  class="input input-bordered input-sm w-full tabular-nums"
+                  :class="portErrors[p.key] && 'input-error'"
                 />
-                <p v-if="portErrors[p.key]" class="mt-0.5 text-xs text-danger">{{ portErrors[p.key] }}</p>
+                <p v-if="portErrors[p.key]" class="mt-0.5 text-xs text-error">{{ portErrors[p.key] }}</p>
               </div>
             </div>
           </section>
 
           <!-- 网络 -->
-          <section class="card divide-y divide-line">
+          <section class="card divide-y divide-base-content/10">
             <h2 class="px-4 pb-2 pt-4 font-semibold">网络</h2>
             <SettingRow title="允许局域网连接" description="其他设备可通过本机 IP 使用代理端口">
               <Switch
@@ -369,7 +366,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             </SettingRow>
             <SettingRow title="日志级别" description="内核输出日志的最低级别">
               <select
-                class="input w-auto py-1.5"
+                class="select select-bordered select-sm w-auto"
                 :value="cfg['log-level']"
                 :disabled="!!saving['log-level']"
                 @change="setLogLevel"
@@ -383,12 +380,12 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <!-- 右列 -->
         <div class="space-y-4">
           <!-- TUN -->
-          <section class="card divide-y divide-line">
+          <section class="card divide-y divide-base-content/10">
             <div class="flex items-center gap-2 px-4 pb-2 pt-4">
               <h2 class="flex-1 font-semibold">TUN 模式</h2>
               <span
-                class="chip"
-                :class="tun.enable && '!bg-ok-soft !text-ok'"
+                class="badge badge-ghost badge-sm text-base-content/70"
+                :class="tun.enable && '!bg-success/10 !text-success'"
               >
                 {{ tun.enable ? '运行中' : '未开启' }}
               </span>
@@ -402,7 +399,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             </SettingRow>
             <SettingRow title="网络栈" description="Mips 为 mihomo 自研栈（推荐）；System 占用低；gVisor 隔离性好；Mixed 兼顾">
               <select
-                class="input w-auto py-1.5"
+                class="select select-bordered select-sm w-auto"
                 :value="tun.stack"
                 :disabled="!!saving.tun"
                 @change="(e) => setTun({ stack: e.target.value }, `网络栈已切换为 ${e.target.value}`)"
@@ -424,7 +421,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                 @update:model-value="(v) => setTun({ 'auto-detect-interface': v }, v ? '已开启自动检测网卡' : '已关闭自动检测网卡')"
               />
             </SettingRow>
-            <div v-if="tun.device || tun['dns-hijack']?.length" class="space-y-1 px-4 py-3 text-xs text-slate-500">
+            <div v-if="tun.device || tun['dns-hijack']?.length" class="space-y-1 px-4 py-3 text-xs text-base-content/70">
               <div v-if="tun.device">设备名：<span class="font-mono">{{ tun.device }}</span></div>
               <div v-if="tun['dns-hijack']?.length">
                 DNS 劫持：<span class="font-mono">{{ tun['dns-hijack'].join(', ') }}</span>
@@ -433,12 +430,12 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </section>
 
           <!-- 维护 -->
-          <section class="card divide-y divide-line">
+          <section class="card divide-y divide-base-content/10">
             <h2 class="px-4 pb-2 pt-4 font-semibold">维护</h2>
             <SettingRow v-for="a in ACTIONS" :key="a.key" :title="a.label" :description="a.desc">
               <button
-                :class="a.danger ? 'btn-danger' : 'btn-outline'"
-                class="py-1 text-xs"
+                :class="a.danger ? 'btn-error' : 'btn-outline border-base-content/20'"
+                class="btn btn-xs"
                 :disabled="!!saving[a.key]"
                 @click="runAction(a)"
               >

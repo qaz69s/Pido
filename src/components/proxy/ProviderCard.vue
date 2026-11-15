@@ -71,9 +71,9 @@ function barHeight(d) {
       <div class="min-w-0 flex-1">
         <div class="flex items-baseline gap-2">
           <h3 class="max-w-full shrink-0 truncate font-semibold">{{ provider.name }}</h3>
-          <span class="min-w-0 truncate text-xs text-slate-400 dark:text-slate-500">{{ provider.vehicleType }} · {{ stats.count }}</span>
+          <span class="min-w-0 truncate text-xs text-base-content/60">{{ provider.vehicleType }} · {{ stats.count }}</span>
         </div>
-        <div class="mt-0.5 truncate text-xs text-slate-500">
+        <div class="mt-0.5 truncate text-xs text-base-content/70">
           可用 {{ stats.alive }} / {{ stats.count }}
           <template v-if="stats.avg">· 平均 {{ stats.avg }} ms</template>
           <template v-if="updatedText"> · 更新于 {{ updatedText }}</template>
@@ -81,42 +81,41 @@ function barHeight(d) {
         <!-- 标准 API：订阅拉取失败时保留上次的节点，并给出原因 -->
         <div
           v-if="provider._lastError || provider._status === 'stale'"
-          class="mt-1 truncate text-xs text-warn"
+          class="mt-1 truncate text-xs text-warning"
           :title="provider._lastError?.message || provider._lastError || ''"
         >
           {{ provider._lastError?.message || provider._lastError || '订阅未产出节点（stale）' }}
         </div>
       </div>
 
-      <button v-if="showManage" class="btn-icon" :title="canManage ? '管理节点' : '查看节点'" @click.stop="emit('manage')">
+      <button v-if="showManage" class="btn btn-sm btn-ghost btn-square size-9" :title="canManage ? '管理节点' : '查看节点'" @click.stop="emit('manage')">
         <Icon :name="canManage ? 'pencil' : 'list'" class="h-5 w-5" />
       </button>
-      <button v-if="canUpdate" class="btn-icon" :disabled="!!busy" title="更新订阅（重新拉取节点）" @click.stop="emit('update')">
-        <Icon name="cloudDown" class="h-5 w-5" :class="busy === 'update' && 'animate-pulse text-brand-500'" />
+      <button v-if="canUpdate" class="btn btn-sm btn-ghost btn-square size-9" :disabled="!!busy" title="更新订阅（重新拉取节点）" @click.stop="emit('update')">
+        <Icon name="cloudDown" class="h-5 w-5" :class="busy === 'update' && 'animate-pulse text-primary'" />
       </button>
-      <button v-if="canCheck" class="btn-icon" :disabled="!!busy" title="健康检查（测试全部节点延迟）" @click.stop="emit('healthcheck')">
-        <Icon name="activity" class="h-5 w-5" :class="busy === 'check' && 'animate-pulse text-brand-500'" />
+      <button v-if="canCheck" class="btn btn-sm btn-ghost btn-square size-9" :disabled="!!busy" title="健康检查（测试全部节点延迟）" @click.stop="emit('healthcheck')">
+        <Icon name="activity" class="h-5 w-5" :class="busy === 'check' && 'animate-pulse text-primary'" />
       </button>
       <Icon
         name="chevronDown"
-        class="h-5 w-5 shrink-0 text-slate-400 transition-transform duration-300"
+        class="h-5 w-5 shrink-0 text-base-content/60 transition-transform duration-300"
         :class="collapsed ? '' : 'rotate-180'"
       />
     </header>
 
     <!-- 订阅流量 -->
     <div v-if="subscription" class="-mt-1 px-4 pb-3 text-xs">
-      <div class="mb-1 flex justify-between text-slate-500">
+      <div class="mb-1 flex justify-between text-base-content/70">
         <span>{{ subscription.used }} / {{ subscription.total }}</span>
         <span>到期 {{ subscription.expire }}</span>
       </div>
-      <div class="h-1.5 overflow-hidden rounded-full bg-tile">
-        <div
-          class="h-full rounded-full"
-          :class="subscription.percent > 90 ? 'bg-danger' : 'bg-brand-500'"
-          :style="{ width: `${subscription.percent}%` }"
-        />
-      </div>
+      <progress
+        class="progress block h-1.5 bg-base-200"
+        :class="subscription.percent > 90 ? 'progress-error' : 'progress-primary'"
+        :value="subscription.percent"
+        max="100"
+      />
     </div>
 
     <!-- 折叠时：迷你延迟柱 -->
@@ -135,8 +134,8 @@ function barHeight(d) {
 
     <!-- 展开：订阅中的节点 -->
     <ExpandTransition fade-only>
-      <div v-if="rendered" v-show="!collapsed" class="border-t border-line">
-        <div v-if="!nodes.length" class="p-4 text-center text-xs text-slate-500">
+      <div v-if="rendered" v-show="!collapsed" class="border-t border-base-content/10">
+        <div v-if="!nodes.length" class="p-4 text-center text-xs text-base-content/70">
           这个集合还没有节点，点右上角的云图标更新一次试试
         </div>
         <div v-else class="grid grid-cols-2 gap-2 p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3">

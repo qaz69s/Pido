@@ -132,30 +132,12 @@
   animation: shake 0.45s ease-in-out;
 }
 
-/* ---------- 按下回弹 ---------- */
-.btn:active:not(:disabled),
+/* ---------- 按下回弹（daisyUI 按钮自带，--btn-focus-scale 见主题） ---------- */
 .press:active {
   transform: scale(0.96);
 }
 
-/* ---------- 加载骨架：闪光扫过 ---------- */
-.skeleton {
-  position: relative;
-  overflow: hidden;
-}
-.skeleton::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  transform: translateX(-100%);
-  background: linear-gradient(90deg, transparent, rgb(var(--n-400, 148 163 184) / 0.14), transparent);
-  animation: shimmer 1.4s ease-in-out infinite;
-}
-@keyframes shimmer {
-  to {
-    transform: translateX(100%);
-  }
-}
+/* ---------- 加载骨架：使用 daisyUI skeleton ---------- */
 
 /* ---------- 连接列表：新连接滑入，关闭的淡出并收起 ---------- */
 .conn-enter-active {
@@ -223,5 +205,5 @@ html[data-motion='off'] *::after {
   bottom: 10px;
   width: 3px;
   border-radius: 0 3px 3px 0;
-  background: rgb(var(--b-500));
+  background: oklch(var(--p));
 }

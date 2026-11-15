@@ -5,7 +5,7 @@ const stack = []
 
 <script setup>
 /**
- * 通用弹窗
+ * 通用弹窗（daisyUI modal）
  * - 手机端：底部抽屉；桌面端：居中对话框
  * - 点击遮罩或按 Esc 关闭；打开时锁定页面滚动
  * 用法：<Modal v-model="open" title="标题"> 内容 <template #footer>按钮</template></Modal>
@@ -85,12 +85,11 @@ onBeforeUnmount(() => {
 <template>
   <Teleport to="body">
     <Transition name="modal">
-      <div v-if="modelValue" class="fixed inset-0 flex items-end justify-center md:items-center md:p-4" :class="z">
-        <!-- 遮罩 -->
-        <div class="absolute inset-0 bg-slate-950/50 backdrop-blur-[2px]" @click="close" />
+      <!-- daisyUI modal：手机端 modal-bottom（底部抽屉），桌面端 modal-middle（居中对话框） -->
+      <div v-if="modelValue" class="modal modal-open modal-bottom backdrop-blur-[2px] md:modal-middle md:p-4" :class="z">
         <!-- 面板 -->
         <div
-          class="modal-panel relative flex max-h-[85svh] w-full flex-col rounded-t-2xl border border-line bg-raised shadow-xl md:rounded-2xl"
+          class="modal-box modal-panel relative flex max-h-[85svh] w-full flex-col overflow-hidden border border-base-content/10 p-0 shadow-xl"
           :class="[width, dragY && '!transition-none']"
           :style="dragY ? { transform: `translateY(${dragY}px)` } : null"
           role="dialog"
@@ -98,11 +97,11 @@ onBeforeUnmount(() => {
         >
           <!-- 手机端把手 -->
           <div class="flex justify-center pt-2 md:hidden" @touchstart.passive="onDragStart" @touchmove.passive="onDragMove" @touchend="onDragEnd" @touchcancel="onDragEnd">
-            <span class="h-1 w-9 rounded-full bg-slate-300 dark:bg-white/20" />
+            <span class="h-1 w-9 rounded-full bg-base-content/20" />
           </div>
           <header class="flex items-center gap-2 px-4 pb-2 pt-1 md:pt-3" @touchstart.passive="onDragStart" @touchmove.passive="onDragMove" @touchend="onDragEnd" @touchcancel="onDragEnd">
             <h3 class="min-w-0 flex-1 truncate font-semibold">{{ title }}</h3>
-            <button class="btn-icon -mr-2 h-8 w-8" title="关闭" @click="close">
+            <button class="btn btn-sm btn-circle btn-ghost -mr-2" title="关闭" @click="close">
               <Icon name="x" class="h-5 w-5" />
             </button>
           </header>
@@ -111,11 +110,13 @@ onBeforeUnmount(() => {
           </div>
           <footer
             v-if="$slots.footer"
-            class="safe-bottom flex justify-end gap-2 border-t border-line px-4 py-3"
+            class="modal-action safe-bottom mt-0 border-t border-base-content/10 px-4 py-3"
           >
             <slot name="footer" />
           </footer>
         </div>
+        <!-- 遮罩：点击关闭 -->
+        <div class="modal-backdrop" @click="close" />
       </div>
     </Transition>
   </Teleport>

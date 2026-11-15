@@ -177,31 +177,31 @@ const title = computed(() => {
     <!-- 表单 -->
     <form v-if="view === 'form'" id="node-form" class="space-y-3" @submit.prevent="submit">
       <div>
-        <label class="label" for="node-link">分享链接</label>
+        <label class="label-text mb-1 block font-medium text-base-content/80" for="node-link">分享链接</label>
         <textarea
           id="node-link"
           v-model="form.link"
           rows="3"
-          class="input resize-none break-all font-mono text-sm leading-5"
+          class="textarea textarea-bordered w-full resize-none break-all font-mono text-sm leading-5"
           :placeholder="editing ? '留空表示不修改链接（后端不回显原链接）' : 'vless://… 、vmess://… 、trojan://… 、ss://… 、hysteria2://…'"
           spellcheck="false"
           autocomplete="off"
           @input="onLinkInput"
         />
-        <p class="mt-1 text-xs text-slate-500">
+        <p class="mt-1 text-xs text-base-content/70">
           支持 vless、vmess、trojan、ss、ssr、socks、http、hysteria2、tuic、juicity、anytls、naive，须带主机与端口。
         </p>
       </div>
       <div>
-        <label class="label" for="node-name">名称</label>
-        <input id="node-name" v-model="form.name" class="input" maxlength="64" placeholder="例如 hk-03" autocomplete="off" />
-        <p class="mt-1 text-xs text-slate-500">节点名全局唯一；改名不会同步修改其他文件里按名称引用它的组过滤 / 规则。</p>
+        <label class="label-text mb-1 block font-medium text-base-content/80" for="node-name">名称</label>
+        <input id="node-name" v-model="form.name" class="input input-bordered input-sm w-full" maxlength="64" placeholder="例如 hk-03" autocomplete="off" />
+        <p class="mt-1 text-xs text-base-content/70">节点名全局唯一；改名不会同步修改其他文件里按名称引用它的组过滤 / 规则。</p>
       </div>
-      <p v-if="formError" class="flex items-start gap-1.5 rounded-lg bg-danger-soft px-3 py-2 text-sm text-danger">
+      <p v-if="formError" role="alert" class="alert flex items-start gap-1.5 rounded-lg border-0 bg-error/10 px-3 py-2 text-left text-sm text-error">
         <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
         {{ formError }}
       </p>
-      <p class="flex items-start gap-1.5 text-xs text-slate-500">
+      <p class="flex items-start gap-1.5 text-xs text-base-content/70">
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         保存后写入 config.d/node.dae 的 node 段（保留 .bak）并重载 {{ backend.engine }}。
       </p>
@@ -209,25 +209,25 @@ const title = computed(() => {
 
     <!-- 列表 -->
     <div v-else class="space-y-3">
-      <p v-if="!editable" class="flex items-start gap-1.5 rounded-lg bg-tile px-3 py-2 text-xs text-slate-500">
+      <p v-if="!editable" class="flex items-start gap-1.5 rounded-lg bg-base-200 px-3 py-2 text-xs text-base-content/70">
         <Icon name="lock" class="mt-px h-3.5 w-3.5 shrink-0" />
         <span v-if="provider && provider._kind !== 'inline'">订阅节点只读：由订阅管理，只能通过更新订阅来变更。</span>
         <span v-else>后端未开启节点管理：需要在 api 段设置 config_write: true，且配置目录为受管布局。</span>
       </p>
-      <ul v-if="nodes.length" class="divide-y divide-line">
+      <ul v-if="nodes.length" class="divide-y divide-base-content/10">
         <li v-for="n in nodes" :key="n._id || n.name" class="flex items-center gap-2 py-2">
           <div class="min-w-0 flex-1">
             <div class="truncate text-sm font-medium" :title="n.name">{{ n.name }}</div>
-            <div class="text-xs text-slate-500">{{ n.type || '--' }}</div>
+            <div class="text-xs text-base-content/70">{{ n.type || '--' }}</div>
           </div>
           <span class="shrink-0 text-sm font-semibold tabular-nums" :class="DELAY_TEXT_CLASS[delayLevel(delays[n.name])]">
             {{ delayText(delays[n.name]) }}
           </span>
           <template v-if="editable">
-            <button class="btn-icon h-8 w-8" title="编辑" :disabled="!!busyNode" @click="startEdit(n)">
+            <button class="btn btn-sm btn-ghost btn-square h-8 w-8" title="编辑" :disabled="!!busyNode" @click="startEdit(n)">
               <Icon name="pencil" class="h-4 w-4" />
             </button>
-            <button class="btn-icon h-8 w-8 hover:!text-danger" title="删除" :disabled="!!busyNode" @click="remove(n)">
+            <button class="btn btn-sm btn-ghost btn-square h-8 w-8 hover:!text-error" title="删除" :disabled="!!busyNode" @click="remove(n)">
               <Icon name="trash" class="h-4 w-4" :class="busyNode === n.name && 'animate-pulse'" />
             </button>
           </template>
@@ -238,18 +238,18 @@ const title = computed(() => {
 
     <template #footer>
       <template v-if="view === 'form'">
-        <button class="btn-ghost" type="button" :disabled="busy" @click="back">{{ mode === 'add' && !provider ? '取消' : '返回' }}</button>
-        <button class="btn-primary" type="submit" form="node-form" :disabled="busy">
+        <button class="btn btn-sm btn-ghost" type="button" :disabled="busy" @click="back">{{ mode === 'add' && !provider ? '取消' : '返回' }}</button>
+        <button class="btn btn-sm btn-primary" type="submit" form="node-form" :disabled="busy">
           <Icon :name="editing ? 'check' : 'plus'" class="h-4 w-4" :class="busy && 'animate-pulse'" />
           {{ busy ? '保存中…' : editing ? '保存' : '添加' }}
         </button>
       </template>
       <template v-else>
-        <button v-if="editable" class="btn-primary" @click="startAdd">
+        <button v-if="editable" class="btn btn-sm btn-primary" @click="startAdd">
           <Icon name="plus" class="h-4 w-4" />
           添加节点
         </button>
-        <button class="btn-ghost" @click="open = false">关闭</button>
+        <button class="btn btn-sm btn-ghost" @click="open = false">关闭</button>
       </template>
     </template>
   </Modal>

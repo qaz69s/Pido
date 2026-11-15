@@ -368,50 +368,51 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
   <div class="space-y-3">
     <!-- 工具栏：不换行，空间不够时标签先收缩（手机系统字体放大时也保持一行） -->
     <div class="flex items-center gap-2">
-      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
+      <div role="tablist" class="tb-tabs tabs tabs-boxed tabs-sm min-w-0 shrink overflow-hidden">
         <button
           v-for="t in [
             { key: 'groups', label: '代理组', count: groups.length },
             { key: 'providers', label: backend.isStandard ? '订阅' : '代理集合', count: providerList.length },
           ]"
           :key="t.key"
-          class="truncate whitespace-nowrap rounded-md transition"
-          :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
+          role="tab"
+          class="tab truncate whitespace-nowrap"
+          :class="tab === t.key && 'tab-active font-medium'"
           @click="tab = t.key"
         >
-          {{ t.label }} <span class="tab-count text-xs text-slate-400">{{ t.count }}</span>
+          {{ t.label }} <span class="tab-count text-xs opacity-60">{{ t.count }}</span>
         </button>
       </div>
 
       <div class="tb ml-auto flex shrink-0 items-center md:ml-1">
         <template v-if="tab === 'groups'">
-          <button class="btn-icon" :title="allCollapsed ? '全部展开' : '全部折叠'" @click="toggleAll">
+          <button class="btn btn-sm btn-ghost btn-square size-9" :title="allCollapsed ? '全部展开' : '全部折叠'" @click="toggleAll">
             <Icon name="chevronDown" class="h-5 w-5 transition-transform" :class="allCollapsed ? '' : 'rotate-180'" />
           </button>
           <button
-            class="btn-icon"
-            :class="showSettings && 'bg-slate-200/70 dark:bg-white/[0.08]'"
+            class="btn btn-sm btn-ghost btn-square size-9"
+            :class="showSettings && 'bg-base-content/10'"
             title="显示与测速设置"
             @click="showSettings = !showSettings"
           >
             <Icon name="settings" class="h-5 w-5" />
           </button>
-          <button v-if="canTest" class="btn-ghost h-[34px] w-[34px] !px-0 sm:w-auto sm:!px-3" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
+          <button v-if="canTest" class="btn btn-sm btn-ghost h-[34px] w-[34px] !px-0 sm:w-auto sm:!px-3" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
             <Icon name="gauge" class="h-5 w-5" :class="testingAll && 'animate-pulse'" />
             <span class="hidden sm:inline">{{ testingAll ? '测速中…' : '全部测速' }}</span>
           </button>
         </template>
         <template v-else>
-          <button v-if="canManageNodes" class="btn-outline" title="通过分享链接添加节点" @click="openAddNode">
+          <button v-if="canManageNodes" class="btn btn-sm btn-outline border-base-content/20" title="通过分享链接添加节点" @click="openAddNode">
             <Icon name="plus" class="h-4 w-4" />
             <span class="hidden sm:inline">添加节点</span>
           </button>
-          <button class="btn-primary" :disabled="updatingAll || !updatableProviders.length" title="更新全部订阅" @click="onUpdateAllProviders">
+          <button class="btn btn-sm btn-primary" :disabled="updatingAll || !updatableProviders.length" title="更新全部订阅" @click="onUpdateAllProviders">
             <Icon name="cloudDown" class="h-4 w-4" :class="updatingAll && 'animate-pulse'" />
             <span class="hidden sm:inline">全部更新</span>
           </button>
         </template>
-        <button class="btn-icon" title="刷新页面数据" @click="load({ silent: true })">
+        <button class="btn btn-sm btn-ghost btn-square size-9" title="刷新页面数据" @click="load({ silent: true })">
           <Icon name="reload" class="h-5 w-5" />
         </button>
       </div>
@@ -424,16 +425,16 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       :class="backend.isStandard ? 'sm:grid-cols-[9rem_9rem_1fr_auto]' : 'sm:grid-cols-[9rem_9rem_1fr_10rem_auto]'"
     >
       <div>
-        <label class="label">节点排序</label>
-        <select v-model="prefs.sort" class="input">
+        <label class="label-text mb-1 block font-medium text-base-content/80">节点排序</label>
+        <select v-model="prefs.sort" class="select select-bordered select-sm w-full">
           <option value="default">默认顺序</option>
           <option value="delay">按延迟</option>
           <option value="name">按名称</option>
         </select>
       </div>
       <div>
-        <label class="label">延迟概览</label>
-        <select v-model="prefs.overview" class="input">
+        <label class="label-text mb-1 block font-medium text-base-content/80">延迟概览</label>
+        <select v-model="prefs.overview" class="select select-bordered select-sm w-full">
           <option value="stack">分段条</option>
           <option value="bars">迷你柱</option>
           <option value="dots">圆点</option>
@@ -441,25 +442,25 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       </div>
       <template v-if="!backend.isStandard">
         <div>
-          <label class="label">测速地址</label>
-          <input v-model.trim="prefs.testUrl" class="input font-mono" :placeholder="DEFAULT_TEST_URL" />
+          <label class="label-text mb-1 block font-medium text-base-content/80">测速地址</label>
+          <input v-model.trim="prefs.testUrl" class="input input-bordered input-sm w-full font-mono" :placeholder="DEFAULT_TEST_URL" />
         </div>
         <div>
-          <label class="label">超时（毫秒）</label>
-          <input v-model.number="prefs.timeout" type="number" min="500" step="500" class="input" />
+          <label class="label-text mb-1 block font-medium text-base-content/80">超时（毫秒）</label>
+          <input v-model.number="prefs.timeout" type="number" min="500" step="500" class="input input-bordered input-sm w-full" />
         </div>
       </template>
       <!-- 标准 API：测速由后端发起，地址取各组的 check_url / 节点配置 -->
-      <p v-else class="flex items-start gap-1.5 text-xs text-slate-500 sm:pb-2.5">
+      <p v-else class="flex items-start gap-1.5 text-xs text-base-content/70 sm:pb-2.5">
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         测速由 {{ backend.engine }} 发起（HTTP 探测），测速地址与超时取后端配置
       </p>
-      <button class="btn-outline" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'stack'; prefs.closeOnSwitch = false">恢复默认</button>
+      <button class="btn btn-sm btn-outline border-base-content/20" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'stack'; prefs.closeOnSwitch = false">恢复默认</button>
       <!-- 切换节点时断开旧连接 -->
-      <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-line/70 pt-3">
+      <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-base-content/[0.07] pt-3">
         <span class="min-w-0">
           <span class="block text-sm font-medium">切换节点时断开旧连接</span>
-          <span class="block text-xs text-slate-500">已建立的连接不会自动换线；开启后切换即断开走旧节点的连接，应用重连后走新节点</span>
+          <span class="block text-xs text-base-content/70">已建立的连接不会自动换线；开启后切换即断开走旧节点的连接，应用重连后走新节点</span>
         </span>
         <Switch v-model="prefs.closeOnSwitch" />
       </label>
@@ -467,22 +468,22 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
     <div
       v-if="mode === 'direct' && tab === 'groups'"
-      class="notice"
+      class="alert flex items-center gap-2 px-3 py-2.5 text-left text-sm text-base-content/80"
     >
-      <Icon name="info" class="h-4 w-4 shrink-0 text-sky-500" />
+      <Icon name="info" class="h-4 w-4 shrink-0 text-info" />
       当前为直连模式，代理组的选择暂不生效。
     </div>
 
     <!-- 加载中 -->
     <div v-if="loading" class="grid gap-3 lg:grid-cols-2">
-      <div v-for="i in 4" :key="i" class="card skeleton h-20" />
+      <div v-for="i in 4" :key="i" class="skeleton h-20" />
     </div>
 
     <!-- 加载失败 -->
     <div v-else-if="loadErrorInfo" class="card">
       <EmptyState icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
-        <button class="btn-primary" @click="load()">重试</button>
-        <RouterLink to="/setup" class="btn-outline">修改设置</RouterLink>
+        <button class="btn btn-sm btn-primary" @click="load()">重试</button>
+        <RouterLink to="/setup" class="btn btn-sm btn-outline border-base-content/20">修改设置</RouterLink>
       </EmptyState>
     </div>
 

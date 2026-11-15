@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
+<html lang="zh-CN" data-theme="default-light">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
@@ -23,10 +23,10 @@
           var dark =
             mode === 'dark' ||
             (mode === 'system' && window.matchMedia('(prefers-color-scheme: dark)').matches)
-          if (dark) document.documentElement.classList.add('dark')
-          // 配色方案
-          document.documentElement.dataset.theme =
-            (localStorage.getItem('mihomo-dashboard:preset') || 'default').replace(/^(matcha|jade)$/, 'neutral')
+          // 配色方案 + 外观 = daisyUI 主题名，例如 nord-dark（与 stores/theme.js 一致；未知配色回落到默认）
+          var preset = (localStorage.getItem('mihomo-dashboard:preset') || 'default').replace(/^(matcha|jade)$/, 'neutral')
+          if (!/^(default|nord|neutral|sakura|cyber|sunset)$/.test(preset)) preset = 'default'
+          document.documentElement.dataset.theme = preset + (dark ? '-dark' : '-light')
           // 动画开关：没设置过时跟随系统「减少动画」
           var motion = localStorage.getItem('mihomo-dashboard:motion')
           document.documentElement.dataset.motion =

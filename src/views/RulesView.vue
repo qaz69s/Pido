@@ -81,9 +81,9 @@ function ruleSize(r) {
 /** 目标的颜色：直连绿、拒绝红、其它主色 */
 function targetClass(name) {
   const n = (name || '').toUpperCase()
-  if (n === 'DIRECT') return 'text-ok'
-  if (n.startsWith('REJECT') || n === 'BLOCK') return 'text-danger' // BLOCK：dae 的拒绝出站
-  return 'text-brand-600 dark:text-brand-400'
+  if (n === 'DIRECT') return 'text-success'
+  if (n.startsWith('REJECT') || n === 'BLOCK') return 'text-error' // BLOCK：dae 的拒绝出站
+  return 'text-primary'
 }
 
 /** 规则类型显示名：后端返回驼峰（DomainSuffix），转成配置文件里的写法（DOMAIN-SUFFIX） */
@@ -174,7 +174,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
     <!-- 工具栏：固定一行不换行（系统字体放大时标签先截断）；手机端搜索框单独一行 -->
     <div class="flex flex-nowrap items-center gap-2">
-      <div class="tb-tabs flex min-w-0 shrink-0 overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
+      <div role="tablist" class="tb-tabs tabs tabs-boxed tabs-sm min-w-0 shrink-0 overflow-hidden">
         <button
           v-for="t in backend.isStandard
             ? [{ key: 'rules', label: '规则', count: rules.length }]
@@ -183,33 +183,34 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
                 { key: 'providers', label: '规则集合', count: providerList.length },
               ]"
           :key="t.key"
-          class="min-w-0 shrink truncate whitespace-nowrap rounded-md transition"
-          :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
+          role="tab"
+          class="tab min-w-0 shrink truncate whitespace-nowrap"
+          :class="tab === t.key && 'tab-active font-medium'"
           @click="tab = t.key"
         >
-          {{ t.label }} <span class="tab-count w4 text-xs text-slate-400">{{ t.count }}</span>
+          {{ t.label }} <span class="tab-count w4 text-xs opacity-60">{{ t.count }}</span>
         </button>
       </div>
 
       <template v-if="tab === 'rules'">
         <!-- 桌面端：搜索框内联 -->
         <div class="relative hidden flex-1 sm:block">
-          <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-          <input v-model="keyword" type="search" class="input py-1.5 pl-8" placeholder="搜索规则内容、类型或目标" />
+          <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
+          <input v-model="keyword" type="search" class="input input-bordered input-sm w-full pl-8" placeholder="搜索规则内容、类型或目标" />
         </div>
-        <select v-model="target" class="input ml-auto w-auto min-w-0 max-w-[45%] shrink py-1.5 sm:ml-0" title="按目标筛选">
+        <select v-model="target" class="select select-bordered select-sm ml-auto w-auto min-w-0 max-w-[45%] shrink sm:ml-0" title="按目标筛选">
           <option value="">全部目标</option>
           <option v-for="t in targets" :key="t.name" :value="t.name">{{ t.name }}（{{ t.n }}）</option>
         </select>
         <div class="tb flex shrink-0 items-center">
-          <button class="btn-icon" title="刷新列表" @click="load({ silent: true })">
+          <button class="btn btn-sm btn-ghost btn-square size-9" title="刷新列表" @click="load({ silent: true })">
             <Icon name="reload" class="h-5 w-5" />
           </button>
         </div>
       </template>
       <!-- 规则集合：只保留一个「全部更新」，更新完成后会自动刷新列表 -->
       <div v-else class="tb ml-auto flex shrink-0 items-center">
-        <button class="btn-primary" title="全部更新（重新下载所有规则集合）" :disabled="updatingAll || !providerList.length" @click="onUpdateAll">
+        <button class="btn btn-sm btn-primary" title="全部更新（重新下载所有规则集合）" :disabled="updatingAll || !providerList.length" @click="onUpdateAll">
           <Icon name="download" class="h-4 w-4" :class="updatingAll && 'animate-bounce'" />
           <span class="whitespace-nowrap">{{ updatingAll ? '更新中' : '全部更新' }}</span>
         </button>
@@ -218,19 +219,19 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
     <!-- 手机端：搜索框单独一行 -->
     <div v-if="tab === 'rules'" class="relative sm:hidden">
-      <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-      <input v-model="keyword" type="search" class="input py-1.5 pl-8" placeholder="搜索规则内容、类型或目标" />
+      <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
+      <input v-model="keyword" type="search" class="input input-bordered input-sm w-full pl-8" placeholder="搜索规则内容、类型或目标" />
     </div>
 
-    <div v-if="loading" class="card divide-y divide-line">
-      <div v-for="i in 8" :key="i" class="skeleton h-12" />
+    <div v-if="loading" class="card divide-y divide-base-content/10">
+      <div v-for="i in 8" :key="i" class="skeleton h-12 rounded-none" />
     </div>
 
     <!-- 加载失败 -->
     <div v-else-if="loadErrorInfo" class="card">
       <EmptyState icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
-        <button class="btn-primary" @click="load()">重试</button>
-        <RouterLink to="/setup" class="btn-outline">修改设置</RouterLink>
+        <button class="btn btn-sm btn-primary" @click="load()">重试</button>
+        <RouterLink to="/setup" class="btn btn-sm btn-outline border-base-content/20">修改设置</RouterLink>
       </EmptyState>
     </div>
 
@@ -242,24 +243,24 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           :title="keyword || target ? '没有匹配的规则' : '没有规则'"
         />
       </div>
-      <div v-else class="card divide-y divide-line">
+      <div v-else class="card divide-y divide-base-content/10">
         <div
           v-for="r in visible"
           :key="r.index"
           class="flex items-center gap-3 px-3 py-2.5 text-sm sm:px-4"
         >
-          <span class="w-8 shrink-0 text-right text-xs tabular-nums text-slate-400">{{ r.index }}</span>
+          <span class="w-8 shrink-0 text-right text-xs tabular-nums text-base-content/60">{{ r.index }}</span>
           <div class="min-w-0 flex-1">
             <div class="flex min-w-0 items-center gap-2">
               <span class="truncate font-mono text-sm" :title="r.payload">{{ r.payload || '（全部流量）' }}</span>
-              <span v-if="ruleSize(r) != null" class="shrink-0 text-xs text-slate-400">{{ ruleSize(r) }} 条</span>
+              <span v-if="ruleSize(r) != null" class="shrink-0 text-xs text-base-content/60">{{ ruleSize(r) }} 条</span>
             </div>
             <div class="mt-0.5 flex items-center gap-2 sm:hidden">
-              <span class="chip">{{ typeName(r.type) }}</span>
+              <span class="badge badge-ghost badge-sm text-base-content/70">{{ typeName(r.type) }}</span>
               <span class="truncate text-xs font-medium" :class="targetClass(r.proxy)">→ {{ r.proxy }}</span>
             </div>
           </div>
-          <span class="chip hidden shrink-0 sm:inline-flex">{{ typeName(r.type) }}</span>
+          <span class="badge badge-ghost badge-sm text-base-content/70 hidden shrink-0 sm:inline-flex">{{ typeName(r.type) }}</span>
           <span
             class="hidden w-36 shrink-0 truncate text-right font-medium sm:block"
             :class="targetClass(r.proxy)"
@@ -268,9 +269,9 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             {{ r.proxy }}
           </span>
         </div>
-        <div v-if="hasMore" ref="sentinel" class="py-3 text-center text-xs text-slate-400">加载中…</div>
+        <div v-if="hasMore" ref="sentinel" class="py-3 text-center text-xs text-base-content/60">加载中…</div>
       </div>
-      <p v-if="filtered.length" class="text-center text-xs text-slate-400">
+      <p v-if="filtered.length" class="text-center text-xs text-base-content/60">
         共 {{ filtered.length }} 条{{ keyword || target ? '匹配' : '' }}规则 · 按从上到下的顺序匹配
       </p>
     </template>
@@ -284,25 +285,25 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <section v-for="p in providerList" :key="p.name" class="card flex flex-col gap-3 p-4">
           <div class="min-w-0">
             <h3 class="truncate font-semibold" :title="p.name">{{ p.name }}</h3>
-            <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-slate-500">
-              <span class="chip">{{ BEHAVIOR_LABEL[p.behavior] || p.behavior }}</span>
-              <span class="chip">{{ FORMAT_LABEL[p.format] || p.format }}</span>
-              <span class="chip">{{ p.vehicleType }}</span>
+            <div class="mt-1.5 flex flex-wrap items-center gap-1.5 text-xs text-base-content/70">
+              <span class="badge badge-ghost badge-sm text-base-content/70">{{ BEHAVIOR_LABEL[p.behavior] || p.behavior }}</span>
+              <span class="badge badge-ghost badge-sm text-base-content/70">{{ FORMAT_LABEL[p.format] || p.format }}</span>
+              <span class="badge badge-ghost badge-sm text-base-content/70">{{ p.vehicleType }}</span>
             </div>
           </div>
           <div class="flex items-end justify-between text-sm">
             <div>
               <div class="text-2xl font-semibold tabular-nums">{{ p.ruleCount?.toLocaleString() ?? '--' }}</div>
-              <div class="text-xs text-slate-500">条规则</div>
+              <div class="text-xs text-base-content/70">条规则</div>
             </div>
-            <div class="text-right text-xs text-slate-500">更新于<br />{{ formatRelativeTime(p.updatedAt) }}</div>
+            <div class="text-right text-xs text-base-content/70">更新于<br />{{ formatRelativeTime(p.updatedAt) }}</div>
           </div>
           <div class="mt-auto flex gap-2">
-            <button class="btn-outline flex-1" @click="showRulesOf(p.name)">
+            <button class="btn btn-sm btn-outline border-base-content/20 flex-1" @click="showRulesOf(p.name)">
               <Icon name="list" class="h-4 w-4" />
               查看引用
             </button>
-            <button class="btn-outline flex-1" :disabled="!!busy[p.name]" @click="onUpdateProvider(p.name).catch(() => {})">
+            <button class="btn btn-sm btn-outline border-base-content/20 flex-1" :disabled="!!busy[p.name]" @click="onUpdateProvider(p.name).catch(() => {})">
               <Icon name="reload" class="h-4 w-4" :class="busy[p.name] && 'animate-spin'" />
               更新
             </button>

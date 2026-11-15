@@ -239,49 +239,50 @@ const STATUS_TEXT = {
     <!-- 顶部统计 -->
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <div class="card px-3 py-2.5">
-        <div class="text-xs text-slate-500">活动连接</div>
+        <div class="text-xs text-base-content/70">活动连接</div>
         <div class="text-lg font-semibold">{{ active.length }}</div>
       </div>
       <div class="card px-3 py-2.5">
-        <div class="text-xs text-slate-500">实时速率 ↓ / ↑</div>
+        <div class="text-xs text-base-content/70">实时速率 ↓ / ↑</div>
         <div class="truncate text-sm font-semibold leading-7">
           {{ formatSpeed(speedSum.down) }}
-          <span class="font-normal text-slate-400">/</span>
+          <span class="font-normal text-base-content/60">/</span>
           {{ formatSpeed(speedSum.up) }}
         </div>
       </div>
       <div class="card px-3 py-2.5">
-        <div class="text-xs text-slate-500">下载总量</div>
+        <div class="text-xs text-base-content/70">下载总量</div>
         <div class="text-lg font-semibold">{{ formatBytes(totals.download) }}</div>
       </div>
       <div class="card px-3 py-2.5">
-        <div class="text-xs text-slate-500">上传总量</div>
+        <div class="text-xs text-base-content/70">上传总量</div>
         <div class="text-lg font-semibold">{{ formatBytes(totals.upload) }}</div>
       </div>
     </div>
 
     <!-- 工具栏：标签与按钮一行不换行；手机上搜索框单独放在下一行 -->
     <div class="flex items-center gap-2">
-      <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-tile">
+      <div role="tablist" class="tb-tabs tabs tabs-boxed tabs-sm min-w-0 shrink overflow-hidden">
         <button
           v-for="t in [
             { key: 'active', label: '活动', count: active.length },
             { key: 'closed', label: '已关闭', count: closed.length },
           ]"
           :key="t.key"
-          class="truncate whitespace-nowrap rounded-md transition"
-          :class="tab === t.key ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
+          role="tab"
+          class="tab truncate whitespace-nowrap"
+          :class="tab === t.key && 'tab-active font-medium'"
           @click="tab = t.key"
         >
-          {{ t.label }} <span class="tab-count text-xs text-slate-400">{{ t.count }}</span>
+          {{ t.label }} <span class="tab-count text-xs opacity-60">{{ t.count }}</span>
         </button>
       </div>
 
       <div class="relative hidden min-w-0 flex-1 sm:block">
-        <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+        <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
         <input
           v-model="keyword"
-          class="input py-1.5 pl-8"
+          class="input input-bordered input-sm w-full pl-8"
           placeholder="搜索主机、IP、进程、规则、节点（空格分隔多个词）"
           type="search"
         />
@@ -289,10 +290,10 @@ const STATUS_TEXT = {
 
       <div class="tb ml-auto flex shrink-0 items-center">
         <!-- 手机端排序：一个图标 + 小菜单（再点当前项切换升降序）；宽屏用表头排序 -->
-        <div v-if="tab === 'active'" class="relative md:hidden">
+        <div v-if="tab === 'active'" class="dropdown dropdown-end md:hidden" :class="sortMenu && 'dropdown-open'">
           <button
-            class="btn-icon"
-            :class="sortMenu && 'bg-slate-200/70 dark:bg-white/[0.08]'"
+            class="btn btn-sm btn-ghost btn-square size-9"
+            :class="sortMenu && 'btn-active'"
             title="排序"
             @click="sortMenu = !sortMenu"
           >
@@ -300,33 +301,33 @@ const STATUS_TEXT = {
           </button>
           <template v-if="sortMenu">
             <div class="fixed inset-0 z-20" @click="sortMenu = false" />
-            <div class="card absolute right-0 top-full z-30 mt-1 w-44 p-1 shadow-lg">
-              <button
-                v-for="s in SORTS"
-                :key="s.key"
-                class="flex w-full items-center justify-between rounded-md px-3 py-2 text-sm transition hover:bg-slate-100 dark:hover:bg-white/[0.06]"
-                :class="sort.key === s.key ? 'font-medium' : 'text-slate-500'"
-                @click="pickSort(s.key)"
-              >
-                {{ s.label }}
-                <Icon v-if="sort.key === s.key" :name="sort.desc ? 'arrowDown' : 'arrowUp'" class="h-4 w-4" />
-              </button>
-            </div>
+            <ul class="dropdown-content menu z-30 mt-1 w-44 rounded-box border border-base-content/10 bg-base-100 p-1 shadow-lg">
+              <li v-for="s in SORTS" :key="s.key">
+                <button
+                  class="flex items-center justify-between"
+                  :class="sort.key === s.key ? 'font-medium' : 'text-base-content/70'"
+                  @click="pickSort(s.key)"
+                >
+                  {{ s.label }}
+                  <Icon v-if="sort.key === s.key" :name="sort.desc ? 'arrowDown' : 'arrowUp'" class="h-4 w-4" />
+                </button>
+              </li>
+            </ul>
           </template>
         </div>
         <button
-          class="btn-icon"
-          :class="paused && 'bg-warn-soft text-warn'"
+          class="btn btn-sm btn-ghost btn-square size-9"
+          :class="paused && 'bg-warning/10 text-warning'"
           :title="paused ? '继续刷新' : '暂停刷新'"
           @click="paused = !paused"
         >
           <Icon :name="paused ? 'play' : 'pause'" class="h-5 w-5" />
         </button>
-        <button v-if="tab === 'active'" class="btn-danger" :disabled="!filtered.length" @click="onCloseAll">
+        <button v-if="tab === 'active'" class="btn btn-sm btn-error" :disabled="!filtered.length" @click="onCloseAll">
           <Icon name="x" class="h-4 w-4" />
           <span class="hidden sm:inline">{{ keyword.trim() ? '断开筛选结果' : '全部断开' }}</span>
         </button>
-        <button v-else class="btn-outline" :disabled="!closed.length" @click="clearClosed">
+        <button v-else class="btn btn-sm btn-outline border-base-content/20" :disabled="!closed.length" @click="clearClosed">
           <Icon name="trash" class="h-4 w-4" />
           <span class="hidden sm:inline">清空</span>
         </button>
@@ -335,10 +336,10 @@ const STATUS_TEXT = {
 
     <!-- 手机端搜索框 -->
     <div class="relative sm:hidden">
-      <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+      <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
       <input
         v-model="keyword"
-        class="input py-1.5 pl-8"
+        class="input input-bordered input-sm w-full pl-8"
         placeholder="搜索主机、IP、进程、规则、节点（空格分隔多个词）"
         type="search"
       />
@@ -347,28 +348,29 @@ const STATUS_TEXT = {
     <!-- 状态提示 -->
     <div
       v-if="paused"
-      class="notice"
+      class="alert flex items-center gap-2 px-3 py-2.5 text-left text-sm text-base-content/80"
     >
-      <Icon name="pause" class="h-4 w-4 shrink-0 text-warn" />
+      <Icon name="pause" class="h-4 w-4 shrink-0 text-warning" />
       已暂停刷新，列表停在暂停时的状态。
     </div>
     <div
       v-else-if="STATUS_TEXT[status]"
-      class="flex items-center gap-2 rounded-xl border p-2.5 text-sm"
+      class="alert flex items-center gap-2 rounded-xl p-2.5 text-left text-sm"
       :class="
         status === 'error'
-          ? 'border-danger-soft bg-danger-soft text-danger'
-          : 'border-transparent bg-tile text-slate-500'
+          ? 'border-error/30 bg-error/10 text-error'
+          : 'border-transparent bg-base-200 text-base-content/70'
       "
     >
-      <Icon :name="status === 'error' ? 'alert' : 'refresh'" class="h-4 w-4 shrink-0" :class="status !== 'error' && 'animate-spin'" />
+      <Icon v-if="status === 'error'" name="alert" class="h-4 w-4 shrink-0" />
+      <span v-else class="loading loading-spinner loading-xs shrink-0" />
       {{ STATUS_TEXT[status] }}
       <span v-if="status === 'error'" class="text-xs opacity-80">（检查后端地址和 secret，或刷新页面）</span>
     </div>
 
     <!-- 空状态 -->
     <div v-if="!received && status !== 'error'" class="space-y-2">
-      <div v-for="i in 4" :key="i" class="card skeleton h-14" />
+      <div v-for="i in 4" :key="i" class="skeleton h-14" />
     </div>
     <div v-else-if="!filtered.length" class="card">
       <EmptyState
@@ -381,57 +383,57 @@ const STATUS_TEXT = {
     <template v-else>
       <!-- 桌面端：表格 -->
       <div class="card hidden overflow-x-auto md:block">
-        <table class="w-full text-sm">
+        <table class="table table-sm [&_tr]:border-base-content/10">
           <thead>
-            <tr class="border-b border-line text-left text-xs text-slate-500">
+            <tr class="text-left text-xs text-base-content/70">
               <th
                 v-for="col in COLUMNS"
                 :key="col.key"
                 class="whitespace-nowrap px-3 py-2.5 font-medium"
-                :class="[col.align === 'right' && 'text-right', col.sortable && tab === 'active' && 'cursor-pointer select-none hover:text-slate-800 dark:hover:text-slate-200']"
+                :class="[col.align === 'right' && 'text-right', col.sortable && tab === 'active' && 'cursor-pointer select-none hover:text-base-content']"
                 @click="col.sortable && tab === 'active' && setSort(col.key)"
               >
                 {{ col.label }}
-                <span v-if="tab === 'active' && sort.key === col.key" class="text-brand-500">{{ sort.desc ? '↓' : '↑' }}</span>
+                <span v-if="tab === 'active' && sort.key === col.key" class="text-primary">{{ sort.desc ? '↓' : '↑' }}</span>
               </th>
               <th class="w-10 px-2" />
             </tr>
           </thead>
           <!-- 新连接滑入、关闭的淡出；切换标签时整体重建（:key），避免大量动画 -->
-          <TransitionGroup :key="tab" tag="tbody" name="conn" class="divide-y divide-line">
+          <TransitionGroup :key="tab" tag="tbody" name="conn">
             <tr
               v-for="c in visible"
               :key="c.id"
-              class="cursor-pointer transition hover:bg-tile"
+              class="hover cursor-pointer transition"
               @click="detail = c"
             >
               <td class="max-w-[16rem] px-3 py-2">
                 <div class="truncate font-medium" :title="connTarget(c)">{{ connTarget(c) }}</div>
                 <div class="mt-0.5 flex gap-1">
-                  <span class="chip uppercase">{{ c.metadata?.network }}</span>
-                  <span class="chip">{{ c.metadata?.type }}</span>
+                  <span class="badge badge-ghost badge-sm text-base-content/70 uppercase">{{ c.metadata?.network }}</span>
+                  <span class="badge badge-ghost badge-sm text-base-content/70">{{ c.metadata?.type }}</span>
                 </div>
               </td>
-              <td class="max-w-[12rem] truncate px-3 py-2 text-slate-600 dark:text-slate-300" :title="connRule(c)">
+              <td class="max-w-[12rem] truncate px-3 py-2 text-base-content/80" :title="connRule(c)">
                 {{ connRule(c) }}
               </td>
-              <td class="max-w-[14rem] truncate px-3 py-2 text-slate-600 dark:text-slate-300" :title="connChain(c).join(' → ')">
+              <td class="max-w-[14rem] truncate px-3 py-2 text-base-content/80" :title="connChain(c).join(' → ')">
                 {{ connChain(c).join(' → ') }}
               </td>
-              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.downSpeed > 0 && 'text-brand-600 dark:text-brand-400'">
+              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.downSpeed > 0 && 'text-primary'">
                 {{ formatSpeed(c.downSpeed) }}
               </td>
-              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.upSpeed > 0 && 'text-warn'">
+              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums" :class="c.upSpeed > 0 && 'text-warning'">
                 {{ formatSpeed(c.upSpeed) }}
               </td>
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ bytes(c.download) }}</td>
               <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums">{{ bytes(c.upload) }}</td>
-              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums text-slate-500">{{ duration(c) }}</td>
-              <td class="max-w-[9rem] truncate px-3 py-2 text-slate-500" :title="connSource(c)">{{ connSource(c) }}</td>
+              <td class="whitespace-nowrap px-3 py-2 text-right tabular-nums text-base-content/70">{{ duration(c) }}</td>
+              <td class="max-w-[9rem] truncate px-3 py-2 text-base-content/70" :title="connSource(c)">{{ connSource(c) }}</td>
               <td class="px-2 py-2">
                 <button
                   v-if="tab === 'active'"
-                  class="btn-icon h-7 w-7 text-slate-400 hover:text-danger"
+                  class="btn btn-xs btn-ghost btn-square h-7 w-7 text-base-content/60 hover:text-error"
                   title="断开"
                   @click.stop="onClose(c)"
                 >
@@ -445,36 +447,36 @@ const STATUS_TEXT = {
 
       <!-- 手机端：卡片 -->
       <TransitionGroup :key="tab" tag="div" name="conn" class="space-y-2 md:hidden">
-        <div v-for="c in visible" :key="c.id" class="card p-3 active:bg-tile" @click="detail = c">
+        <div v-for="c in visible" :key="c.id" class="card p-3 active:bg-base-200" @click="detail = c">
           <div class="flex items-start gap-2">
             <div class="min-w-0 flex-1">
               <div class="truncate font-medium">{{ connTarget(c) }}</div>
-              <div class="mt-0.5 truncate text-xs text-slate-500">
+              <div class="mt-0.5 truncate text-xs text-base-content/70">
                 {{ connChain(c).join(' → ') }}
               </div>
             </div>
             <button
               v-if="tab === 'active'"
-              class="btn-icon -mr-1 -mt-1 h-8 w-8 text-slate-400"
+              class="btn btn-sm btn-ghost btn-square -mr-1 -mt-1 h-8 w-8 text-base-content/60"
               title="断开"
               @click.stop="onClose(c)"
             >
               <Icon name="x" class="h-4 w-4" />
             </button>
           </div>
-          <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-500">
-            <span class="chip uppercase">{{ c.metadata?.network }}</span>
+          <div class="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-base-content/70">
+            <span class="badge badge-ghost badge-sm text-base-content/70 uppercase">{{ c.metadata?.network }}</span>
             <span class="max-w-[10rem] truncate">{{ connRule(c) }}</span>
             <span class="ml-auto tabular-nums">{{ duration(c) }}</span>
           </div>
           <div class="mt-1.5 grid grid-cols-2 gap-2 text-xs tabular-nums">
             <div>
-              <span class="text-brand-600 dark:text-brand-400">↓ {{ formatSpeed(c.downSpeed) }}</span>
-              <span class="text-slate-400"> · {{ bytes(c.download) }}</span>
+              <span class="text-primary">↓ {{ formatSpeed(c.downSpeed) }}</span>
+              <span class="text-base-content/60"> · {{ bytes(c.download) }}</span>
             </div>
             <div class="text-right">
-              <span class="text-warn">↑ {{ formatSpeed(c.upSpeed) }}</span>
-              <span class="text-slate-400"> · {{ bytes(c.upload) }}</span>
+              <span class="text-warning">↑ {{ formatSpeed(c.upSpeed) }}</span>
+              <span class="text-base-content/60"> · {{ bytes(c.upload) }}</span>
             </div>
           </div>
         </div>
@@ -482,7 +484,7 @@ const STATUS_TEXT = {
 
       <!-- 加载更多 -->
       <div v-if="filtered.length > visible.length" class="text-center">
-        <button class="btn-outline" @click="renderLimit += RENDER_STEP">
+        <button class="btn btn-sm btn-outline border-base-content/20" @click="renderLimit += RENDER_STEP">
           显示更多（剩余 {{ filtered.length - visible.length }} 条）
         </button>
       </div>

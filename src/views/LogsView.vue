@@ -30,10 +30,10 @@ const LEVELS = [
 
 /** 各级别的标签样式 */
 const LEVEL_CLASS = {
-  debug: 'bg-tile text-slate-500 dark:text-slate-400',
-  info: 'bg-sky-100 text-sky-700 dark:bg-sky-900/50 dark:text-sky-300',
-  warning: 'bg-warn-soft text-warn',
-  error: 'bg-danger-soft text-danger',
+  debug: 'bg-base-200 text-base-content/70',
+  info: 'bg-info/15 text-info',
+  warning: 'bg-warning/10 text-warning',
+  error: 'bg-error/10 text-error',
 }
 const LEVEL_TEXT = { debug: 'DBG', info: 'INF', warning: 'WRN', error: 'ERR' }
 
@@ -112,13 +112,13 @@ function exportLogs() {
 }
 
 const STATUS = {
-  open: { dot: 'bg-ok', text: '实时' },
-  connecting: { dot: 'bg-warn animate-pulse', text: '连接中' },
-  reconnecting: { dot: 'bg-warn animate-pulse', text: '重连中' },
-  error: { dot: 'bg-danger', text: '连接失败' },
-  unsupported: { dot: 'bg-slate-400', text: '后端未开放日志' },
+  open: { dot: 'bg-success', text: '实时' },
+  connecting: { dot: 'bg-warning animate-pulse', text: '连接中' },
+  reconnecting: { dot: 'bg-warning animate-pulse', text: '重连中' },
+  error: { dot: 'bg-error', text: '连接失败' },
+  unsupported: { dot: 'bg-base-content/40', text: '后端未开放日志' },
 }
-const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400', text: '未连接' })
+const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-base-content/40', text: '未连接' })
 </script>
 
 <template>
@@ -126,44 +126,45 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
     <!-- 工具栏 -->
     <div class="flex flex-wrap items-center gap-2">
       <!-- 级别：桌面分段按钮，手机下拉框 -->
-      <div class="hidden rounded-lg bg-slate-200/70 p-0.5 text-sm sm:flex dark:bg-tile">
+      <div role="tablist" class="tabs tabs-boxed tabs-sm hidden sm:grid">
         <button
           v-for="l in LEVELS"
           :key="l.value"
-          class="rounded-md px-3 py-1 transition"
-          :class="level === l.value ? 'bg-raised font-medium shadow-sm' : 'text-slate-500'"
+          role="tab"
+          class="tab"
+          :class="level === l.value && 'tab-active font-medium'"
           @click="level = l.value"
         >
           {{ l.label }}
         </button>
       </div>
-      <select v-model="level" class="input w-auto py-1.5 sm:hidden" title="日志级别">
+      <select v-model="level" class="select select-bordered select-sm w-auto sm:hidden" title="日志级别">
         <option v-for="l in LEVELS" :key="l.value" :value="l.value">{{ l.label }}及以上</option>
       </select>
 
-      <span class="flex items-center gap-1.5 text-xs text-slate-500">
+      <span class="flex items-center gap-1.5 text-xs text-base-content/70">
         <span class="h-2 w-2 rounded-full" :class="statusInfo.dot" />
         {{ statusInfo.text }}
       </span>
 
       <div class="relative order-last w-full sm:order-none sm:w-auto sm:flex-1">
-        <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
-        <input v-model="keyword" type="search" class="input py-1.5 pl-8" placeholder="搜索日志内容" />
+        <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
+        <input v-model="keyword" type="search" class="input input-bordered input-sm w-full pl-8" placeholder="搜索日志内容" />
       </div>
 
       <div class="ml-auto flex items-center gap-1">
         <button
-          class="btn-icon"
-          :class="paused && 'bg-warn-soft text-warn'"
+          class="btn btn-sm btn-ghost btn-square size-9"
+          :class="paused && 'bg-warning/10 text-warning'"
           :title="paused ? '继续' : '暂停'"
           @click="togglePause"
         >
           <Icon :name="paused ? 'play' : 'pause'" class="h-5 w-5" />
         </button>
-        <button class="btn-icon" title="导出为文本" :disabled="!filtered.length" @click="exportLogs">
+        <button class="btn btn-sm btn-ghost btn-square size-9" title="导出为文本" :disabled="!filtered.length" @click="exportLogs">
           <Icon name="download" class="h-5 w-5" />
         </button>
-        <button class="btn-icon" title="清空" :disabled="!logs.length && !pendingCount" @click="clearLogs">
+        <button class="btn btn-sm btn-ghost btn-square size-9" title="清空" :disabled="!logs.length && !pendingCount" @click="clearLogs">
           <Icon name="trash" class="h-5 w-5" />
         </button>
       </div>
@@ -171,15 +172,16 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
 
     <div
       v-if="paused"
-      class="notice"
+      class="alert flex items-center gap-2 px-3 py-2.5 text-left text-sm text-base-content/80"
     >
-      <Icon name="pause" class="h-4 w-4 shrink-0 text-warn" />
+      <Icon name="pause" class="h-4 w-4 shrink-0 text-warning" />
       <span class="flex-1">已暂停，期间收到 {{ pendingCount }} 条新日志</span>
-      <button class="btn-outline py-1 text-xs" @click="togglePause">继续</button>
+      <button class="btn btn-xs btn-outline border-base-content/20" @click="togglePause">继续</button>
     </div>
     <div
       v-else-if="status === 'error'"
-      class="flex items-center gap-2 rounded-xl border border-danger-soft bg-danger-soft p-2.5 text-sm text-danger"
+      role="alert"
+      class="alert flex items-center gap-2 rounded-xl border-error/30 bg-error/10 p-2.5 text-left text-sm text-error"
     >
       <Icon name="alert" class="h-4 w-4 shrink-0" />
       日志连接失败，请检查后端地址和 secret。
@@ -193,19 +195,19 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
         :description="keyword ? '' : level === 'error' || level === 'warning' ? '当前级别较高，只有出现问题时才会有日志。' : '有新连接或内核事件时会显示在这里。'"
       />
     </div>
-    <div v-else class="card divide-y divide-line overflow-hidden">
+    <div v-else class="card divide-y divide-base-content/10 overflow-hidden">
       <div v-for="l in visible" :key="l.id" class="flex gap-2 px-3 py-2 sm:gap-3 sm:px-4">
         <div class="flex shrink-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
-          <span class="text-xs tabular-nums text-slate-400 sm:w-14">{{ formatClock(l.time) }}</span>
+          <span class="text-xs tabular-nums text-base-content/60 sm:w-14">{{ formatClock(l.time) }}</span>
           <span class="rounded-md px-1.5 py-0.5 text-xs font-semibold" :class="LEVEL_CLASS[l.type] || LEVEL_CLASS.debug">
             {{ LEVEL_TEXT[l.type] || l.type }}
           </span>
         </div>
         <p class="min-w-0 flex-1 whitespace-pre-wrap font-mono [overflow-wrap:anywhere] text-[12.5px] leading-5">{{ l.payload }}</p>
       </div>
-      <div v-if="hasMore" ref="sentinel" class="py-3 text-center text-xs text-slate-400">加载中…</div>
+      <div v-if="hasMore" ref="sentinel" class="py-3 text-center text-xs text-base-content/60">加载中…</div>
     </div>
-    <p v-if="logs.length" class="text-center text-xs text-slate-400">
+    <p v-if="logs.length" class="text-center text-xs text-base-content/60">
       显示最近 {{ logs.length }} 条（最多保留 {{ MAX_LOGS }} 条）
     </p>
   </div>

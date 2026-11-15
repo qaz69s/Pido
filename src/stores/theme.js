@@ -1,8 +1,9 @@
 /**
  * 主题
  * - mode：跟随系统 / 浅色 / 深色
- * - preset：配色方案（见 utils/themes.js 与 themes.css）
- * - 选择保存在 localStorage（index.html 里的内联脚本会提前读取，防止闪白）
+ * - preset：配色方案（见 utils/themes.js）
+ * - 两者合成 daisyUI 主题名写到 <html data-theme>，例如 "nord-dark"（每套配色有 -light / -dark 两个主题）
+ * - 选择保存在 localStorage（键名不变：theme / preset；index.html 里的内联脚本会提前读取，防止闪白）
  * - 跟随系统时监听 prefers-color-scheme 变化
  * - 手动切换时，新主题从点击位置圆形扩散铺满全屏（View Transitions API，不支持的浏览器直接切换）
  */
@@ -10,7 +11,7 @@ import { defineStore } from 'pinia'
 import { ref, computed, watchEffect, nextTick } from 'vue'
 import { motionEnabled } from '@/utils/motion'
 import { loadString, saveString } from '@/utils/storage'
-import { THEME_PRESETS, PRESET_IDS } from '@/utils/themes'
+import { THEME_PRESETS, PRESET_IDS, themeName } from '@/utils/themes'
 
 const media = window.matchMedia('(prefers-color-scheme: dark)')
 export const THEME_MODES = ['system', 'light', 'dark']
@@ -29,11 +30,13 @@ export const useThemeStore = defineStore('theme', () => {
   )
   const presetInfo = computed(() => THEME_PRESETS.find((t) => t.id === preset.value) || THEME_PRESETS[0])
 
-  // 同步到 <html class="dark" data-theme="..."> 和浏览器地址栏颜色
+  /** 当前 daisyUI 主题名，例如 default-light / nord-dark */
+  const daisyTheme = computed(() => themeName(preset.value, isDark.value))
+
+  // 同步到 <html data-theme="..."> 和浏览器地址栏颜色
   watchEffect(() => {
     const root = document.documentElement
-    root.classList.toggle('dark', isDark.value)
-    root.dataset.theme = preset.value
+    root.dataset.theme = daisyTheme.value
     document
       .querySelector('meta[name="theme-color"]')
       ?.setAttribute('content', presetInfo.value.meta[isDark.value ? 1 : 0])
@@ -51,7 +54,7 @@ export const useThemeStore = defineStore('theme', () => {
     const y = event?.clientY ?? window.innerHeight / 2
     const t = document.startViewTransition(async () => {
       apply()
-      await nextTick() // 等 watchEffect 把 class / data-theme 写到 <html>
+      await nextTick() // 等 watchEffect 把 data-theme 写到 <html>
     })
     t.ready
       .then(() => {
@@ -86,5 +89,5 @@ export const useThemeStore = defineStore('theme', () => {
     setMode(THEME_MODES[(i + 1) % THEME_MODES.length], event)
   }
 
-  return { mode, preset, presetInfo, isDark, setMode, setPreset, cycle }
+  return { mode, preset, presetInfo, isDark, daisyTheme, setMode, setPreset, cycle }
 })
