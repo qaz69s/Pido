@@ -171,9 +171,9 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
 
     <div
       v-if="paused"
-      class="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-200"
+      class="notice"
     >
-      <Icon name="pause" class="h-4 w-4 shrink-0" />
+      <Icon name="pause" class="h-4 w-4 shrink-0 text-amber-500" />
       <span class="flex-1">已暂停，期间收到 {{ pendingCount }} 条新日志</span>
       <button class="btn-outline py-1 text-xs" @click="togglePause">继续</button>
     </div>

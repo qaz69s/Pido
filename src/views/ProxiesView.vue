@@ -365,7 +365,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
 <template>
   <!-- stagger：代理组卡片首次出现时依次浮现 -->
-  <div class="stagger space-y-3">
+  <div class="space-y-3">
     <!-- 工具栏：不换行，空间不够时标签先收缩（手机系统字体放大时也保持一行） -->
     <div class="flex items-center gap-2">
       <div class="tb-tabs flex min-w-0 shrink overflow-hidden rounded-lg bg-slate-200/70 p-0.5 text-sm dark:bg-slate-800">
@@ -467,9 +467,9 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
 
     <div
       v-if="mode === 'direct' && tab === 'groups'"
-      class="flex items-center gap-2 rounded-xl border border-sky-200 bg-sky-50 p-3 text-sm text-sky-800 dark:border-sky-900 dark:bg-sky-950/60 dark:text-sky-200"
+      class="notice"
     >
-      <Icon name="info" class="h-4 w-4 shrink-0" />
+      <Icon name="info" class="h-4 w-4 shrink-0 text-sky-500" />
       当前为直连模式，代理组的选择暂不生效。
     </div>
 

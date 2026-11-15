@@ -18,6 +18,7 @@ import { getRuntime } from '@/api/standard/data'
 import { formatBytes, formatSpeed, formatDuration, formatRelativeTime } from '@/utils/format'
 import TrafficChart from '@/components/charts/TrafficChart.vue'
 import Icon from '@/components/common/Icon.vue'
+import Num from '@/components/common/Num.vue'
 import { useTween } from '@/composables/useTween'
 
 const MAX_POINTS = 60
@@ -150,26 +151,26 @@ const infoRows = computed(() => {
   <div class="space-y-3">
     <div
       v-if="streamError && backend.status !== 'error'"
-      class="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-200"
+      class="notice"
     >
-      <Icon name="alert" class="h-4 w-4 shrink-0" />
-      实时数据连接失败，正在自动重试。若持续出现，请检查 secret 或网络。
+      <Icon name="alert" class="h-4 w-4 shrink-0 text-amber-500" />
+      实时数据连接不稳定，正在自动重试
     </div>
 
     <!-- 指标卡片（排版同 v0.3；桌面 1280 左右用 3 列，超宽屏 2xl 才排成一行，避免数值被截断） -->
-    <div class="stagger grid grid-cols-2 gap-3 sm:grid-cols-3" :class="stats.length === 5 ? '2xl:grid-cols-5' : '2xl:grid-cols-6'">
-      <div v-for="s in stats" :key="s.label" class="card flex items-center gap-3 p-3">
+    <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" :class="stats.length === 5 ? '2xl:grid-cols-5' : '2xl:grid-cols-6'">
+      <div v-for="s in stats" :key="s.label" class="card flex items-center gap-3 p-4">
         <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full" :class="s.color">
           <Icon :name="s.icon" class="h-5 w-5" />
         </span>
         <div class="min-w-0">
           <div class="text-xs text-slate-500">{{ s.label }}</div>
-          <div class="truncate text-[17px] font-semibold tabular-nums">{{ s.value }}</div>
+          <div class="truncate text-lg font-semibold leading-7 tracking-tight tabular-nums"><Num :value="s.value" /></div>
         </div>
       </div>
     </div>
 
-    <div class="stagger grid gap-3 lg:grid-cols-3">
+    <div class="grid gap-3 lg:grid-cols-3">
       <!-- 流量曲线 -->
       <section class="card p-4 lg:col-span-2">
         <div class="mb-3 flex items-center justify-between">

@@ -413,9 +413,9 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
         <!-- 校验结果 -->
         <div
           v-if="validState === 'ok' && !errorCount"
-          class="flex items-center gap-2 rounded-xl border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800 dark:border-emerald-900 dark:bg-emerald-950/50 dark:text-emerald-200"
+          class="notice"
         >
-          <Icon name="check" class="h-4 w-4 shrink-0" />
+          <Icon name="check" class="h-4 w-4 shrink-0 text-emerald-500" />
           校验通过{{ dirty ? '，可以保存' : '' }}
         </div>
         <div v-if="diagnostics.length" class="overflow-hidden rounded-xl border border-rose-200 dark:border-rose-900/70">

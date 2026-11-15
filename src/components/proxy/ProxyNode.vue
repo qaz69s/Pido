@@ -9,6 +9,7 @@
 import { computed, ref, watch } from 'vue'
 import { delayLevel, delayText, DELAY_TEXT_CLASS } from '@/utils/format'
 import ProxyIcon from './ProxyIcon.vue'
+import Num from '@/components/common/Num.vue'
 
 const props = defineProps({
   name: { type: String, required: true },
@@ -73,14 +74,13 @@ function onSelect() {
   <div
     role="button"
     :tabindex="selectable ? 0 : -1"
-    class="flex min-w-0 flex-col gap-1 rounded-xl border p-2.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-200 [contain:layout_style]"
+    class="relative flex min-w-0 flex-col gap-1 overflow-hidden rounded-xl border p-2.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-200 [contain:layout_style]"
     :class="[
       active
-        ? 'border-brand-500 bg-brand-50 ring-1 ring-brand-500 dark:bg-brand-500/10'
+        ? 'node-active border-transparent bg-tile'
         : 'border-transparent bg-tile',
       selectable && !active ? 'press cursor-pointer hover:border-slate-300 hover:shadow-sm dark:hover:border-slate-600' : '',
       !selectable ? 'cursor-default' : '',
-      bouncing && 'anim-select',
     ]"
     @animationend.self="bouncing = false"
     @click="onSelect"
@@ -88,24 +88,24 @@ function onSelect() {
   >
     <span class="flex min-w-0 items-center gap-1.5">
       <ProxyIcon v-if="icon" :icon="icon" :size="16" />
-      <span class="truncate text-sm font-medium" :title="name">{{ name }}</span>
+      <span class="truncate text-sm" :class="active ? 'font-semibold text-slate-900 dark:text-slate-50' : 'font-medium'" :title="name">{{ name }}</span>
     </span>
     <div class="flex items-center justify-between gap-2 text-[13px]">
       <span class="truncate text-slate-500 dark:text-slate-400" :title="type">{{ typeLabel }}</span>
-      <span v-if="!testable" class="shrink-0 px-1 font-semibold tabular-nums" :class="delayClass">
-        <span :key="popKey" :class="popping && 'anim-pop'">{{ delayText(delay) }}</span>
+      <span v-if="!testable" class="shrink-0 px-1 tabular-nums" :class="delayClass">
+        <Num :value="delayText(delay)" />
       </span>
       <button
         v-else
         type="button"
-        class="shrink-0 rounded px-1 tabular-nums font-semibold hover:bg-slate-200/60 dark:hover:bg-white/10"
+        class="shrink-0 rounded px-1 tabular-nums hover:bg-slate-200/60 dark:hover:bg-white/10"
         :class="delayClass"
         :disabled="testing"
         title="测试延迟"
         @click.stop="emit('test')"
       >
         <span v-if="testing" class="inline-block animate-pulse">测速中</span>
-        <span v-else :key="popKey" :class="popping && 'anim-pop'">{{ delayText(delay) }}</span>
+        <Num v-else :value="delayText(delay)" />
       </button>
     </div>
   </div>

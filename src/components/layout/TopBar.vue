@@ -3,7 +3,7 @@
  * 顶栏：页面标题、连接状态、主题切换、后端设置入口
  * - 手机端左上角 Logo：已连接时显示对应内核的图标（mihomo / dae / honk），未连接时显示 Pido 闪电图标
  */
-import { computed } from 'vue'
+import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { useRoute } from 'vue-router'
 import { useBackendStore } from '@/stores/backend'
 import { useThemeStore } from '@/stores/theme'
@@ -31,7 +31,7 @@ const statusInfo = computed(() => {
   switch (backend.status) {
     case 'ok':
       return {
-        dot: 'bg-emerald-500 anim-breathe',
+        dot: 'bg-emerald-500',
         text: backend.version?.version || '已连接',
         logo: CORE_LOGOS[backend.engine] || '',
         engine: CORE_NAMES[backend.engine] || backend.engine,
@@ -45,11 +45,21 @@ const statusInfo = computed(() => {
       return { dot: 'bg-slate-400', text: '未配置' }
   }
 })
+
+// 顶部栏平时通透无线，滚动后才出现毛玻璃和细线
+const scrolled = ref(false)
+const onScroll = () => (scrolled.value = window.scrollY > 4)
+onMounted(() => {
+  onScroll()
+  window.addEventListener('scroll', onScroll, { passive: true })
+})
+onUnmounted(() => window.removeEventListener('scroll', onScroll))
 </script>
 
 <template>
   <header
-    class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b border-slate-200/80 bg-page/80 px-4 backdrop-blur dark:border-slate-800/80 "
+    class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 transition-[background-color,border-color] duration-200"
+    :class="scrolled ? 'border-slate-200/80 bg-page/80 backdrop-blur dark:border-slate-800/80' : 'border-transparent bg-page'"
   >
     <!-- 手机端显示 Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
     <img

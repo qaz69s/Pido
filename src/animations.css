@@ -204,3 +204,24 @@ html[data-motion='off'] *::after {
   transition-duration: 0.01ms !important;
   transition-delay: 0ms !important;
 }
+
+/* ---------- 动画收敛：只保留页面淡入和数字滚动 ---------- */
+.stagger > *,
+.anim-pop,
+.anim-select,
+.nav-active svg,
+.anim-breathe {
+  animation: none !important;
+}
+
+/* 选中节点：左侧一条主色细线 */
+.node-active::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 10px;
+  bottom: 10px;
+  width: 3px;
+  border-radius: 0 3px 3px 0;
+  background: rgb(var(--b-500));
+}

@@ -11,6 +11,7 @@ import Icon from '@/components/common/Icon.vue'
 import ProxyNode from './ProxyNode.vue'
 import ProxyIcon from './ProxyIcon.vue'
 import ExpandTransition from '@/components/common/ExpandTransition.vue'
+import Num from '@/components/common/Num.vue'
 
 const props = defineProps({
   group: { type: Object, required: true }, // { name, type, now, all }
@@ -116,15 +117,15 @@ const levelCounts = computed(() => {
       <!-- 延迟胶囊：显示当前节点延迟，点击整组测速（不再单独放闪电按钮，避免和工具栏「全部测速」撞脸） -->
       <span
         v-if="!testable"
-        class="flex shrink-0 items-center rounded-full bg-tile px-2.5 py-1 text-[13px] font-semibold tabular-nums"
+        class="flex shrink-0 items-center rounded-full bg-tile px-2.5 py-1 text-[13px] font-medium tabular-nums"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         title="后端自动健康检查的延迟"
       >
-        <span :key="delayText(nowDelay)" class="anim-pop">{{ nowDelay !== undefined ? delayText(nowDelay) : '--' }}</span>
+        <Num :value="nowDelay !== undefined ? delayText(nowDelay) : '--'" />
       </span>
       <button
         v-else
-        class="flex shrink-0 items-center gap-1 rounded-full bg-tile px-2.5 py-1 text-[13px] font-semibold tabular-nums transition hover:brightness-110 disabled:opacity-100"
+        class="flex shrink-0 items-center gap-1 rounded-full bg-tile px-2.5 py-1 text-[13px] font-medium tabular-nums transition hover:brightness-110 disabled:opacity-100"
         :class="DELAY_TEXT_CLASS[delayLevel(nowDelay)]"
         :disabled="testing"
         title="整组测速"
@@ -132,7 +133,7 @@ const levelCounts = computed(() => {
       >
         <Icon name="zap" class="h-3.5 w-3.5" :class="testing && 'anim-zap'" />
         <span v-if="testing" class="animate-pulse">测速中</span>
-        <span v-else :key="delayText(nowDelay)" class="anim-pop">{{ nowDelay !== undefined ? delayText(nowDelay) : '测速' }}</span>
+        <Num v-else :value="nowDelay !== undefined ? delayText(nowDelay) : '测速'" />
       </button>
       <Icon
         name="chevronDown"

@@ -149,14 +149,14 @@ function drawSeries(data, color, max, plotW, plotH, offset = 0, pulse = -1, lead
   area.lineTo(pts[0][0], bottom)
   area.closePath()
   const grad = ctx.createLinearGradient(0, PAD.top, 0, bottom)
-  grad.addColorStop(0, withAlpha(color, 0.32))
+  grad.addColorStop(0, withAlpha(color, 0.16))
   grad.addColorStop(1, withAlpha(color, 0))
   ctx.fillStyle = grad
   ctx.fill(area)
 
   // 曲线
   ctx.strokeStyle = withAlpha(color, 1)
-  ctx.lineWidth = 2
+  ctx.lineWidth = 1.5
   ctx.lineJoin = 'round'
   ctx.stroke(path)
 
@@ -201,7 +201,7 @@ function draw() {
   for (let i = 0; i <= GRID_LINES; i++) {
     const y = Math.round(PAD.top + (plotH / GRID_LINES) * i) + 0.5
     // 淡实线，底线稍深
-    ctx.globalAlpha = i === GRID_LINES ? 0.22 : 0.1
+    ctx.globalAlpha = i === GRID_LINES ? 0.15 : 0.08
     ctx.strokeStyle = textColor
     ctx.lineWidth = 1
     ctx.beginPath()
@@ -228,7 +228,7 @@ function draw() {
   const animate = motionEnabled()
   const now = performance.now()
   const offset = animate ? Math.max(0, 1 - (now - shiftStart) / SHIFT_MS) : 0
-  const pulse = animate ? (now % 1600) / 1600 : -1
+  const pulse = -1 // 不再画右端呼吸光点，曲线更安静
 
   ctx.save()
   ctx.beginPath()

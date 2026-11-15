@@ -347,9 +347,9 @@ const STATUS_TEXT = {
     <!-- 状态提示 -->
     <div
       v-if="paused"
-      class="flex items-center gap-2 rounded-xl border border-amber-200 bg-amber-50 p-2.5 text-sm text-amber-800 dark:border-amber-900 dark:bg-amber-950/60 dark:text-amber-200"
+      class="notice"
     >
-      <Icon name="pause" class="h-4 w-4 shrink-0" />
+      <Icon name="pause" class="h-4 w-4 shrink-0 text-amber-500" />
       已暂停刷新，列表停在暂停时的状态。
     </div>
     <div
@@ -358,7 +358,7 @@ const STATUS_TEXT = {
       :class="
         status === 'error'
           ? 'border-rose-200 bg-rose-50 text-rose-800 dark:border-rose-900 dark:bg-rose-950/60 dark:text-rose-200'
-          : 'border-slate-200 bg-white text-slate-500 dark:border-slate-800 dark:bg-slate-900'
+          : 'border-transparent bg-tile text-slate-500'
       "
     >
       <Icon :name="status === 'error' ? 'alert' : 'refresh'" class="h-4 w-4 shrink-0" :class="status !== 'error' && 'animate-spin'" />

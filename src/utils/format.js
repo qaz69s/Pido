@@ -52,16 +52,17 @@ export function delayLevel(delay) {
 export const DELAY_TEXT_CLASS = {
   none: 'text-slate-400 dark:text-slate-500',
   timeout: 'text-rose-600 dark:text-rose-400',
-  good: 'text-emerald-700 dark:text-emerald-400',
+  // 正常延迟不上色，只有慢和超时才用颜色提醒
+  good: 'text-slate-500 dark:text-slate-400',
   ok: 'text-amber-700 dark:text-amber-400',
   bad: 'text-orange-600 dark:text-orange-400',
 }
 
 /** 延迟分级对应的背景色（折叠时的小圆点） */
 export const DELAY_BG_CLASS = {
-  none: 'bg-slate-300 dark:bg-slate-600',
+  none: 'bg-slate-200 dark:bg-slate-700',
   timeout: 'bg-rose-500',
-  good: 'bg-emerald-500',
+  good: 'bg-slate-400 dark:bg-slate-500',
   ok: 'bg-amber-400',
   bad: 'bg-orange-500',
 }
