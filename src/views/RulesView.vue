@@ -203,7 +203,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         </select>
         <div class="tb flex shrink-0 items-center">
           <button class="btn-icon" title="刷新列表" @click="load({ silent: true })">
-            <Icon name="reload" class="h-[18px] w-[18px]" />
+            <Icon name="reload" class="h-5 w-5" />
           </button>
         </div>
       </template>

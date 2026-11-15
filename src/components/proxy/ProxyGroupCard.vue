@@ -112,7 +112,7 @@ const levelCounts = computed(() => {
         </div>
       </div>
       <button v-if="configurable" class="btn-icon hidden sm:inline-flex" title="组参数（检查间隔 / 容差）" @click.stop="emit('settings')">
-        <Icon name="sliders" class="h-[17px] w-[17px]" />
+        <Icon name="sliders" class="h-5 w-5" />
       </button>
       <!-- 延迟胶囊：显示当前节点延迟，点击整组测速（不再单独放闪电按钮，避免和工具栏「全部测速」撞脸） -->
       <span

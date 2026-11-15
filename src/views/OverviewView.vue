@@ -102,8 +102,8 @@ const NEUTRAL_COLOR = 'text-slate-600 dark:text-slate-300 bg-slate-500/[0.14]'
 
 const allStats = computed(() => [
   // 配色跟随主题：上传 = accent（强调色），下载 = brand（主色），内存 / 连接 = 中性色；与下方流量曲线一致
-  { label: '上传速率', value: formatSpeed(tUp.value), icon: 'circleUp', color: UP_COLOR },
-  { label: '下载速率', value: formatSpeed(tDown.value), icon: 'circleDown', color: DOWN_COLOR },
+  { label: '上传速率', value: formatSpeed(tUp.value), icon: 'arrowUp', color: UP_COLOR },
+  { label: '下载速率', value: formatSpeed(tDown.value), icon: 'arrowDown', color: DOWN_COLOR },
   { label: '上传总量', value: formatBytes(tUpTotal.value), icon: 'cloudUp', color: UP_COLOR },
   { label: '下载总量', value: formatBytes(tDownTotal.value), icon: 'cloudDown', color: DOWN_COLOR },
   { label: '内存占用', value: formatBytes(tMemory.value), icon: 'cpu', color: NEUTRAL_COLOR },
@@ -160,7 +160,7 @@ const infoRows = computed(() => {
     <!-- 指标卡片（排版同 v0.3；桌面 1280 左右用 3 列，超宽屏 2xl 才排成一行，避免数值被截断） -->
     <div class="grid grid-cols-2 gap-3 sm:grid-cols-3" :class="stats.length === 5 ? '2xl:grid-cols-5' : '2xl:grid-cols-6'">
       <div v-for="s in stats" :key="s.label" class="card flex items-center gap-3 p-4">
-        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-full" :class="s.color">
+        <span class="grid h-9 w-9 shrink-0 place-items-center rounded-xl" :class="s.color">
           <Icon :name="s.icon" class="h-5 w-5" />
         </span>
         <div class="min-w-0">

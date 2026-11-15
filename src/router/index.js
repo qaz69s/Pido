@@ -14,7 +14,7 @@ import OverviewView from '@/views/OverviewView.vue'
  * - also：手机底部导航中这些路径也算作本项选中（DNS 在手机上并入「规则」，见 PhoneSectionSwitch.vue）
  */
 export const navItems = [
-  { path: '/overview', title: '概览', icon: 'chart' },
+  { path: '/overview', title: '概览', icon: 'activity' },
   { path: '/proxies', title: '代理', icon: 'globe' },
   { path: '/connections', title: '连接', icon: 'link' },
   { path: '/rules', title: '规则', icon: 'list', also: ['/dns'] },

@@ -89,13 +89,13 @@ function barHeight(d) {
       </div>
 
       <button v-if="showManage" class="btn-icon" :title="canManage ? '管理节点' : '查看节点'" @click.stop="emit('manage')">
-        <Icon :name="canManage ? 'pencil' : 'list'" class="h-[17px] w-[17px]" />
+        <Icon :name="canManage ? 'pencil' : 'list'" class="h-5 w-5" />
       </button>
       <button v-if="canUpdate" class="btn-icon" :disabled="!!busy" title="更新订阅（重新拉取节点）" @click.stop="emit('update')">
-        <Icon name="cloudDown" class="h-[18px] w-[18px]" :class="busy === 'update' && 'animate-pulse text-brand-500'" />
+        <Icon name="cloudDown" class="h-5 w-5" :class="busy === 'update' && 'animate-pulse text-brand-500'" />
       </button>
       <button v-if="canCheck" class="btn-icon" :disabled="!!busy" title="健康检查（测试全部节点延迟）" @click.stop="emit('healthcheck')">
-        <Icon name="activity" class="h-[18px] w-[18px]" :class="busy === 'check' && 'animate-pulse text-brand-500'" />
+        <Icon name="activity" class="h-5 w-5" :class="busy === 'check' && 'animate-pulse text-brand-500'" />
       </button>
       <Icon
         name="chevronDown"

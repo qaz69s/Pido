@@ -298,7 +298,7 @@ async function runMihomo(a) {
         </div>
         <div class="tb ml-auto flex shrink-0 items-center">
           <button v-if="tab !== 'query'" class="btn-icon" title="刷新" @click="refresh">
-            <Icon name="refresh" class="h-[18px] w-[18px]" :class="(log.loading || cache.loading || rules.loading) && 'animate-spin'" />
+            <Icon name="refresh" class="h-5 w-5" :class="(log.loading || cache.loading || rules.loading) && 'animate-spin'" />
           </button>
         </div>
       </div>

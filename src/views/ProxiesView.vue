@@ -394,7 +394,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             title="显示与测速设置"
             @click="showSettings = !showSettings"
           >
-            <Icon name="settings" class="h-[18px] w-[18px]" />
+            <Icon name="settings" class="h-5 w-5" />
           </button>
           <button v-if="canTest" class="btn-primary" :disabled="testingAll || !groups.length" title="全部测速" @click="onTestAll">
             <Icon name="gauge" class="h-4 w-4" :class="testingAll && 'animate-pulse'" />
@@ -412,7 +412,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </button>
         </template>
         <button class="btn-icon" title="刷新页面数据" @click="load({ silent: true })">
-          <Icon name="reload" class="h-[18px] w-[18px]" />
+          <Icon name="reload" class="h-5 w-5" />
         </button>
       </div>
     </div>

@@ -296,7 +296,7 @@ const STATUS_TEXT = {
             title="排序"
             @click="sortMenu = !sortMenu"
           >
-            <Icon name="sort" class="h-[18px] w-[18px]" />
+            <Icon name="sort" class="h-5 w-5" />
           </button>
           <template v-if="sortMenu">
             <div class="fixed inset-0 z-20" @click="sortMenu = false" />
@@ -320,7 +320,7 @@ const STATUS_TEXT = {
           :title="paused ? '继续刷新' : '暂停刷新'"
           @click="paused = !paused"
         >
-          <Icon :name="paused ? 'play' : 'pause'" class="h-[18px] w-[18px]" />
+          <Icon :name="paused ? 'play' : 'pause'" class="h-5 w-5" />
         </button>
         <button v-if="tab === 'active'" class="btn-danger" :disabled="!filtered.length" @click="onCloseAll">
           <Icon name="x" class="h-4 w-4" />

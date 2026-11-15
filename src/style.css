@@ -33,16 +33,16 @@
     @apply ml-[0.15em] text-[0.75em] font-medium text-slate-400 dark:text-slate-500;
   }
   .btn {
-    @apply inline-flex select-none items-center justify-center gap-1.5 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex select-none items-center justify-center gap-1 whitespace-nowrap rounded-lg px-3 py-1.5 text-sm font-medium transition disabled:cursor-not-allowed disabled:opacity-50;
   }
   .btn-primary {
     @apply btn bg-brand-600 text-on-brand hover:bg-brand-700 active:bg-brand-800;
   }
   .btn-outline {
-    @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800;
+    @apply btn border border-slate-300 bg-white text-slate-700 hover:bg-slate-100 disabled:text-slate-400 disabled:opacity-100 dark:border-slate-700 dark:bg-slate-900 dark:text-slate-200 dark:hover:bg-slate-800 dark:disabled:text-slate-600;
   }
   .btn-ghost {
-    @apply btn text-slate-600 hover:bg-slate-200/70 dark:text-slate-300 dark:hover:bg-slate-800;
+    @apply btn text-slate-600 hover:bg-slate-200/70 disabled:text-slate-400 disabled:opacity-100 disabled:hover:bg-transparent dark:text-slate-300 dark:hover:bg-slate-800 dark:disabled:text-slate-600;
   }
   .btn-danger {
     @apply btn bg-rose-600 text-white hover:bg-rose-700;
@@ -81,6 +81,7 @@
 .tb {
   gap: 4px;
 }
+/* 工具栏放不下 36px，手机上保持 34px，避免分段标签被截断 */
 .tb .btn-icon {
   width: 34px;
   height: 34px;
@@ -106,3 +107,19 @@
 }
 
 
+
+/* ---------- 图标线宽按尺寸补偿：大小图标看起来一样重 ---------- */
+.ic.h-3,
+.ic.h-3\.5,
+.ic.h-4 {
+  stroke-width: 2;
+}
+.ic.h-6,
+.ic.h-7,
+.ic.h-8 {
+  stroke-width: 1.5;
+}
+/* 底部导航 / 侧栏：选中项线条加粗，层次靠粗细而不只靠颜色 */
+.nav-active .ic {
+  stroke-width: 2.25;
+}

@@ -36,7 +36,7 @@ const activeIndex = computed(() => items.findIndex((n) => n.path === route.path 
         class="press flex flex-col items-center gap-0.5 whitespace-nowrap py-2 text-xs text-slate-500 transition dark:text-slate-400"
         :class="i === activeIndex && 'nav-active !text-brand-600 dark:!text-brand-400'"
       >
-        <Icon :name="item.icon" class="h-5 w-5" />
+        <Icon :name="item.icon" class="h-5 w-5" :class="i !== activeIndex && 'text-slate-400 dark:text-slate-500'" />
         {{ item.title }}
       </RouterLink>
     </div>

@@ -34,7 +34,7 @@ const coreLogo = useCoreLogo()
         class="flex items-center gap-3 rounded-lg px-3 py-2 text-sm text-slate-600 transition hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
         active-class="!bg-brand-50 !text-brand-700 font-medium dark:!bg-brand-500/10 dark:!text-brand-300"
       >
-        <Icon :name="item.icon" class="h-[18px] w-[18px]" />
+        <Icon :name="item.icon" class="h-5 w-5" />
         <span class="flex-1">{{ item.title }}</span>
       </RouterLink>
     </nav>

@@ -158,13 +158,13 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-slate-400',
           :title="paused ? '继续' : '暂停'"
           @click="togglePause"
         >
-          <Icon :name="paused ? 'play' : 'pause'" class="h-[18px] w-[18px]" />
+          <Icon :name="paused ? 'play' : 'pause'" class="h-5 w-5" />
         </button>
         <button class="btn-icon" title="导出为文本" :disabled="!filtered.length" @click="exportLogs">
-          <Icon name="download" class="h-[18px] w-[18px]" />
+          <Icon name="download" class="h-5 w-5" />
         </button>
         <button class="btn-icon" title="清空" :disabled="!logs.length && !pendingCount" @click="clearLogs">
-          <Icon name="trash" class="h-[18px] w-[18px]" />
+          <Icon name="trash" class="h-5 w-5" />
         </button>
       </div>
     </div>
