@@ -123,3 +123,14 @@
 .nav-active .ic {
   stroke-width: 2.25;
 }
+
+/* ---------- 深色：卡片发丝描边 + 顶部内高光，靠光线而不是粗边框分层 ---------- */
+.dark .card {
+  border-color: rgb(255 255 255 / 0.07);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+}
+/* 北境 / 暖阳的主色偏浅，白字对比不足 4.5:1，深色下主按钮改用深一级主色 */
+.dark[data-theme='nord'] .btn-primary,
+.dark[data-theme='sunset'] .btn-primary {
+  background-color: rgb(var(--b-700));
+}
