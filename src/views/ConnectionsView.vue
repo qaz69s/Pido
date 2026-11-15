@@ -240,11 +240,11 @@ const STATUS_TEXT = {
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">活动连接</div>
-        <div class="text-2xl font-bold tracking-tight sm:text-stat">{{ active.length }}</div>
+        <div class="text-lg font-bold">{{ active.length }}</div>
       </div>
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">实时速率 ↓ / ↑</div>
-        <div class="truncate py-1 text-base font-semibold leading-7 sm:py-0.5">
+        <div class="truncate text-sm font-semibold leading-7">
           {{ formatSpeed(speedSum.down) }}
           <span class="font-normal text-base-content/60">/</span>
           {{ formatSpeed(speedSum.up) }}
@@ -252,11 +252,11 @@ const STATUS_TEXT = {
       </div>
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">下载总量</div>
-        <div class="text-2xl font-bold tracking-tight sm:text-stat">{{ formatBytes(totals.download) }}</div>
+        <div class="text-lg font-bold">{{ formatBytes(totals.download) }}</div>
       </div>
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">上传总量</div>
-        <div class="text-2xl font-bold tracking-tight sm:text-stat">{{ formatBytes(totals.upload) }}</div>
+        <div class="text-lg font-bold">{{ formatBytes(totals.upload) }}</div>
       </div>
     </div>
 

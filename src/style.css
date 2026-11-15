@@ -23,10 +23,6 @@
   [data-theme] {
     background-color: var(--fallback-b3, oklch(var(--b3) / 1));
   }
-  /* 区块标题统一 17px（效果图 v2 的 h2） */
-  h2 {
-    @apply text-section;
-  }
   body {
     @apply bg-base-300 text-base-content antialiased;
     /* 中文字体按平台补齐：苹果 PingFang、华为 HarmonyOS、小米 MiSans、OPPO/realme OPPO Sans、其余 Noto

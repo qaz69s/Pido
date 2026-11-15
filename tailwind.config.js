@@ -34,10 +34,6 @@ export default {
         sm: ['13px', '20px'],
         base: ['15px', '22px'],
         lg: ['18px', '26px'],
-        // 按主题效果图 v2：页面标题 30px、区块标题 17px、指标数值 28px
-        title: ['30px', { lineHeight: '36px', letterSpacing: '-0.02em' }],
-        section: ['17px', { lineHeight: '24px', letterSpacing: '-0.01em' }],
-        stat: ['28px', { lineHeight: '34px', letterSpacing: '-0.02em' }],
       },
       // 统一动效：所有 transition 类默认同一条缓动曲线和时长（与 style.css 的 --ease / --dur-* 一致）
       transitionTimingFunction: { DEFAULT: 'cubic-bezier(0.2, 0.8, 0.2, 1)' },

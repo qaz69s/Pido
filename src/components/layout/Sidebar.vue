@@ -17,7 +17,7 @@ const coreLogo = useCoreLogo()
     class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-line bg-base-100 md:flex "
   >
     <!-- Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
-    <div class="flex h-16 items-center gap-2.5 px-5 text-xl font-extrabold tracking-tight">
+    <div class="flex h-14 items-center gap-2.5 px-5 text-xl font-extrabold tracking-tight">
       <img v-if="coreLogo" :src="coreLogo.src" :alt="coreLogo.name" :title="coreLogo.name" class="h-7 w-7 shrink-0 rounded-lg object-contain" />
       <span v-else class="glow grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-content">
         <Icon name="zap" class="h-4 w-4" />
