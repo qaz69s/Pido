@@ -403,7 +403,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </button>
         </template>
         <template v-else>
-          <button v-if="canManageNodes" class="btn btn-sm btn-outline border-base-content/20" title="通过分享链接添加节点" @click="openAddNode">
+          <button v-if="canManageNodes" class="btn btn-sm btn-outline border-line-strong" title="通过分享链接添加节点" @click="openAddNode">
             <Icon name="plus" class="h-4 w-4" />
             <span class="hidden sm:inline">添加节点</span>
           </button>
@@ -455,7 +455,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />
         测速由 {{ backend.engine }} 发起（HTTP 探测），测速地址与超时取后端配置
       </p>
-      <button class="btn btn-sm btn-outline border-base-content/20" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'stack'; prefs.closeOnSwitch = false">恢复默认</button>
+      <button class="btn btn-sm btn-outline border-line-strong" @click="prefs.testUrl = DEFAULT_TEST_URL; prefs.timeout = 5000; prefs.sort = 'default'; prefs.overview = 'stack'; prefs.closeOnSwitch = false">恢复默认</button>
       <!-- 切换节点时断开旧连接 -->
       <label class="col-span-full flex cursor-pointer items-center justify-between gap-3 border-t border-base-content/[0.07] pt-3">
         <span class="min-w-0">
@@ -483,7 +483,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     <div v-else-if="loadErrorInfo" class="card">
       <EmptyState icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
         <button class="btn btn-sm btn-primary" @click="load()">重试</button>
-        <RouterLink to="/setup" class="btn btn-sm btn-outline border-base-content/20">修改设置</RouterLink>
+        <RouterLink to="/setup" class="btn btn-sm btn-outline border-line-strong">修改设置</RouterLink>
       </EmptyState>
     </div>
 

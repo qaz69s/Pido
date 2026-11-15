@@ -40,7 +40,7 @@ async function disconnect() {
 
 <template>
   <!-- 面板 -->
-  <section class="card divide-y divide-base-content/10">
+  <section class="card divide-y divide-line">
     <h2 class="px-4 pb-2 pt-4 font-semibold">面板</h2>
     <SettingRow title="外观">
       <div role="tablist" class="tabs tabs-boxed tabs-xs">
@@ -67,18 +67,32 @@ async function disconnect() {
           class="group rounded-xl border p-2 text-left transition"
           :class="
             theme.preset === p.id
-              ? 'border-primary ring-2 ring-primary/25'
-              : 'border-base-content/10 hover:border-base-content/20'
+              ? 'border-primary ring-2 ring-primary/30'
+              : 'border-line hover:border-line-strong'
           "
           :title="p.desc"
           @click="theme.setPreset(p.id, $event)"
         >
-          <div class="flex h-7 overflow-hidden rounded-md">
-            <span class="flex-[2]" :style="{ background: p.swatch[0] }" />
-            <span class="flex-[2]" :style="{ background: p.swatch[1] }" />
-            <span class="flex-1" :style="{ background: p.swatch[2] }" />
+          <!-- 迷你界面预览：侧栏 + 顶栏 + 主色 / 强调色块，跟随当前外观取浅色或深色 -->
+          <div
+            class="flex h-12 overflow-hidden rounded-md border border-line"
+            :style="{ background: (theme.isDark ? p.dark : p.light)['base-300'] }"
+          >
+            <div class="flex w-1/4 flex-col gap-1 p-1" :style="{ background: (theme.isDark ? p.dark : p.light)['base-100'] }">
+              <i class="block h-1 w-4/5 rounded-full" :style="{ background: (theme.isDark ? p.dark : p.light).primary }" />
+              <i class="block h-1 w-3/5 rounded-full" :style="{ background: (theme.isDark ? p.dark : p.light)['--line'] }" />
+              <i class="block h-1 w-2/3 rounded-full" :style="{ background: (theme.isDark ? p.dark : p.light)['--line'] }" />
+            </div>
+            <div class="flex flex-1 flex-col gap-1 p-1">
+              <i class="block h-2 rounded-sm" :style="{ background: (theme.isDark ? p.dark : p.light)['base-100'] }" />
+              <div class="flex flex-1 gap-1">
+                <i class="block flex-1 rounded-sm" :style="{ background: (theme.isDark ? p.dark : p.light).primary }" />
+                <i class="block flex-1 rounded-sm" :style="{ background: (theme.isDark ? p.dark : p.light).accent }" />
+                <i class="block flex-1 rounded-sm" :style="{ background: (theme.isDark ? p.dark : p.light)['--line'] }" />
+              </div>
+            </div>
           </div>
-          <div class="mt-1.5 text-xs font-medium">{{ p.name }}</div>
+          <div class="mt-1.5 text-xs font-bold">{{ p.name }}</div>
         </button>
       </div>
     </div>
@@ -96,7 +110,7 @@ async function disconnect() {
           内核 {{ backend.version?.version || '--' }}{{ backend.version?.meta ? '（Meta）' : '' }}
         </div>
       </div>
-      <RouterLink to="/setup" class="btn btn-xs btn-outline border-base-content/20">更换</RouterLink>
+      <RouterLink to="/setup" class="btn btn-xs btn-outline border-line-strong">更换</RouterLink>
       <button class="btn btn-xs btn-ghost text-error" @click="disconnect">断开</button>
     </div>
   </section>

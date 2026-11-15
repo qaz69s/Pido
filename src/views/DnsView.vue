@@ -270,10 +270,10 @@ async function runMihomo(a) {
     <!-- ================= mihomo ================= -->
     <div v-if="!backend.isStandard" class="grid items-start gap-3 lg:grid-cols-2">
       <DnsQueryTool />
-      <section class="card divide-y divide-base-content/10">
+      <section class="card divide-y divide-line">
         <h2 class="px-4 pb-2 pt-4 font-semibold">缓存</h2>
         <SettingRow v-for="a in MIHOMO_ACTIONS" :key="a.key" :title="a.label" :description="a.desc">
-          <button class="btn btn-xs btn-outline border-base-content/20" :disabled="!!mihomoBusy[a.key]" @click="runMihomo(a)">
+          <button class="btn btn-xs btn-outline border-line-strong" :disabled="!!mihomoBusy[a.key]" @click="runMihomo(a)">
             <Icon name="trash" class="h-3.5 w-3.5" :class="mihomoBusy[a.key] && 'animate-pulse'" />
             {{ mihomoBusy[a.key] ? '执行中…' : '执行' }}
           </button>
@@ -329,7 +329,7 @@ async function runMihomo(a) {
         <div v-else-if="!log.records.length" class="card">
           <EmptyState icon="compass" title="没有查询记录" :description="logFilter.name || logFilter.type || logFilter.src ? '没有符合条件的记录，换个条件试试。' : '客户端发起解析后会出现在这里（诊断查询不记录）。'" />
         </div>
-        <section v-else class="card divide-y divide-base-content/10">
+        <section v-else class="card divide-y divide-line">
           <div v-for="r in log.records" :key="r.id" class="px-4 py-2.5">
             <!-- 第一行只放域名与耗时：手机上域名完整显示，过长时换行而不截断 -->
             <div class="flex items-start gap-2 text-sm">
@@ -363,7 +363,7 @@ async function runMihomo(a) {
             <Icon name="search" class="pointer-events-none absolute left-2.5 top-1/2 h-4 w-4 -translate-y-1/2 text-base-content/60" />
             <input v-model="cacheSearch" class="input input-bordered input-sm w-full pl-8" placeholder="搜索域名或 IP" autocapitalize="off" spellcheck="false" />
           </div>
-          <button v-if="exactDomain" class="btn btn-sm btn-outline border-base-content/20" @click="removeByName">
+          <button v-if="exactDomain" class="btn btn-sm btn-outline border-line-strong" @click="removeByName">
             <Icon name="trash" class="h-4 w-4" />
             删除该域名
           </button>
@@ -384,7 +384,7 @@ async function runMihomo(a) {
         <div v-else-if="!cacheShown.length" class="card">
           <EmptyState icon="database" :title="cacheSearch ? '没有匹配的缓存' : '缓存为空'" />
         </div>
-        <section v-else class="card divide-y divide-base-content/10">
+        <section v-else class="card divide-y divide-line">
           <div v-for="e in cacheShown" :key="e.entry_id" class="flex items-center gap-2 px-4 py-2.5">
             <div class="min-w-0 flex-1">
               <div class="flex items-center gap-2 text-sm">
@@ -437,7 +437,7 @@ async function runMihomo(a) {
                 <h2 class="font-semibold">{{ part.title }}</h2>
                 <p class="text-xs text-base-content/70">{{ part.desc }}</p>
               </div>
-              <ol class="divide-y divide-base-content/10">
+              <ol class="divide-y divide-line">
                 <li v-for="r in rules.data[part.key] || []" :key="r.rule_id" class="flex items-start gap-3 px-4 py-2 text-sm">
                   <span class="w-6 shrink-0 text-right text-xs tabular-nums text-base-content/60">{{ r.kind === 'fallback' ? '' : r.index + 1 }}</span>
                   <div class="min-w-0 flex-1">

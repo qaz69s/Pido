@@ -21,7 +21,7 @@ const open = computed({
       {{ confirm.options.message }}
     </p>
     <template #footer>
-      <button class="btn btn-sm btn-outline border-base-content/20" @click="confirm.settle(false)">取消</button>
+      <button class="btn btn-sm btn-outline border-line-strong" @click="confirm.settle(false)">取消</button>
       <button :class="confirm.options.danger ? 'btn-error' : 'btn-primary'" @click="confirm.settle(true)" class="btn btn-sm">
         {{ confirm.options.confirmText }}
       </button>

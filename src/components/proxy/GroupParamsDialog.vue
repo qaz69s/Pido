@@ -192,7 +192,7 @@ async function save() {
       >
         <Icon name="alert" class="mt-0.5 h-4 w-4 shrink-0" />
         <span class="min-w-0 flex-1">{{ error }}</span>
-        <button v-if="stale" type="button" class="btn btn-xs btn-outline border-base-content/20 shrink-0" @click="load">重新读取</button>
+        <button v-if="stale" type="button" class="btn btn-xs btn-outline border-line-strong shrink-0" @click="load">重新读取</button>
       </div>
       <p class="flex items-start gap-1.5 text-xs text-base-content/70">
         <Icon name="info" class="mt-px h-3.5 w-3.5 shrink-0" />

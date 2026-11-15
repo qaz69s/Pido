@@ -32,7 +32,7 @@ async function retry() {
       </div>
     </div>
     <div class="flex gap-2 self-end sm:self-auto">
-      <button class="btn btn-xs btn-outline border-base-content/20" :disabled="retrying" @click="retry">
+      <button class="btn btn-xs btn-outline border-line-strong" :disabled="retrying" @click="retry">
         {{ retrying ? '检测中…' : '重试' }}
       </button>
       <RouterLink to="/setup" class="btn btn-xs btn-primary">修改设置</RouterLink>

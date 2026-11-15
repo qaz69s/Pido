@@ -31,6 +31,7 @@
   `stores/theme.js` 把 `<html data-theme>` 设为「配色 + 外观」，例如 `nord-dark`；`index.html` 的内联脚本在 Vue 挂载前先写好，避免闪白。设置仍保存在原来的 `localStorage` 键（`theme` / `preset`）里。
 - **颜色语义**：`primary` 主色（按钮、选中、下载曲线）、`accent` 强调色（上传曲线）、`base-100` 卡片、`base-200` 卡片内的小块、`base-300` 页面底色、`base-content` 正文（次要文字用 `text-base-content/70` 等透明度），`info` / `success` / `warning` / `error` 状态色。组件里只用这些语义类（如 `bg-base-100`、`text-primary`、`border-base-content/10`），不写死颜色。
 - **组件**：按钮 `btn`、弹窗 `modal`（手机底部抽屉 `modal-bottom`，桌面居中 `md:modal-middle`）、开关 `toggle`、提示 `toast` + `alert`、卡片 `card`、徽标 `badge`、分段切换 `tabs tabs-boxed`、输入框 `input` / `select` / `textarea`、菜单 `menu`、下拉 `dropdown`、表格 `table`、进度条 `progress`、加载 `loading` / `skeleton`。
+- **线条与阴影**：每个主题带 `--line`（描边、分隔线，Tailwind 类 `border-line` / `divide-line`）、`--line-strong`（输入框、悬停描边）和 `--muted`（次要文字，`text-muted`）；主色按钮和选中导航带主题光晕 `--glow`，卡片阴影 `--card-shadow`，见 `src/style.css`。配色取值来自 `pido-theme-preview-v2`。
 - **圆角与字体**：每个主题带 `--rounded-box`（卡片、弹窗）、`--rounded-btn`（按钮、分段）、`--rounded-badge`（徽标），Tailwind 的 `rounded-md / lg / xl / 2xl / 3xl` 也按这两个变量换算；赛博主题用 `--font-body` 换成等宽字体。
 - **其他**：各配色的背景质感（光晕、网格、渐变）在 `src/style.css`，按 `[data-theme^='sakura-']` 等选择器生效；流量曲线读取主题变量 `--p` / `--a`，随主题变色。
 

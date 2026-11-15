@@ -176,7 +176,7 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-base-conten
     >
       <Icon name="pause" class="h-4 w-4 shrink-0 text-warning" />
       <span class="flex-1">已暂停，期间收到 {{ pendingCount }} 条新日志</span>
-      <button class="btn btn-xs btn-outline border-base-content/20" @click="togglePause">继续</button>
+      <button class="btn btn-xs btn-outline border-line-strong" @click="togglePause">继续</button>
     </div>
     <div
       v-else-if="status === 'error'"
@@ -195,7 +195,7 @@ const statusInfo = computed(() => STATUS[status.value] || { dot: 'bg-base-conten
         :description="keyword ? '' : level === 'error' || level === 'warning' ? '当前级别较高，只有出现问题时才会有日志。' : '有新连接或内核事件时会显示在这里。'"
       />
     </div>
-    <div v-else class="card divide-y divide-base-content/10 overflow-hidden">
+    <div v-else class="card divide-y divide-line overflow-hidden">
       <div v-for="l in visible" :key="l.id" class="flex gap-2 px-3 py-2 sm:gap-3 sm:px-4">
         <div class="flex shrink-0 flex-col items-start gap-1 sm:flex-row sm:items-center sm:gap-3">
           <span class="text-xs tabular-nums text-base-content/60 sm:w-14">{{ formatClock(l.time) }}</span>

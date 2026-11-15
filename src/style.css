@@ -33,19 +33,64 @@
   }
 }
 
-/* ---------- daisyUI 组件的项目级默认 ---------- */
+/* ---------- daisyUI 组件的项目级默认（按 pido-theme-preview-v2） ---------- */
 @layer components {
-  /* 卡片：daisyUI card + 卡片底色 + 发丝描边 */
+  /* 卡片：卡片底色 + 主题线条色描边 + 主题阴影 */
   .card {
-    @apply border border-base-content/10 bg-base-100;
+    @apply border border-line bg-base-100;
+    box-shadow: var(--card-shadow);
   }
-  /* 数值后的单位：小一号、灰一级 */
+  /* 数值后的单位：小一号、次要文字色 */
   .unit {
-    @apply ml-[0.15em] text-[0.75em] font-normal text-base-content/60;
+    @apply ml-[0.15em] text-[0.75em] font-semibold text-muted;
   }
-  /* 按钮：字重与面板其余文字一致，图标与文字间距 4px */
+  /* 按钮：粗体，图标与文字间距 6px */
   .btn {
-    @apply gap-1 font-medium;
+    @apply gap-1.5 font-bold;
+  }
+  /* 主色按钮带主题光晕；描边 / 幽灵按钮不带 */
+  .btn-primary,
+  .glow {
+    box-shadow: var(--glow);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.07);
+  }
+  .btn-outline:not(.btn-primary):not(.btn-error):not(.btn-success):not(.btn-warning) {
+    @apply border-line-strong;
+  }
+  /* 徽标：胶囊、粗体 */
+  .badge {
+    @apply font-bold;
+  }
+  /* 分段切换：底色 + 线条描边，选中块实心主色 */
+  .tabs-boxed {
+    @apply border border-line bg-base-200;
+  }
+  .tabs-boxed .tab {
+    @apply font-semibold text-muted;
+  }
+  .tabs-boxed .tab-active:not(.tab-disabled):not([disabled]),
+  .tabs-boxed :is(input:checked) {
+    @apply bg-primary text-primary-content;
+  }
+  /* 输入框 / 下拉 / 多行文本：线条色描边 */
+  .input-bordered,
+  .select-bordered,
+  .textarea-bordered {
+    @apply border-line;
+  }
+  /* 表格：表头次要色、半粗、略加字距；行线条用主题线条色 */
+  .table :where(thead tr, tbody tr:not(:last-child), tbody tr:first-child:last-child) {
+    @apply border-line;
+  }
+  .table thead th {
+    @apply text-xs font-semibold tracking-wide text-muted;
+  }
+  /* 菜单悬停用线条色铺底 */
+  .menu li > *:not(ul, .menu-title, details, .btn):active,
+  .menu li > *:not(ul, .menu-title, details, .btn).active {
+    @apply bg-primary text-primary-content;
   }
 }
 
@@ -111,48 +156,105 @@
   stroke-width: 2.25;
 }
 
-/* ---------- 深色：卡片顶部内高光；弹窗 / 下拉菜单比卡片再亮一级（靠光线而不是粗边框分层） ---------- */
-[data-theme$='-dark'] .card {
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 0.04);
+/* ---------- 阴影与光晕（各配色可覆盖） ---------- */
+[data-theme$='-light'] {
+  --card-shadow: 0 1px 2px rgb(20 20 40 / 0.05), 0 10px 28px -14px rgb(20 20 40 / 0.22);
+  --glow: 0 8px 20px -8px oklch(var(--p));
 }
+[data-theme$='-dark'] {
+  --card-shadow: inset 0 1px 0 rgb(255 255 255 / 0.05), 0 14px 32px -16px rgb(0 0 0 / 0.7);
+  --glow: 0 8px 20px -8px oklch(var(--p));
+}
+/* 深色：弹窗 / 下拉菜单比卡片再亮一级（靠光线而不是粗边框分层） */
 [data-theme$='-dark'] .modal-box,
 [data-theme$='-dark'] .dropdown-content {
   background-image: linear-gradient(rgb(255 255 255 / 0.05), rgb(255 255 255 / 0.05));
 }
 
-/* ---------- 各配色的背景质感 ---------- */
-/* 北境：冷色雾面背景 */
-[data-theme^='nord-'] body {
-  background-image: linear-gradient(180deg, oklch(var(--p) / 0.08), transparent 320px);
-}
-/* 素墨：纯中性灰的极简风格；深色卡片不描边 */
-[data-theme='neutral-dark'] .card {
-  border-color: transparent;
-}
-/* 樱花：粉紫双光晕 */
-[data-theme^='sakura-'] body {
+/* ---------- 各配色的背景质感（取自效果图 v2） ---------- */
+/* 靛夜：右上靛蓝 + 左下青色光晕 */
+[data-theme='default-light'] body {
   background-image:
-    radial-gradient(700px 380px at 0% -10%, oklch(var(--p) / 0.14), transparent 70%),
-    radial-gradient(700px 380px at 100% 0%, oklch(var(--a) / 0.12), transparent 70%);
+    radial-gradient(900px 480px at 85% -10%, rgb(79 70 229 / 0.13), transparent 70%),
+    radial-gradient(700px 420px at -5% 100%, rgb(14 116 144 / 0.1), transparent 70%);
+}
+[data-theme='default-dark'] body {
+  background-image:
+    radial-gradient(900px 480px at 85% -10%, rgb(129 140 248 / 0.2), transparent 70%),
+    radial-gradient(700px 420px at -5% 100%, rgb(34 211 238 / 0.1), transparent 70%);
+}
+/* 北境：右上冷色雾面 */
+[data-theme^='nord-'] {
+  --glow: 0 6px 16px -8px oklch(var(--p));
+}
+[data-theme='nord-light'] body {
+  background-image: radial-gradient(800px 420px at 100% 0%, rgb(94 129 172 / 0.16), transparent 70%);
+}
+[data-theme='nord-dark'] body {
+  background-image: radial-gradient(800px 420px at 100% 0%, rgb(136 192 208 / 0.14), transparent 70%);
+}
+/* 素墨：无光晕、无阴影，只靠线条分层 */
+[data-theme^='neutral-'] {
+  --card-shadow: none;
+  --glow: none;
+}
+/* 樱花：粉紫双光晕，更大的光晕阴影 */
+[data-theme^='sakura-'] {
+  --glow: 0 10px 22px -8px oklch(var(--p));
+}
+[data-theme='sakura-light'] {
+  --card-shadow: 0 2px 4px rgb(190 24 93 / 0.05), 0 16px 32px -16px rgb(190 24 93 / 0.28);
+}
+[data-theme='sakura-light'] body {
+  background-image:
+    radial-gradient(700px 460px at 0% 0%, rgb(190 24 93 / 0.14), transparent 70%),
+    radial-gradient(700px 460px at 100% 100%, rgb(124 58 237 / 0.14), transparent 70%);
 }
 [data-theme='sakura-dark'] body {
   background-image:
-    radial-gradient(700px 380px at 0% -10%, oklch(var(--p) / 0.1), transparent 70%),
-    radial-gradient(700px 380px at 100% 0%, oklch(var(--a) / 0.08), transparent 70%);
+    radial-gradient(700px 460px at 0% 0%, rgb(244 114 182 / 0.22), transparent 70%),
+    radial-gradient(700px 460px at 100% 100%, rgb(196 181 253 / 0.18), transparent 70%);
 }
-/* 赛博：网格底纹 + 霓虹描边（等宽字体见主题的 --font-body） */
-[data-theme^='cyber-'] body {
+/* 赛博：32px 网格底纹、霓虹光晕、直角、线框卡片（等宽字体见主题的 --font-body） */
+[data-theme^='cyber-'] {
+  --glow: 0 0 16px -2px oklch(var(--p));
+  --card-shadow: 0 0 0 1px var(--line);
+}
+[data-theme='cyber-dark'] {
+  --card-shadow: 0 0 0 1px var(--line), 0 0 22px -12px oklch(var(--a));
+}
+[data-theme='cyber-light'] body {
   background-image:
-    linear-gradient(oklch(var(--p) / 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, oklch(var(--p) / 0.05) 1px, transparent 1px);
-  background-size: 28px 28px;
+    linear-gradient(rgb(0 0 0 / 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 0 0 / 0.05) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
-[data-theme='cyber-dark'] .card {
-  box-shadow: 0 0 0 1px oklch(var(--p) / 0.18), 0 0 24px -12px oklch(var(--p) / 0.6);
+[data-theme='cyber-dark'] body {
+  background-image:
+    linear-gradient(rgb(0 240 255 / 0.07) 1px, transparent 1px),
+    linear-gradient(90deg, rgb(0 240 255 / 0.07) 1px, transparent 1px);
+  background-size: 32px 32px;
 }
-/* 暖阳：纸张般的暖色顶部渐变 */
-[data-theme^='sunset-'] body {
-  background-image: linear-gradient(180deg, oklch(var(--p) / 0.1), transparent 360px);
+[data-theme='cyber-dark'] h1 {
+  text-shadow: 0 0 14px oklch(var(--p));
+}
+[data-theme^='cyber-'] .toggle,
+[data-theme^='cyber-'] .progress,
+[data-theme^='cyber-'] .range {
+  --rounded-box: 0;
+  --rounded-badge: 0;
+  border-radius: 0;
+}
+/* 暖阳：左上暖橙 + 右下琥珀光晕 */
+[data-theme='sunset-light'] body {
+  background-image:
+    radial-gradient(800px 460px at 10% -10%, rgb(251 146 60 / 0.22), transparent 70%),
+    radial-gradient(700px 400px at 100% 100%, rgb(251 191 36 / 0.18), transparent 70%);
+}
+[data-theme='sunset-dark'] body {
+  background-image:
+    radial-gradient(800px 460px at 10% -10%, rgb(251 146 60 / 0.22), transparent 70%),
+    radial-gradient(700px 400px at 100% 100%, rgb(251 191 36 / 0.12), transparent 70%);
 }
 
 /* ---------- 动效节奏：进入 220ms、退出 160ms，共用一条缓动曲线 ---------- */
@@ -164,7 +266,7 @@
 
 /* ---------- 键盘焦点：只在键盘操作时出现，点击不显示 ---------- */
 :where(button, a, [role='button'], [tabindex], summary):focus-visible {
-  outline: 2px solid oklch(var(--p) / 0.7);
+  outline: 2px solid oklch(var(--a));
   outline-offset: 2px;
   border-radius: var(--rounded-btn, 0.5rem);
 }

@@ -24,7 +24,7 @@ const STYLES = {
         v-for="t in toast.items"
         :key="t.id"
         role="alert"
-        class="alert pointer-events-auto flex cursor-pointer items-start gap-2 whitespace-normal rounded-xl border-base-content/10 bg-base-100 px-3 py-2.5 text-left text-sm text-base-content/90 shadow-lg"
+        class="alert pointer-events-auto flex cursor-pointer items-start gap-2 whitespace-normal rounded-xl border-line bg-base-100 px-3 py-2.5 text-left text-sm text-base-content/90 shadow-lg"
         @click="toast.remove(t.id)"
       >
         <Icon :name="STYLES[t.type]?.icon" class="mt-0.5 h-4 w-4 shrink-0" :class="STYLES[t.type]?.ic" />

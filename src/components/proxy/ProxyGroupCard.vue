@@ -184,7 +184,7 @@ const levelCounts = computed(() => {
       <div
         v-if="rendered"
         v-show="!collapsed"
-        class="grid grid-cols-2 gap-2 border-t border-base-content/10 p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3"
+        class="grid grid-cols-2 gap-2 border-t border-line p-3 sm:grid-cols-3 lg:grid-cols-2 2xl:grid-cols-3"
       >
         <ProxyNode
           v-for="n in nodes"
@@ -206,7 +206,7 @@ const levelCounts = computed(() => {
     <!-- 标准 API：组参数（展开时显示当前值；手机上标题栏放不下按钮，入口只在这里） -->
     <div
       v-if="configurable && !collapsed"
-      class="flex items-center gap-2 border-t border-base-content/10 px-4 py-2 text-xs text-base-content/70"
+      class="flex items-center gap-2 border-t border-line px-4 py-2 text-xs text-base-content/70"
     >
       <span class="min-w-0 flex-1 truncate">
         间隔 {{ group._config?.check_interval != null ? `${group._config.check_interval} 秒` : '默认' }}

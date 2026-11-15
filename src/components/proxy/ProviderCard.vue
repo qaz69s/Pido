@@ -134,7 +134,7 @@ function barHeight(d) {
 
     <!-- 展开：订阅中的节点 -->
     <ExpandTransition fade-only>
-      <div v-if="rendered" v-show="!collapsed" class="border-t border-base-content/10">
+      <div v-if="rendered" v-show="!collapsed" class="border-t border-line">
         <div v-if="!nodes.length" class="p-4 text-center text-xs text-base-content/70">
           这个集合还没有节点，点右上角的云图标更新一次试试
         </div>

@@ -78,12 +78,12 @@ defineExpose({ jumpTo })
 
 <template>
   <div
-    class="code-editor relative flex overflow-hidden rounded-lg border border-base-content/10 bg-base-200 font-mono"
+    class="code-editor relative flex overflow-hidden rounded-lg border border-line bg-base-200 font-mono"
     :style="{ '--lh': `${LH}px`, '--pad': `${PAD}px` }"
   >
     <!-- 行号 -->
     <div
-      class="code-line relative shrink-0 select-none border-r border-base-content/10 text-right text-base-content/60"
+      class="code-line relative shrink-0 select-none border-r border-line text-right text-base-content/60"
       :style="{ width: gutterWidth }"
       aria-hidden="true"
     >

@@ -77,9 +77,9 @@ function onSelect() {
     class="relative flex min-w-0 flex-col gap-1 overflow-hidden rounded-lg border p-2.5 text-left transition-[border-color,background-color,box-shadow,transform] duration-200 [contain:layout_style]"
     :class="[
       active
-        ? 'node-active border-transparent bg-base-200'
-        : 'border-transparent bg-base-200',
-      selectable && !active ? 'press cursor-pointer hover:border-base-content/20 hover:shadow-sm' : '',
+        ? 'node-active border-primary bg-base-200 ring-1 ring-primary'
+        : 'border-line bg-base-200',
+      selectable && !active ? 'press cursor-pointer hover:border-line-strong hover:shadow-sm' : '',
       !selectable ? 'cursor-default' : '',
     ]"
     @animationend.self="bouncing = false"
@@ -88,7 +88,7 @@ function onSelect() {
   >
     <span class="flex min-w-0 items-center gap-1.5">
       <ProxyIcon v-if="icon" :icon="icon" :size="16" />
-      <span class="truncate text-sm" :class="active ? 'font-semibold text-base-content' : 'font-normal'" :title="name">{{ name }}</span>
+      <span class="truncate text-sm" :class="active ? 'font-bold text-base-content' : 'font-semibold'" :title="name">{{ name }}</span>
     </span>
     <div class="flex items-center justify-between gap-2 text-sm">
       <span class="truncate text-base-content/70" :title="type">{{ typeLabel }}</span>

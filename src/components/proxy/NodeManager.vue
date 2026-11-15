@@ -214,7 +214,7 @@ const title = computed(() => {
         <span v-if="provider && provider._kind !== 'inline'">订阅节点只读：由订阅管理，只能通过更新订阅来变更。</span>
         <span v-else>后端未开启节点管理：需要在 api 段设置 config_write: true，且配置目录为受管布局。</span>
       </p>
-      <ul v-if="nodes.length" class="divide-y divide-base-content/10">
+      <ul v-if="nodes.length" class="divide-y divide-line">
         <li v-for="n in nodes" :key="n._id || n.name" class="flex items-center gap-2 py-2">
           <div class="min-w-0 flex-1">
             <div class="truncate text-sm font-medium" :title="n.name">{{ n.name }}</div>

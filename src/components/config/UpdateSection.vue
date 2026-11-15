@@ -162,7 +162,7 @@ async function updateCore(force = false) {
 </script>
 
 <template>
-  <section class="card divide-y divide-base-content/10">
+  <section class="card divide-y divide-line">
     <div class="flex items-center gap-2 px-4 pb-2 pt-4">
       <h2 class="flex-1 font-semibold">更新</h2>
       <button class="btn btn-xs btn-ghost" :disabled="checking" @click="checkLatest">
@@ -183,12 +183,12 @@ async function updateCore(force = false) {
           <template v-if="latest.panel"> · 最新 <span class="font-mono">{{ latest.panel }}</span></template>
         </div>
       </div>
-      <button v-if="!backend.isStandard" class="btn btn-xs btn-outline border-base-content/20" :disabled="upgradingUi" @click="updatePanel">
+      <button v-if="!backend.isStandard" class="btn btn-xs btn-outline border-line-strong" :disabled="upgradingUi" @click="updatePanel">
         <Icon name="download" class="h-3.5 w-3.5" :class="upgradingUi && 'animate-pulse'" />
         {{ upgradingUi ? '更新中…' : '更新面板' }}
       </button>
       <!-- 标准 API：后端不提供在线更新面板，给出下载链接 -->
-      <a v-else-if="PANEL_ZIP_URL" class="btn btn-xs btn-outline border-base-content/20" :href="PANEL_ZIP_URL" target="_blank" rel="noopener">
+      <a v-else-if="PANEL_ZIP_URL" class="btn btn-xs btn-outline border-line-strong" :href="PANEL_ZIP_URL" target="_blank" rel="noopener">
         <Icon name="download" class="h-3.5 w-3.5" />
         下载面板
       </a>
@@ -229,7 +229,7 @@ async function updateCore(force = false) {
           :class="
             channel === c.value
               ? 'border-primary bg-primary/10 ring-1 ring-primary'
-              : 'border-base-content/10 hover:border-base-content/20'
+              : 'border-line hover:border-line-strong'
           "
           :disabled="upgradingCore"
           @click="channel = c.value"

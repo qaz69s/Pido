@@ -89,7 +89,7 @@ onBeforeUnmount(() => {
       <div v-if="modelValue" class="modal modal-open modal-bottom backdrop-blur-[2px] md:modal-middle md:p-4" :class="z">
         <!-- 面板 -->
         <div
-          class="modal-box modal-panel relative flex max-h-[85svh] w-full flex-col overflow-hidden border border-base-content/10 p-0 shadow-xl"
+          class="modal-box modal-panel relative flex max-h-[85svh] w-full flex-col overflow-hidden border border-line p-0 shadow-xl"
           :class="[width, dragY && '!transition-none']"
           :style="dragY ? { transform: `translateY(${dragY}px)` } : null"
           role="dialog"
@@ -110,7 +110,7 @@ onBeforeUnmount(() => {
           </div>
           <footer
             v-if="$slots.footer"
-            class="modal-action safe-bottom mt-0 border-t border-base-content/10 px-4 py-3"
+            class="modal-action safe-bottom mt-0 border-t border-line px-4 py-3"
           >
             <slot name="footer" />
           </footer>

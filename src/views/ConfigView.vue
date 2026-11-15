@@ -269,7 +269,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     <div v-else-if="loadErrorInfo" class="card">
       <EmptyState icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
         <button class="btn btn-sm btn-primary" @click="load()">重试</button>
-        <RouterLink to="/setup" class="btn btn-sm btn-outline border-base-content/20">修改设置</RouterLink>
+        <RouterLink to="/setup" class="btn btn-sm btn-outline border-line-strong">修改设置</RouterLink>
       </EmptyState>
     </div>
 
@@ -334,7 +334,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </section>
 
           <!-- 网络 -->
-          <section class="card divide-y divide-base-content/10">
+          <section class="card divide-y divide-line">
             <h2 class="px-4 pb-2 pt-4 font-semibold">网络</h2>
             <SettingRow title="允许局域网连接" description="其他设备可通过本机 IP 使用代理端口">
               <Switch
@@ -380,7 +380,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
         <!-- 右列 -->
         <div class="space-y-4">
           <!-- TUN -->
-          <section class="card divide-y divide-base-content/10">
+          <section class="card divide-y divide-line">
             <div class="flex items-center gap-2 px-4 pb-2 pt-4">
               <h2 class="flex-1 font-semibold">TUN 模式</h2>
               <span
@@ -430,11 +430,11 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           </section>
 
           <!-- 维护 -->
-          <section class="card divide-y divide-base-content/10">
+          <section class="card divide-y divide-line">
             <h2 class="px-4 pb-2 pt-4 font-semibold">维护</h2>
             <SettingRow v-for="a in ACTIONS" :key="a.key" :title="a.label" :description="a.desc">
               <button
-                :class="a.danger ? 'btn-error' : 'btn-outline border-base-content/20'"
+                :class="a.danger ? 'btn-error' : 'btn-outline border-line-strong'"
                 class="btn btn-xs"
                 :disabled="!!saving[a.key]"
                 @click="runAction(a)"

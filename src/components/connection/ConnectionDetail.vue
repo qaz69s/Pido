@@ -105,7 +105,7 @@ const metaRows = computed(() => {
       </dl>
 
       <!-- 元数据 -->
-      <dl class="divide-y divide-base-content/10 text-sm">
+      <dl class="divide-y divide-line text-sm">
         <div v-for="r in metaRows" :key="r.key" class="flex gap-3 py-1.5">
           <dt class="w-24 shrink-0 text-base-content/70">{{ r.label }}</dt>
           <dd class="min-w-0 flex-1 break-all font-mono text-sm">{{ r.value }}</dd>
@@ -114,7 +114,7 @@ const metaRows = computed(() => {
     </template>
 
     <template #footer>
-      <button class="btn btn-sm btn-outline border-base-content/20" @click="emit('close')">关闭</button>
+      <button class="btn btn-sm btn-outline border-line-strong" @click="emit('close')">关闭</button>
       <button v-if="!closed" class="btn btn-sm btn-error" @click="emit('disconnect', conn)">
         <Icon name="x" class="h-4 w-4" />
         断开连接

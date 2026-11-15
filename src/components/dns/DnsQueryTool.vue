@@ -107,7 +107,7 @@ const STATUS_CLASS = (s) =>
             :key="t"
             type="button"
             class="btn btn-xs font-mono font-normal"
-            :class="form.types.includes(t) ? 'btn-primary' : 'btn-outline border-base-content/20 text-base-content/70'"
+            :class="form.types.includes(t) ? 'btn-primary' : 'btn-outline border-line-strong text-base-content/70'"
             @click="toggleType(t)"
           >
             {{ t }}
@@ -141,7 +141,7 @@ const STATUS_CLASS = (s) =>
       </div>
       <div v-for="r in result.results" :key="r.type" class="rounded-xl bg-base-200 p-3">
         <div class="flex flex-wrap items-center gap-2 text-xs">
-          <span class="badge badge-outline badge-sm border-base-content/20 font-mono text-base-content/90">{{ r.type }}</span>
+          <span class="badge badge-outline badge-sm border-line-strong font-mono text-base-content/90">{{ r.type }}</span>
           <span class="rounded-md px-1.5 py-0.5 font-medium" :class="STATUS_CLASS(r.status)">{{ r.status }}</span>
           <span v-if="r.cached === true" class="badge badge-sm border-0 bg-info/15 text-info">命中缓存</span>
           <span v-if="r.upstream" class="truncate text-base-content/70">上游 <span class="font-mono">{{ r.upstream }}</span></span>

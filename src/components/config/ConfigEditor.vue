@@ -339,7 +339,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
           </div>
           <div class="flex shrink-0 items-center gap-2">
             <button v-if="dirty" class="btn btn-sm btn-ghost" :disabled="saving" @click="revert">还原</button>
-            <button class="btn btn-sm btn-outline border-base-content/20" :disabled="validating || saving" @click="runValidate">
+            <button class="btn btn-sm btn-outline border-line-strong" :disabled="validating || saving" @click="runValidate">
               <Icon name="check" class="h-4 w-4" :class="validating && 'animate-pulse'" />
               {{ validating ? '校验中…' : '校验' }}
             </button>
@@ -358,7 +358,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
         <!-- 只读说明 -->
         <div
           v-if="reasonInfo"
-          class="alert block rounded-xl border-base-content/10 bg-base-content/5 p-3 text-left text-sm"
+          class="alert block rounded-xl border-line bg-base-content/5 p-3 text-left text-sm"
         >
           <div class="flex items-start gap-2">
             <Icon name="lock" class="mt-0.5 h-4 w-4 shrink-0 text-base-content/70" />
@@ -406,7 +406,7 @@ const errorCount = computed(() => diagnostics.value.filter((d) => d.level === 'e
             <div class="text-xs opacity-80">读取之后，{{ current.path }} 在服务器上被改动过，本次保存没有写入。</div>
           </div>
           <div class="flex shrink-0 gap-2">
-            <button class="btn btn-xs btn-outline border-base-content/20" @click="takeLatest">载入最新内容</button>
+            <button class="btn btn-xs btn-outline border-line-strong" @click="takeLatest">载入最新内容</button>
             <button class="btn btn-xs btn-ghost" @click="keepMine">保留我的修改</button>
           </div>
         </div>

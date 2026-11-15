@@ -165,7 +165,7 @@ const infoRows = computed(() => {
         </span>
         <div class="min-w-0">
           <div class="text-xs text-base-content/70">{{ s.label }}</div>
-          <div class="truncate text-lg font-semibold leading-7 tracking-tight tabular-nums"><Num :value="s.value" /></div>
+          <div class="truncate text-lg font-bold leading-7 tracking-tight tabular-nums"><Num :value="s.value" /></div>
         </div>
       </div>
     </div>
@@ -187,7 +187,7 @@ const infoRows = computed(() => {
       <!-- 运行信息 -->
       <section class="card p-4">
         <h2 class="mb-3 font-semibold">运行信息</h2>
-        <dl class="divide-y divide-base-content/10 text-sm">
+        <dl class="divide-y divide-line text-sm">
           <div v-for="row in infoRows" :key="row.label" class="flex justify-between py-2.5">
             <dt class="text-base-content/70">{{ row.label }}</dt>
             <dd class="font-medium tabular-nums">{{ row.value }}</dd>

@@ -14,12 +14,12 @@ const coreLogo = useCoreLogo()
 
 <template>
   <aside
-    class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-base-content/10 bg-base-100 md:flex "
+    class="fixed inset-y-0 left-0 z-40 hidden w-56 flex-col border-r border-line bg-base-100 md:flex "
   >
     <!-- Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
-    <div class="flex h-14 items-center gap-2 px-5 text-lg font-semibold">
+    <div class="flex h-14 items-center gap-2.5 px-5 text-xl font-extrabold tracking-tight">
       <img v-if="coreLogo" :src="coreLogo.src" :alt="coreLogo.name" :title="coreLogo.name" class="h-7 w-7 shrink-0 rounded-lg object-contain" />
-      <span v-else class="grid h-7 w-7 place-items-center rounded-lg bg-primary text-primary-content">
+      <span v-else class="glow grid h-8 w-8 place-items-center rounded-lg bg-primary text-primary-content">
         <Icon name="zap" class="h-4 w-4" />
       </span>
       Pido
@@ -31,8 +31,8 @@ const coreLogo = useCoreLogo()
         <li v-for="item in navItems" :key="item.path">
           <RouterLink
             :to="item.path"
-            class="gap-3 px-3 py-2 text-sm text-base-content/80"
-            active-class="!bg-primary/10 !text-primary font-medium"
+            class="min-h-11 gap-3 rounded-lg px-3 py-2 text-base font-semibold text-muted hover:!bg-line hover:!text-base-content"
+            active-class="glow !bg-primary !text-primary-content"
           >
             <Icon :name="item.icon" class="h-5 w-5" />
             <span class="flex-1">{{ item.title }}</span>
@@ -44,7 +44,7 @@ const coreLogo = useCoreLogo()
     <!-- 当前后端 -->
     <RouterLink
       to="/setup"
-      class="m-3 flex items-center gap-2 rounded-lg border border-base-content/10 px-3 py-2 text-xs text-base-content/70 hover:bg-base-content/5"
+      class="m-3 flex items-center gap-2 rounded-xl border border-line bg-base-200 px-3 py-2 text-xs text-muted hover:border-line-strong"
       title="修改后端设置"
     >
       <Icon name="server" class="h-4 w-4 shrink-0" />

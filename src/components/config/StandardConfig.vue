@@ -126,7 +126,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           <EmptyState v-else-if="loadErrorInfo" icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
             <button class="btn btn-sm btn-primary" @click="load()">重试</button>
           </EmptyState>
-          <dl v-else class="divide-y divide-base-content/10 px-4 pb-2 text-sm">
+          <dl v-else class="divide-y divide-line px-4 pb-2 text-sm">
             <div v-for="row in rows" :key="row.label" class="flex justify-between gap-3 py-2.5">
               <dt class="shrink-0 text-base-content/70">{{ row.label }}</dt>
               <dd class="min-w-0 truncate text-right font-medium tabular-nums" :class="row.mono && 'font-mono text-sm'" :title="String(row.value)">
@@ -157,10 +157,10 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       <!-- 右列 -->
       <div class="min-w-0 space-y-4">
         <!-- 维护 -->
-        <section class="card divide-y divide-base-content/10">
+        <section class="card divide-y divide-line">
           <h2 class="px-4 pb-2 pt-4 font-semibold">维护</h2>
           <SettingRow title="重载配置" description="重新读取磁盘上的配置文件，生成新的路由代次">
-            <button class="btn btn-xs btn-outline border-base-content/20" :disabled="reloading" @click="reload">
+            <button class="btn btn-xs btn-outline border-line-strong" :disabled="reloading" @click="reload">
               <Icon name="file" class="h-3.5 w-3.5" :class="reloading && 'animate-pulse'" />
               {{ reloading ? '重载中…' : '执行' }}
             </button>

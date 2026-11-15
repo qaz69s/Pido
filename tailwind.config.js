@@ -14,6 +14,12 @@ export default {
   darkMode: ['variant', '&:where([data-theme$="-dark"], [data-theme$="-dark"] *)'],
   theme: {
     extend: {
+      // 线条两档：--line 描边 / 分隔线，--line-strong 输入框与悬停描边（各主题定义，见 utils/themes.js）
+      colors: {
+        line: 'var(--line)',
+        'line-strong': 'var(--line-strong)',
+        muted: 'var(--muted)',
+      },
       // 三档浮起：sm 贴面（分段选中块）、DEFAULT/md 浮动（菜单、Toast）、lg/xl 弹层（弹窗）；均为近实 + 远虚两层
       boxShadow: {
         sm: '0 1px 2px rgb(15 23 42 / 0.06), 0 1px 1px rgb(15 23 42 / 0.04)',

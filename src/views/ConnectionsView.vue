@@ -240,7 +240,7 @@ const STATUS_TEXT = {
     <div class="grid grid-cols-2 gap-2 sm:grid-cols-4">
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">活动连接</div>
-        <div class="text-lg font-semibold">{{ active.length }}</div>
+        <div class="text-lg font-bold">{{ active.length }}</div>
       </div>
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">实时速率 ↓ / ↑</div>
@@ -252,11 +252,11 @@ const STATUS_TEXT = {
       </div>
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">下载总量</div>
-        <div class="text-lg font-semibold">{{ formatBytes(totals.download) }}</div>
+        <div class="text-lg font-bold">{{ formatBytes(totals.download) }}</div>
       </div>
       <div class="card px-3 py-2.5">
         <div class="text-xs text-base-content/70">上传总量</div>
-        <div class="text-lg font-semibold">{{ formatBytes(totals.upload) }}</div>
+        <div class="text-lg font-bold">{{ formatBytes(totals.upload) }}</div>
       </div>
     </div>
 
@@ -301,7 +301,7 @@ const STATUS_TEXT = {
           </button>
           <template v-if="sortMenu">
             <div class="fixed inset-0 z-20" @click="sortMenu = false" />
-            <ul class="dropdown-content menu z-30 mt-1 w-44 rounded-box border border-base-content/10 bg-base-100 p-1 shadow-lg">
+            <ul class="dropdown-content menu z-30 mt-1 w-44 rounded-box border border-line bg-base-100 p-1 shadow-lg">
               <li v-for="s in SORTS" :key="s.key">
                 <button
                   class="flex items-center justify-between"
@@ -327,7 +327,7 @@ const STATUS_TEXT = {
           <Icon name="x" class="h-4 w-4" />
           <span class="hidden sm:inline">{{ keyword.trim() ? '断开筛选结果' : '全部断开' }}</span>
         </button>
-        <button v-else class="btn btn-sm btn-outline border-base-content/20" :disabled="!closed.length" @click="clearClosed">
+        <button v-else class="btn btn-sm btn-outline border-line-strong" :disabled="!closed.length" @click="clearClosed">
           <Icon name="trash" class="h-4 w-4" />
           <span class="hidden sm:inline">清空</span>
         </button>
@@ -383,7 +383,7 @@ const STATUS_TEXT = {
     <template v-else>
       <!-- 桌面端：表格 -->
       <div class="card hidden overflow-x-auto md:block">
-        <table class="table table-sm [&_tr]:border-base-content/10">
+        <table class="table table-sm [&_tr]:border-line">
           <thead>
             <tr class="text-left text-xs text-base-content/70">
               <th
@@ -484,7 +484,7 @@ const STATUS_TEXT = {
 
       <!-- 加载更多 -->
       <div v-if="filtered.length > visible.length" class="text-center">
-        <button class="btn btn-sm btn-outline border-base-content/20" @click="renderLimit += RENDER_STEP">
+        <button class="btn btn-sm btn-outline border-line-strong" @click="renderLimit += RENDER_STEP">
           显示更多（剩余 {{ filtered.length - visible.length }} 条）
         </button>
       </div>

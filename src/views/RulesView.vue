@@ -223,7 +223,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
       <input v-model="keyword" type="search" class="input input-bordered input-sm w-full pl-8" placeholder="搜索规则内容、类型或目标" />
     </div>
 
-    <div v-if="loading" class="card divide-y divide-base-content/10">
+    <div v-if="loading" class="card divide-y divide-line">
       <div v-for="i in 8" :key="i" class="skeleton h-12 rounded-none" />
     </div>
 
@@ -231,7 +231,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
     <div v-else-if="loadErrorInfo" class="card">
       <EmptyState icon="alert" :title="loadErrorInfo.title" :tips="loadErrorInfo.tips">
         <button class="btn btn-sm btn-primary" @click="load()">重试</button>
-        <RouterLink to="/setup" class="btn btn-sm btn-outline border-base-content/20">修改设置</RouterLink>
+        <RouterLink to="/setup" class="btn btn-sm btn-outline border-line-strong">修改设置</RouterLink>
       </EmptyState>
     </div>
 
@@ -243,7 +243,7 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
           :title="keyword || target ? '没有匹配的规则' : '没有规则'"
         />
       </div>
-      <div v-else class="card divide-y divide-base-content/10">
+      <div v-else class="card divide-y divide-line">
         <div
           v-for="r in visible"
           :key="r.index"
@@ -299,11 +299,11 @@ const loadErrorInfo = computed(() => (loadError.value ? describeError(loadError.
             <div class="text-right text-xs text-base-content/70">更新于<br />{{ formatRelativeTime(p.updatedAt) }}</div>
           </div>
           <div class="mt-auto flex gap-2">
-            <button class="btn btn-sm btn-outline border-base-content/20 flex-1" @click="showRulesOf(p.name)">
+            <button class="btn btn-sm btn-outline border-line-strong flex-1" @click="showRulesOf(p.name)">
               <Icon name="list" class="h-4 w-4" />
               查看引用
             </button>
-            <button class="btn btn-sm btn-outline border-base-content/20 flex-1" :disabled="!!busy[p.name]" @click="onUpdateProvider(p.name).catch(() => {})">
+            <button class="btn btn-sm btn-outline border-line-strong flex-1" :disabled="!!busy[p.name]" @click="onUpdateProvider(p.name).catch(() => {})">
               <Icon name="reload" class="h-4 w-4" :class="busy[p.name] && 'animate-spin'" />
               更新
             </button>

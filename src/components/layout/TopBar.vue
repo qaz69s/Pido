@@ -59,7 +59,7 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
 <template>
   <header
     class="sticky top-0 z-30 flex h-14 items-center gap-3 border-b px-4 transition-[background-color,border-color] duration-200"
-    :class="scrolled ? 'border-base-content/10 bg-base-300/80 backdrop-blur' : 'border-transparent bg-base-300'"
+    :class="scrolled ? 'border-line bg-base-300/80 backdrop-blur' : 'border-transparent bg-base-300'"
   >
     <!-- 手机端显示 Logo：已连接时为内核图标，否则为 Pido 闪电图标 -->
     <img
@@ -72,12 +72,12 @@ onUnmounted(() => window.removeEventListener('scroll', onScroll))
     <span v-else class="grid h-7 w-7 shrink-0 place-items-center rounded-lg bg-primary text-primary-content md:hidden">
       <Icon name="zap" class="h-4 w-4" />
     </span>
-    <h1 class="shrink-0 whitespace-nowrap text-lg font-semibold tracking-tight">{{ route.meta.title }}</h1>
+    <h1 class="shrink-0 whitespace-nowrap text-lg font-extrabold tracking-tight">{{ route.meta.title }}</h1>
 
     <div class="ml-auto flex items-center gap-1">
       <RouterLink
         to="/setup"
-        class="press mr-1 flex items-center gap-1.5 rounded-full border border-base-content/10 bg-base-100 px-2.5 py-1 text-xs text-base-content/80 transition"
+        class="press mr-1 flex items-center gap-1.5 rounded-full border border-line bg-base-100 px-2.5 py-1 text-xs text-base-content/80 transition"
         :class="backend.status === 'error' && 'anim-shake'"
         :title="statusInfo.engine ? `${statusInfo.engine} ${statusInfo.text} · 后端设置` : '后端设置'"
       >
