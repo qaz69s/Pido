@@ -70,6 +70,15 @@
   .tabs-boxed .tab {
     @apply flex-nowrap whitespace-nowrap font-semibold text-muted;
   }
+  /* daisyUI 的 tabs-sm 写死 24px 高、行高 12px，手机系统字体放大后文字会冲出选中块；改成随字号自适应 */
+  .tabs-sm .tab {
+    height: auto;
+    min-height: 1.625rem;
+    padding-top: 0.1875rem;
+    padding-bottom: 0.1875rem;
+    font-size: 0.8125rem;
+    line-height: 1.25rem;
+  }
   .tabs-boxed .tab-active:not(.tab-disabled):not([disabled]),
   .tabs-boxed :is(input:checked) {
     @apply bg-primary text-primary-content;
